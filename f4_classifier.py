@@ -1,7 +1,5 @@
 # Libraries
-from matplotlib import transforms
 import pandas as pd
-import plotly.express as px
 from datetime import datetime
 import numpy as np
 import constants as const
@@ -34,10 +32,10 @@ class CLASSIFIER_F4():
         self.f4['Posible Causa'] = np.nan
     
     def set_local_agg(self):
-        self.f4.loc[self.f4.local.isin(const.tienda), 'local_agg'] = 'TIENDA'
-        self.f4.loc[self.f4.local.isin(const.cd), 'local_agg'] = 'CD'
-        self.f4.loc[self.f4.local == "3001", 'local_agg'] = 'DVD ADMINISTRATIVO'
-        self.f4.loc[self.f4.local == "11", 'local_agg'] = 'VENTA EMPRESA'
+        self.f4.loc[self.f4[var_f4["local"]].isin(const.tienda), 'local_agg'] = 'TIENDA'
+        self.f4.loc[self.f4[var_f4["local"]].isin(const.cd), 'local_agg'] = 'CD'
+        self.f4.loc[self.f4[var_f4["local"]] == "3001", 'local_agg'] = 'DVD ADMINISTRATIVO'
+        self.f4.loc[self.f4[var_f4["local"]] == "11", 'local_agg'] = 'VENTA EMPRESA'
 
     # Filters
     def filters(self):
@@ -47,7 +45,7 @@ class CLASSIFIER_F4():
     # Methods 
     def set_posible_causa(self):
         # Filtros para tienda 
-        self.f4_db_res.loc[ ((self.f4_db_res['Posible Causa'].isna())) & (self.f4_db_res[var_f4['local']]=='3000'),'Posible Causa']='Conciliación NC 2021 - Local 3000'
+        self.f4_db_res.loc[((self.f4_db_res['Posible Causa'].isna())) & (self.f4_db_res[var_f4['local']]=='3000'),'Posible Causa']='Conciliación NC 2021 - Local 3000'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & self.f4_db_res[var_f4["destino"]].str.contains(r'pantalla\w? rota\w?|pantalla quebrada| pantalla\w? |pantalla rota'), 'Posible Causa'] = 'Pantallas rotas'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & (self.f4_db_res[var_f4["destino"]].str.contains(r'calidad|cambio|politica|devolucion cliente|danocalida') | self.f4_db_res[var_f4['desccentro_e_costo']].str.contains(r'servicio al cliente|servicio cliente|calidad')), 'Posible Causa'] = 'Calidad'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & (self.f4_db_res[var_f4['desccentro_e_costo']].str.contains(r'tester') | self.f4_db_res[var_f4["destino"]].str.contains(r'tester|tes ter|muestra')), 'Posible Causa'] = 'Testers' 
@@ -70,7 +68,7 @@ class CLASSIFIER_F4():
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'cobro\b.*\d{10}|\d{10}.*cobro\b|recupero'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobro\b.*\d{10}|\d{10}.*recobro\b'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobrado\b.*\d{10}|\d{10}.*recobrado\b'), 'Posible Causa'] = 'Recobro a transportadora'
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & (self.f4_db_res[var_f4["destino"]] == 'oc inferiores usd250 recibo'), 'Posible Causa'] = 'Merma importaciones - CD'
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & (self.f4_db_res[var_f4["destino"]] == 'oc inferiores usd250 recibo'), 'Posible Causa'] = "Avería"
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & self.f4_db_res[var_f4["destino"]].str.contains(r'prestamo\w?'), 'Posible Causa'] = 'Prestamo no devuelto'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='CD') & (self.f4_db_res[var_f4["destino"]].str.contains("baja por danoaveria en dvl")), 'Posible Causa'] = 'DVL'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'cambio agil'), 'Posible Causa'] = 'Cambio ágil'
@@ -78,10 +76,10 @@ class CLASSIFIER_F4():
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'calidad'), 'Posible Causa'] = 'Avería'
 
         # revisar 
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'importacion'), 'Posible Causa'] = 'Merma importaciones - CD'
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destrucc oc inferior usd 250'), 'Posible Causa'] = 'Merma importaciones - CD'
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc5677206 impo con nc'), 'Posible Causa'] = 'Merma importaciones - CD'
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc460039 impo con nc'), 'Posible Causa'] = 'Merma importaciones - CD'
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'importacion'), 'Posible Causa'] = "Avería"
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destrucc oc inferior usd 250'), 'Posible Causa'] = "Avería"
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc5677206 impo con nc'), 'Posible Causa'] = "Avería"
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc460039 impo con nc'), 'Posible Causa'] = "Avería"
 
 
     def set_marca(self):
@@ -92,7 +90,7 @@ class CLASSIFIER_F4():
         self.reg_sin_clasificar = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].shape[0]
         self.reg_clasificados = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].notna()].shape[0]
         self.reg_sin_marca = self.f4_clas_marc.loc[self.f4_clas_marc["Marca"].isna(), "upc"].nunique()
-        self.montos_estado = self.f4.groupby("estado")["total_precio_costo"].sum()/1e6
+        self.montos_estado = self.f4.groupby([var_f4["estado"]])[[var_f4["costo"]]].sum()/1e6
         self.montos_estado = self.montos_estado.reset_index()
 
     def print_data(self):
@@ -100,9 +98,11 @@ class CLASSIFIER_F4():
         print(f"Cantidad de registros sin clasificar posible causa: {self.reg_sin_clasificar}")
         print(f"Cantidad de registros sin clasificar marca: {self.reg_sin_marca}\n")
         print(f"{self.montos_estado}\n")
+    
+       
 
     def save_files(self):
-        self.f4_clas_marc.to_excel(f"output/{self.dt_string}_f4_clasificado.xlsx", index=False)
+        self.f4_clas_marc.to_csv(f"output/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
         self.f4_db_reg.to_excel(f"output/{self.dt_string}_f4_registrados.xlsx", index=False)
         print("Se guardo archivo de F4s en estado registrado")
@@ -115,4 +115,4 @@ class CLASSIFIER_F4():
             print("Se guardo archivo con los UPCs, a los cuales no se asociaron marcas")
 
     # TODO un método para las reglas de tiendas y otro para CD 
-f4 =CLASSIFIER_F4()
+f4 = CLASSIFIER_F4()

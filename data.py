@@ -14,6 +14,7 @@ var_f11 = {
 }
 var_f4={
     'path_df':'input/220322_f4.csv',
+    'path_df_clas':'output/220325_f4_clasificado.csv',
     'marcas_df':'input/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
@@ -21,5 +22,8 @@ var_f4={
     'estado' : 'estado',
     'destino' : 'destino',
     'desccentro_e_costo' : 'desccentro_e_costo',
-    'local' : 'local'
+    'local' : 'local',
+    'costo' : 'total_precio_costo',
+    'desc_linea': 'descripcion_linea'
+
 }
