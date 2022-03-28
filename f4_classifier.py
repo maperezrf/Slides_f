@@ -14,7 +14,6 @@ class CLASSIFIER_F4():
     def __init__(self):
         self.f4 = pd.read_csv(var_f4["path_df"], sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
-        generate_structure()
         self.transform()
         self.set_local_agg()
         self.filters()
@@ -121,10 +120,3 @@ class CLASSIFIER_F4():
     # TODO un método para las reglas de tiendas y otro para CD 
 
 f4 = CLASSIFIER_F4()
-   
-def generate_structure():
-    if (f"{dt_string}_corte" in listdir("output")):
-        pass
-    else:
-        mkdir(f"output/{dt_string}_corte")
-    return  f"output/{dt_string}_corte"

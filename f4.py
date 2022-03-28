@@ -6,7 +6,7 @@ import numpy as np
 import constants as const
 from calendar import monthrange
 from data import var_f4
-from f4_classifier import generate_structure
+
 pd.set_option('display.max_columns', 500)
 dt_string = datetime.now().strftime('%y%m%d')
 
@@ -15,7 +15,6 @@ class F4():
     def __init__(self) -> None:
         self.f4_2022 = pd.read_csv(var_f4["path_df_clas"],sep=";" , dtype = object)
         self.f4_2021 = pd.read_csv("input/f4_2021.csv",sep=";", dtype = object)
-        self.path = generate_structure()
         self.f4_21_22()
         self.transform()
         self.filters()
@@ -162,7 +161,6 @@ class F4():
         self.fig_f4_linea_motivo = px.bar(linea_motivo, x=var_f4['costo'], y=var_f4["desc_linea"],text=var_f4['costo'] ,color="Posible Causa" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","Posible Causa":"Causa","local_agg":"Local"})
         self.fig_f4_linea_motivo.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por local")
       
-        
     def save_grap(self):
         self.fig_torta_local.write_image(f"{self.path}/{dt_string}_f4_torta.svg", engine='orca') 
         self.ten_creac_x_año.show()#.write_image(f"images/{dt_string}_tendencia_creacion_f4_x_años.svg", width = 800, height=450, engine='orca')

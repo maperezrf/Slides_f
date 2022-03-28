@@ -5,9 +5,12 @@ from   datetime import date, timedelta, datetime
 import plotly.graph_objects as go
 import numpy as np
 from data import var_f11 as dtagco
+from general import GENERAL
 
 class F11():
 
+    general = GENERAL()
+    
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
     mes=['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21'] # Editar esta lista cada vez 
@@ -60,8 +63,8 @@ class F11():
         # Gráfica para costo
         gb_f11_gm = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['costo']].sum().reset_index()
         gb_f11_gm.to_excel(f'input/{self.dt_string}_f11_corte.xlsx') # TODO Guardar automatico
-        gb_f11_gm = set_columns_sum(gb_f11_gm, dtagco['mes'])
-        gb_f11_gm = set_columns_sum(gb_f11_gm, dtagco['grupo'])
+        gb_f11_gm = self.general.set_columns_sum(gb_f11_gm, dtagco['mes'],dtagco['costo'])
+        gb_f11_gm = self.general.set_columns_sum(gb_f11_gm, dtagco['grupo'],dtagco['costo'])
         orden_grupo = gb_f11_gm.groupby([dtagco['grupo']], sort=False)[dtagco['costo']].sum().sort_values(ascending=False).reset_index()[dtagco['grupo']].to_list()
         orden_mes = gb_f11_gm[dtagco['mes']].unique().tolist()
         total_abierto = gb_f11_gm[dtagco['costo']].sum()
@@ -71,8 +74,8 @@ class F11():
         # Gráfica por cantidad 
         gb_f11_gm_cant = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['f11_id']].nunique().reset_index()
         gb_f11_gm_cant.to_excel(f'input/{self.dt_string}_f11_corte_cant.xlsx') # TODO Guardar automatico
-        gb_f11_gm_cant = set_columns_nunique(gb_f11_gm_cant, dtagco['mes'])
-        gb_f11_gm_cant = set_columns_nunique(gb_f11_gm_cant, dtagco['grupo'])
+        gb_f11_gm_cant = self.general.set_columns_nunique(gb_f11_gm_cant, dtagco['mes'],dtagco['f11_id'])
+        gb_f11_gm_cant = self.general.set_columns_nunique(gb_f11_gm_cant, dtagco['grupo'],dtagco['f11_id'])
         orden_grupo_cant = gb_f11_gm_cant.groupby([dtagco['grupo']], sort=False)[dtagco['f11_id']].sum().sort_values(ascending=False).reset_index()[dtagco['grupo']].to_list()
         orden_mes_cant = gb_f11_gm_cant[dtagco['mes']].unique().tolist()
         total_abierto_cant = gb_f11_gm_cant[dtagco['f11_id']].sum()
@@ -121,21 +124,6 @@ def fltr_abiertos(df):
 def fltr_fecha_desde(df):
     return df.loc[df[dtagco['fech_creacion']] >= dtagco['fecha_inicial']].reset_index(drop=True)
 
-def set_columns_sum(base, var):    
-    lista = base.loc[base[var].notna()][var].unique()
-    gb_var = base.groupby(var)[dtagco['costo']].sum().reset_index()
-    gb_var.set_index(var, inplace=True)
-    for item in lista:
-        base.loc[base[var]==item, var] = f'{item} ${round(gb_var.loc[item, dtagco["costo"]]/1e6):,.0f}M'
-    return base 
-
-def set_columns_nunique(base, var):    
-    lista = base.loc[base[var].notna()][var].unique()
-    gb_var = base.groupby(var)[dtagco['f11_id']].sum().reset_index()
-    gb_var.set_index(var, inplace=True)
-    for item in lista:
-        base.loc[base[var]==item, var] = f'{item} {round(gb_var.loc[item, dtagco["f11_id"]]):,.0f}'
-    return base 
 """ 
     # Tendencias 
 
