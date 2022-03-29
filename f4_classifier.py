@@ -5,15 +5,18 @@ import numpy as np
 import constants as const
 from data import var_f4 
 from os import mkdir,listdir
+from general import GENERAL
 dt_string = datetime.now().strftime('%y%m%d')
 
 class CLASSIFIER_F4():
 
+    general = GENERAL()
     dt_string = datetime.now().strftime('%y%m%d')
 
     def __init__(self):
         self.f4 = pd.read_csv(var_f4["path_df"], sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
+        path = self.general.generate_structure()
         self.transform()
         self.set_local_agg()
         self.filters()
