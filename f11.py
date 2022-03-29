@@ -16,12 +16,14 @@ class F11():
     mes=['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21'] # Editar esta lista cada vez 
     rango_fechas = ['2022-02-20','2022-04-05']
 
+    f11_tcosto  = None
+    f11_tm90_costo  = None
+    f11_tcant = None
+    f11_tm90_cant = None 
+
     def __init__(self) -> None:
-        self.f11 = pd.read_excel(dtagco['path_df'], dtype=str)
-        self.f11_tcosto = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_costo')
-        self.f11_tm90_costo = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_m90_costo')
-        self.f11_tcant = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_cant')
-        self.f11_tm90_cant = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_m90_cant')
+        #self.f11 = pd.read_excel(dtagco['path_df'], dtype=str)
+        self.f11 = pd.read_csv(dtagco['path_df'], dtype='object', sep=';')
         self.transform()
         self.f11 = self.f11.sort_values(dtagco['fech_creacion'])
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
@@ -53,14 +55,46 @@ class F11():
     def fltr_riesgo(self, df):
         return df.loc[df[dtagco['mes']].isin(self.mes)].reset_index(drop=True) # TODO mejorar estructura
 
-    def get_f11_cutoff(self):
-        # Costo 
-        gb_f11_gm_m90 = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['costo']].sum().reset_index()
-        #gb_f11_gm_m90.to_excel(f'input/{self.dt_string}_f11_corte_90.xlsx', index=False) # TODO Guardar automatico
+    def load_trend_files(self):
+        self.f11_tcosto = pd.read_excel(dtagco['trend_path'], sheet_name='f11_abiertos_costo')
+        self.f11_tm90_costo = pd.read_excel(dtagco['trend_path'], sheet_name='f11_abiertos_m90_costo')
+        self.f11_tcant = pd.read_excel(dtagco['trend_path'], sheet_name='f11_abiertos_cant')
+        self.f11_tm90_cant = pd.read_excel(dtagco['trend_path'], sheet_name='f11_abiertos_m90_cant')
 
-        # Cantidad
+    def get_f11_cutoff(self):
+        gb_f11_gm = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['costo']].sum().reset_index()
+        gb_f11_gm_m90 = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['costo']].sum().reset_index()
+        gb_f11_gm_cant = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['f11_id']].nunique().reset_index()
         gb_f11_gm_m90_cant = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['f11_id']].nunique().reset_index()
-        #gb_f11_gm_m90_cant.to_excel(f'input/{self.dt_string}_f11_corte_90_cant.xlsx', index=False) # TODO Guardar automatico
+
+        gb_f11_gm = set_fecha_corte(gb_f11_gm)
+        gb_f11_gm_m90 = set_fecha_corte(gb_f11_gm_m90)
+        gb_f11_gm_cant = set_fecha_corte(gb_f11_gm_cant)
+        gb_f11_gm_m90_cant = set_fecha_corte(gb_f11_gm_m90_cant)
+
+        self.f11_tcosto = pd.concat([self.f11_tcosto, gb_f11_gm], axis=0)
+        self.f11_tm90_costo = pd.concat([self.f11_tm90_costo, gb_f11_gm_m90], axis=0)
+        self.f11_tcant = pd.concat([self.f11_tcant, gb_f11_gm_cant], axis=0)
+        self.f11_tm90_cant = pd.concat([self.f11_tm90_cant, gb_f11_gm_m90_cant], axis=0)
+
+        # Transform 
+        self.f11_tcosto = transform_df_trend(self.f11_tcosto, dtagco['costo'])
+        self.f11_tm90_costo = transform_df_trend(self.f11_tm90_costo, dtagco['costo'])
+        self.f11_tcant = transform_df_trend(self.f11_tcant, dtagco['f11_id'])
+        self.f11_tm90_cant = transform_df_trend(self.f11_tm90_cant, dtagco['f11_id'])
+
+        writer = pd.ExcelWriter(dtagco['trend_path'], engine='xlsxwriter')
+        self.f11_tcosto.to_excel(writer, sheet_name='f11_abiertos_costo', index=False)
+        self.f11_tm90_costo.to_excel(writer, sheet_name='f11_abiertos_m90_costo', index=False)
+        self.f11_tcant.to_excel(writer, sheet_name='f11_abiertos_cant', index=False)
+        self.f11_tm90_cant.to_excel(writer, sheet_name='f11_abiertos_m90_cant', index=False)
+        writer.save()
+
+    def tendencias(self):
+        self.load_trend_files()
+        self.get_f11_cutoff()
+        self.get_tendencias_costo()
+        self.get_tendencias_cantidad()
 
     def print_numbers(self):
         print(f'Estados de F11 encontrados: {self.f11_rf[dtagco["estado"]].unique()}')
@@ -69,8 +103,7 @@ class F11():
 
     def f11_resfil(self):
         # Gráfica para costo
-        gb_f11_gm = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['costo']].sum().reset_index()
-        #gb_f11_gm.to_excel(f'input/{self.dt_string}_f11_corte.xlsx') # TODO Guardar automatico
+        gb_f11_gm = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['costo']].sum().reset_index() # TODO repetido 
         gb_f11_gm = set_columns_sum(gb_f11_gm, dtagco['mes'],dtagco['costo'])
         gb_f11_gm = set_columns_sum(gb_f11_gm, dtagco['grupo'],dtagco['costo'])
         orden_grupo = gb_f11_gm.groupby([dtagco['grupo']], sort=False)[dtagco['costo']].sum().sort_values(ascending=False).reset_index()[dtagco['grupo']].to_list()
@@ -80,8 +113,7 @@ class F11():
         self.fig_f11_costo(gb_f11_gm, gb_f11_3m_grupo, orden_grupo, orden_mes, total_abierto)
 
         # Gráfica por cantidad 
-        gb_f11_gm_cant = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['f11_id']].nunique().reset_index()
-        #gb_f11_gm_cant.to_excel(f'input/{self.dt_string}_f11_corte_cant.xlsx') # TODO Guardar automatico
+        gb_f11_gm_cant = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['f11_id']].nunique().reset_index() # TODO repetido
         gb_f11_gm_cant = set_columns_nunique(gb_f11_gm_cant, dtagco['mes'],dtagco['f11_id'])
         gb_f11_gm_cant = set_columns_nunique(gb_f11_gm_cant, dtagco['grupo'],dtagco['f11_id'])
         orden_grupo_cant = gb_f11_gm_cant.groupby([dtagco['grupo']], sort=False)[dtagco['f11_id']].sum().sort_values(ascending=False).reset_index()[dtagco['grupo']].to_list()
@@ -124,9 +156,7 @@ class F11():
 
     # ---------------- Trend methods 
     def get_tendencias_costo(self):
-        # Costo 
-        self.f11_tcosto = transform_df_trend(self.f11_tcosto, dtagco['costo'])
-        
+        # Total flujo 
         tcd = self.f11_tcosto.loc[self.f11_tcosto[dtagco['grupo']]=='CD']
         ttienda = self.f11_tcosto.loc[(self.f11_tcosto[dtagco['grupo']]=='TIENDAS')|(self.f11_tcosto[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
 
@@ -136,9 +166,7 @@ class F11():
         self.fig_f11_trend_costo(gb_tcd, 'CD', ['rgb(204, 97, 176)'])
         self.fig_f11_trend_costo(gb_ttienda, 'Tiendas & DVD', ['rgb(36, 121, 108)'])
 
-        # Costo 90 días 
-        self.f11_tm90_costo = transform_df_trend(self.f11_tm90_costo, dtagco['costo'])
-
+        # Mayores a 90 días 
         tm90_cd = self.f11_tm90_costo.loc[self.f11_tm90_costo[dtagco['grupo']]=='CD']
         tm90_tienda = self.f11_tm90_costo.loc[(self.f11_tm90_costo[dtagco['grupo']]=='TIENDAS')|(self.f11_tm90_costo[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
 
@@ -207,15 +235,10 @@ def transform_df_trend(df, value):
     df[dtagco['fecha_corte']] = pd.to_datetime(df[dtagco['fecha_corte']], format='%Y-%m-%d')
     return df 
 
+def set_fecha_corte(df, fecha_corte=date.today()):
+    df['FECHA_CORTE']= fecha_corte
+    return df
+
 f11 = F11()
-f11.get_f11_cutoff()
 f11.f11_resfil()
-# New trend lines 
-f11.get_tendencias_costo()
-f11.get_tendencias_cantidad()
-
-
-atoc[dtagco['fech_creacion']] = pd.to_datetime(atoc[dtagco['fech_creacion']], format='%Y-%m-%d')
-atoc[dtagco['mes']] = atoc[dtagco['fech_creacion']].dt.strftime('%b-%y')
-# Numbers 
-atoc[dtagco['costo']] = pd.to_numeric(atoc[dtagco['costo']])
+f11.tendencias()
