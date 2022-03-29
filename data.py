@@ -14,8 +14,8 @@ var_f11 = {
     'fecha_corte':'FECHA_CORTE'}
 
 var_f4={
-    'path_df':'input/220322_f4.csv',
-    'path_df_clas':'output/220325_f4_clasificado.csv',
+    'path_df':'input/220329-0845-f4-output.csv',
+    'path_df_clas':'output/220329_f4_clasificado.csv',
     'marcas_df':'input/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',

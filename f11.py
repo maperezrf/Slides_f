@@ -28,10 +28,6 @@ class F11():
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados
         self.print_numbers()
 
-        # New trend lines 
-        self.get_tendencias_costo()
-        self.get_tendencias_cantidad()
-
     def get_f11(self):
         return self.f11_rf
 
@@ -214,3 +210,12 @@ def transform_df_trend(df, value):
 f11 = F11()
 f11.get_f11_cutoff()
 f11.f11_resfil()
+# New trend lines 
+f11.get_tendencias_costo()
+f11.get_tendencias_cantidad()
+
+
+atoc[dtagco['fech_creacion']] = pd.to_datetime(atoc[dtagco['fech_creacion']], format='%Y-%m-%d')
+atoc[dtagco['mes']] = atoc[dtagco['fech_creacion']].dt.strftime('%b-%y')
+# Numbers 
+atoc[dtagco['costo']] = pd.to_numeric(atoc[dtagco['costo']])
