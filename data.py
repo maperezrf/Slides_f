@@ -1,5 +1,5 @@
 var_f11 = {
-    'path_df':'input/220322_f11.xlsx',
+    'path_df': 'C:/Users/palejparra/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220328_f11.xlsx', #'input/220328_f11.xlsx',
     'trend_path': 'input/tendencias.xlsx', 
     'f11_id':'NRO_F11',
     'propietario':'PROPIETARIO',
@@ -11,7 +11,8 @@ var_f11 = {
     'mes':'MES', 
     'costo':'TOTAL_COSTO',
     'grupo':'GRUPO',
-}
+    'fecha_corte':'FECHA_CORTE'}
+
 var_f4={
     'path_df':'input/220322_f4.csv',
     'path_df_clas':'output/220325_f4_clasificado.csv',

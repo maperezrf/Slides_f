@@ -1,30 +1,42 @@
 # Libraries
+import re
+from shutil import register_unpack_format
 import pandas as pd
 import plotly.express as px
 from   datetime import date, timedelta, datetime
 import plotly.graph_objects as go
 import numpy as np
 from data import var_f11 as dtagco
-from general import GENERAL
+from general import set_columns_nunique, set_columns_sum
 
 class F11():
-
-    general = GENERAL()
     
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
     mes=['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21'] # Editar esta lista cada vez 
+    rango_fechas = ['2022-02-20','2022-04-05']
 
     def __init__(self) -> None:
-        self.f11 = pd.read_excel(dtagco['path_df'], dtype=str, sheet_name='DB')
-        self.f11_ant = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11')
-        self.f11_ant_3m = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11-3meses')
+        self.f11 = pd.read_excel(dtagco['path_df'], dtype=str)
+        self.f11_tcosto = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_costo')
+        self.f11_tm90_costo = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_m90_costo')
+        self.f11_tcant = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_cant')
+        self.f11_tm90_cant = pd.read_excel(dtagco['trend_path'], dtype=str, sheet_name='f11_abiertos_m90_cant')
         self.transform()
         self.f11 = self.f11.sort_values(dtagco['fech_creacion'])
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados
-
         self.print_numbers()
+
+        # New trend lines 
+        self.get_tendencias_costo()
+        self.get_tendencias_cantidad()
+
+    def get_f11(self):
+        return self.f11_rf
+
+    def get_f11_m90(self):
+        return self.f11_m90
 
     ## ------ Trasform 
     def transform(self):
@@ -48,11 +60,11 @@ class F11():
     def get_f11_cutoff(self):
         # Costo 
         gb_f11_gm_m90 = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['costo']].sum().reset_index()
-        gb_f11_gm_m90.to_excel(f'input/{self.dt_string}_f11_corte_90.xlsx') # TODO Guardar automatico
+        #gb_f11_gm_m90.to_excel(f'input/{self.dt_string}_f11_corte_90.xlsx', index=False) # TODO Guardar automatico
 
         # Cantidad
         gb_f11_gm_m90_cant = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['f11_id']].nunique().reset_index()
-        gb_f11_gm_m90_cant.to_excel(f'input/{self.dt_string}_f11_corte_90_cant.xlsx') # TODO Guardar automatico
+        #gb_f11_gm_m90_cant.to_excel(f'input/{self.dt_string}_f11_corte_90_cant.xlsx', index=False) # TODO Guardar automatico
 
     def print_numbers(self):
         print(f'Estados de F11 encontrados: {self.f11_rf[dtagco["estado"]].unique()}')
@@ -62,9 +74,9 @@ class F11():
     def f11_resfil(self):
         # Gráfica para costo
         gb_f11_gm = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['costo']].sum().reset_index()
-        gb_f11_gm.to_excel(f'input/{self.dt_string}_f11_corte.xlsx') # TODO Guardar automatico
-        gb_f11_gm = self.general.set_columns_sum(gb_f11_gm, dtagco['mes'],dtagco['costo'])
-        gb_f11_gm = self.general.set_columns_sum(gb_f11_gm, dtagco['grupo'],dtagco['costo'])
+        #gb_f11_gm.to_excel(f'input/{self.dt_string}_f11_corte.xlsx') # TODO Guardar automatico
+        gb_f11_gm = set_columns_sum(gb_f11_gm, dtagco['mes'],dtagco['costo'])
+        gb_f11_gm = set_columns_sum(gb_f11_gm, dtagco['grupo'],dtagco['costo'])
         orden_grupo = gb_f11_gm.groupby([dtagco['grupo']], sort=False)[dtagco['costo']].sum().sort_values(ascending=False).reset_index()[dtagco['grupo']].to_list()
         orden_mes = gb_f11_gm[dtagco['mes']].unique().tolist()
         total_abierto = gb_f11_gm[dtagco['costo']].sum()
@@ -73,9 +85,9 @@ class F11():
 
         # Gráfica por cantidad 
         gb_f11_gm_cant = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['f11_id']].nunique().reset_index()
-        gb_f11_gm_cant.to_excel(f'input/{self.dt_string}_f11_corte_cant.xlsx') # TODO Guardar automatico
-        gb_f11_gm_cant = self.general.set_columns_nunique(gb_f11_gm_cant, dtagco['mes'],dtagco['f11_id'])
-        gb_f11_gm_cant = self.general.set_columns_nunique(gb_f11_gm_cant, dtagco['grupo'],dtagco['f11_id'])
+        #gb_f11_gm_cant.to_excel(f'input/{self.dt_string}_f11_corte_cant.xlsx') # TODO Guardar automatico
+        gb_f11_gm_cant = set_columns_nunique(gb_f11_gm_cant, dtagco['mes'],dtagco['f11_id'])
+        gb_f11_gm_cant = set_columns_nunique(gb_f11_gm_cant, dtagco['grupo'],dtagco['f11_id'])
         orden_grupo_cant = gb_f11_gm_cant.groupby([dtagco['grupo']], sort=False)[dtagco['f11_id']].sum().sort_values(ascending=False).reset_index()[dtagco['grupo']].to_list()
         orden_mes_cant = gb_f11_gm_cant[dtagco['mes']].unique().tolist()
         total_abierto_cant = gb_f11_gm_cant[dtagco['f11_id']].sum()
@@ -86,13 +98,13 @@ class F11():
         f11_empresa_sede = px.bar(df, x=dtagco['mes'], y=dtagco['costo'], color=dtagco['grupo'], text=dtagco['costo'], text_auto='.2s', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
         f11_empresa_sede.update_layout(barmode='stack',title_text=f"F11s empresa abiertos por sede - Total abierto {ta/1e6:,.0f}M") #,uniformtext=dict(mode="hide", minsize=10),legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         f11_empresa_sede.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
-        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.77, y1=0.75,line=dict(color="red", width=2,))
+        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.75, y1=0.75,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0] 
-        f11_empresa_sede.add_annotation(x=mes_ref, y=0.8*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
-        f11_empresa_sede.add_annotation(x=mes_ref, y=0.75*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
-        f11_empresa_sede.add_annotation(x=mes_ref, y=0.7*1e9, text= f"TIENDAS = {gb_annotations.loc['TIENDAS'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
-        f11_empresa_sede.add_annotation(x=mes_ref, y=0.65*1e9, text= f"BODEGA PRODUCTO EN PROCESO = {gb_annotations.loc['BODEGA PRODUCTO EN PROCESO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
-        f11_empresa_sede.add_annotation(x=mes_ref, y=0.6*1e9, text= f"DVD ADMINISTRATIVO = {gb_annotations.loc['DVD ADMINISTRATIVO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
+        f11_empresa_sede.add_annotation(x=mes_ref, y=1.2*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
+        f11_empresa_sede.add_annotation(x=mes_ref, y=1.1*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
+        f11_empresa_sede.add_annotation(x=mes_ref, y=1*1e9, text= f"TIENDAS = {gb_annotations.loc['TIENDAS'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
+        f11_empresa_sede.add_annotation(x=mes_ref, y=0.9*1e9, text= f"BODEGA PRODUCTO EN PROCESO = {gb_annotations.loc['BODEGA PRODUCTO EN PROCESO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
+        f11_empresa_sede.add_annotation(x=mes_ref, y=0.8*1e9, text= f"DVD ADMINISTRATIVO = {gb_annotations.loc['DVD ADMINISTRATIVO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
 
         f11_empresa_sede.layout.yaxis.title.text='Total costo promedio'
         f11_empresa_sede.layout.xaxis.title.text='Mes de creación'
@@ -102,7 +114,7 @@ class F11():
         f11_es_cantidad = px.bar(df, x=dtagco['mes'], y=dtagco['f11_id'], color=dtagco['grupo'], text=dtagco['f11_id'], text_auto='.0f', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
         f11_es_cantidad.update_layout(barmode='stack',title_text=f"F11s empresa abiertos por sede - Total abierto {ta:,.0f} folios de F11" ) #,uniformtext=dict(mode="hide", minsize=10),legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         f11_es_cantidad.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
-        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.77, y1=1,line=dict(color="red", width=2,))
+        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.75, y1=1,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0]
         f11_es_cantidad.add_annotation(x=mes_ref, y=1100, text= f"Total > 90 días = {gb_annotations.sum()[0]:,.0f} folios", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO igual que en la lina 88
         f11_es_cantidad.add_annotation(x=mes_ref, y=1000,text= f"CD = {gb_annotations.loc['CD'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
@@ -112,7 +124,77 @@ class F11():
 
         f11_es_cantidad.layout.yaxis.title.text='Cantidad de folios de F11'
         f11_es_cantidad.layout.xaxis.title.text='Mes de creación'
-        f11_es_cantidad.write_image(F"images/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.svg",scale=1, height=700,width=850, engine='orca')
+        f11_es_cantidad.write_image(F"images/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.svg",scale=1, height=800,width=800, engine='orca')
+
+    # ---------------- Trend methods 
+    def get_tendencias_costo(self):
+        # Costo 
+        self.f11_tcosto = transform_df_trend(self.f11_tcosto, dtagco['costo'])
+        
+        tcd = self.f11_tcosto.loc[self.f11_tcosto[dtagco['grupo']]=='CD']
+        ttienda = self.f11_tcosto.loc[(self.f11_tcosto[dtagco['grupo']]=='TIENDAS')|(self.f11_tcosto[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
+
+        gb_tcd = tcd.groupby([dtagco['fecha_corte']])[dtagco['costo']].sum().reset_index()
+        gb_ttienda = ttienda.groupby([dtagco['fecha_corte']])[dtagco['costo']].sum().reset_index()
+
+        self.fig_f11_trend_costo(gb_tcd, 'CD', ['rgb(204, 97, 176)'])
+        self.fig_f11_trend_costo(gb_ttienda, 'Tiendas & DVD', ['rgb(36, 121, 108)'])
+
+        # Costo 90 días 
+        self.f11_tm90_costo = transform_df_trend(self.f11_tm90_costo, dtagco['costo'])
+
+        tm90_cd = self.f11_tm90_costo.loc[self.f11_tm90_costo[dtagco['grupo']]=='CD']
+        tm90_tienda = self.f11_tm90_costo.loc[(self.f11_tm90_costo[dtagco['grupo']]=='TIENDAS')|(self.f11_tm90_costo[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
+
+        gb_tm90_cd = tm90_cd.groupby([dtagco['fecha_corte']])[dtagco['costo']].sum().reset_index()
+        gb_tm90_tienda = tm90_tienda.groupby([dtagco['fecha_corte']])[dtagco['costo']].sum().reset_index()
+
+        self.fig_f11_trend_costo(gb_tm90_cd, 'CD mayores a 90 días', ['rgb(204, 97, 176)'])
+        self.fig_f11_trend_costo(gb_tm90_tienda, 'Tiendas & DVD mayores a 90 días', ['rgb(36, 121, 108)'])
+
+    def fig_f11_trend_costo(self, df, local, color):
+        df[dtagco['costo']] = round(df[dtagco['costo']]/1e6)
+        fig_f11_cd_trend = px.line(df, x=dtagco['fecha_corte'], y=dtagco['costo'], labels={dtagco['fecha_corte']:'Fecha de corte', 
+        dtagco['costo']: "Costo total (Millones)" }, text=dtagco['costo'], color_discrete_sequence=color, 
+        title=f"F11 abiertos {local} según fecha de corte" )
+        fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
+        fig_f11_cd_trend.update_traces(textposition="bottom right")
+        fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
+        fig_f11_cd_trend.write_image(f"images/{self.dt_string}_f11_trend_{local}.svg",width=650, height=400, engine='orca')
+
+    def get_tendencias_cantidad(self):
+        # Cantidad 
+        self.f11_tcant = transform_df_trend(self.f11_tcant, dtagco['f11_id'])
+        
+        tcd = self.f11_tcant.loc[self.f11_tcant[dtagco['grupo']]=='CD']
+        ttienda = self.f11_tcant.loc[(self.f11_tcant[dtagco['grupo']]=='TIENDAS')|(self.f11_tcant[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
+
+        gb_tcd = tcd.groupby([dtagco['fecha_corte']])[dtagco['f11_id']].sum().reset_index()
+        gb_ttienda = ttienda.groupby([dtagco['fecha_corte']])[dtagco['f11_id']].sum().reset_index()
+
+        self.fig_f11_trend_cantidad(gb_tcd, 'CD', ['rgb(204, 97, 176)'])
+        self.fig_f11_trend_cantidad(gb_ttienda, 'Tiendas & DVD', ['rgb(36, 121, 108)'])
+
+        # Cantidad 90 días 
+        self.f11_tm90_cant = transform_df_trend(self.f11_tm90_cant, dtagco['f11_id'])
+
+        tm90_cd = self.f11_tm90_cant.loc[self.f11_tm90_cant[dtagco['grupo']]=='CD']
+        tm90_tienda = self.f11_tm90_cant.loc[(self.f11_tm90_cant[dtagco['grupo']]=='TIENDAS')|(self.f11_tm90_cant[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
+
+        gb_tm90_cd = tm90_cd.groupby([dtagco['fecha_corte']])[dtagco['f11_id']].sum().reset_index()
+        gb_tm90_tienda = tm90_tienda.groupby([dtagco['fecha_corte']])[dtagco['f11_id']].sum().reset_index()
+
+        self.fig_f11_trend_cantidad(gb_tm90_cd, 'CD mayores a 90 días', ['rgb(204, 97, 176)'])
+        self.fig_f11_trend_cantidad(gb_tm90_tienda, 'Tiendas & DVD mayores a 90 días', ['rgb(36, 121, 108)'])
+
+    def fig_f11_trend_cantidad(self, df, local, color):
+        fig_f11_cd_trend = px.line(df, x=dtagco['fecha_corte'], y=dtagco['f11_id'], labels={dtagco['fecha_corte']:'Fecha de corte', 
+        dtagco['f11_id']: "Cantidad de folios F11" }, text=dtagco['f11_id'], color_discrete_sequence=color, 
+        title=f"F11 abiertos {local} según fecha de corte" )
+        fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
+        fig_f11_cd_trend.update_traces(textposition="bottom right")
+        fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
+        fig_f11_cd_trend.write_image(f"images/{self.dt_string}_f11_tcant_{local}.svg",width=650, height=400, engine='orca')
 
 # General methods 
 def fltr_empresa(df):
@@ -124,63 +206,10 @@ def fltr_abiertos(df):
 def fltr_fecha_desde(df):
     return df.loc[df[dtagco['fech_creacion']] >= dtagco['fecha_inicial']].reset_index(drop=True)
 
-""" 
-    # Tendencias 
-
-    # Rango de fechas a graficar
-    rango_fechas = ['2021-12-15','2022-03-31']
-
-    f11_ant['COSTO'] = pd.to_numeric(f11_ant['COSTO'])
-    f11_ant['Fecha PPT'] = pd.to_datetime(f11_ant['Fecha PPT'], format='%Y-%m-%d')
-    gb_f11_ant = f11_ant.groupby(['Fecha PPT', 'SEDE'])['COSTO'].sum().reset_index()
-    ult_corte = gb_f11_ant.loc[gb_f11_ant['Fecha PPT']>'2021-12-15'].reset_index(drop=True)
-    ult_corte["COSTO"] = round(ult_corte["COSTO"]/1e6)
-
-    # CD 
-    trend_cd = ult_corte.loc[ult_corte['SEDE']=='CD']
-    fig_f11_cd_trend = px.line(trend_cd, x="Fecha PPT", y="COSTO", labels={'Fecha PPT':'Fecha de corte', "COSTO": "Costo total (Millones)" }, 
-    text='COSTO', color_discrete_sequence=['rgb(204, 97, 176)'], title=f"F11 abiertos CD según fecha de corte" )
-    fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
-    fig_f11_cd_trend.update_traces(textposition="bottom right")
-    fig_f11_cd_trend.update_xaxes(range=rango_fechas, constrain="domain")
-    fig_f11_cd_trend.write_image(f"images/{dt_string}_F11_TENDENCIA_CD.svg",width=650, height=400, engine='orca')
-
-    # Tienda
-    trend_tienda = ult_corte.loc[ult_corte['SEDE']=='TIENDAS']
-    fig_f11_tienda_trend = px.line(trend_tienda, x="Fecha PPT", y="COSTO", labels={'Fecha PPT':'Fecha de corte', "COSTO": "Costo total (Millones)" },
-    text='COSTO', color_discrete_sequence=['rgb(36, 121, 108)'], title=f"F11 abiertos Tienda según fecha de corte" )
-    fig_f11_tienda_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
-    fig_f11_tienda_trend.update_traces(textposition="bottom right")
-    fig_f11_tienda_trend.update_xaxes(range=rango_fechas, constrain="domain")
-    fig_f11_tienda_trend.write_image(f"images/{dt_string}_F11_TENDENCIA_TIENDA.svg",width=650, height=400, engine='orca')
-
-    # tend 90 dias 
-
-    f11_ant_3m[dtagco['costo']] = pd.to_numeric(f11_ant_3m[dtagco['costo']])
-    f11_ant_3m['FECHA_CORTE'] = pd.to_datetime(f11_ant_3m['FECHA_CORTE'], format='%Y-%m-%d')
-    gb_corte = f11_ant_3m.groupby(['FECHA_CORTE', dtagco['grupo']])[dtagco['costo']].sum().reset_index()
-    gb_corte[dtagco['costo']] = round(gb_corte[dtagco['costo']]/1e6)
-
-    rango_fechas = ['2021-12-30','2022-03-31']
-    trend_cd_3m = gb_corte.loc[gb_corte[dtagco['grupo']]=='CD'].reset_index(drop=True)
-
-    fig_f11_cd_trend_90 = px.line(trend_cd_3m, x="FECHA_CORTE", y=dtagco['costo'], labels={'FECHA_CORTE':'Fecha de corte', dtagco['costo']: "Costo total (Millones)" },
-    text=dtagco['costo'], color_discrete_sequence=['rgb(204, 97, 176)'], title=f"F11 CD abiertos con más de 90 días" )
-    fig_f11_cd_trend_90.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
-    fig_f11_cd_trend_90.update_traces(textposition="bottom right")
-    fig_f11_cd_trend_90.update_xaxes(range=rango_fechas, constrain="domain")
-    fig_f11_cd_trend_90.write_image(f"images/{dt_string}_f11_trend_CD_90.svg",width=600, height=400, engine='orca')
-
-    trend_cd_3m = gb_corte.loc[(gb_corte[dtagco['grupo']]=='TIENDAS') ].reset_index(drop=True)
-    fig_f11_tienda_trend_90 = px.line(trend_cd_3m, x="FECHA_CORTE", y=dtagco['costo'], labels={'FECHA_CORTE':'Fecha de corte', dtagco['costo']: "Costo total (Millones)" },
-    text=dtagco['costo'], color_discrete_sequence=['rgb(36, 121, 108)'], title=f"F11 Tienda abiertos con más de 90 días" )
-    fig_f11_tienda_trend_90.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
-    fig_f11_tienda_trend_90.update_traces(textposition="bottom right")
-    fig_f11_tienda_trend_90.update_xaxes(range=rango_fechas, constrain="domain")
-    fig_f11_tienda_trend_90.write_image(f"images/{dt_string}_f11_trend_TIENDA_90.svg",width=600, height=400, engine='orca') """
-
-    ## ------ Output 
-    # TODO guardar figuras en una carpeta para cada corte 
+def transform_df_trend(df, value):
+    df[value] = pd.to_numeric(df[value])
+    df[dtagco['fecha_corte']] = pd.to_datetime(df[dtagco['fecha_corte']], format='%Y-%m-%d')
+    return df 
 
 f11 = F11()
 f11.get_f11_cutoff()
