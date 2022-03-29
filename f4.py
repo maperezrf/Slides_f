@@ -37,7 +37,7 @@ class F4():
         for mes in meses_ing:
                 self.f4_21_22.loc[self.f4_21_22["mes"] == mes, "mes" ] = meses_esp[i]
                 i=i+1
-        col_str = ["desc_local","Marca"]
+        col_str = ["desc_local","Marca","descripcion_linea"]
         for col in col_str : self.f4_21_22[col] = self.f4_21_22[col].str.capitalize()
                 
     def filters(self):
@@ -180,6 +180,7 @@ class F4():
         colores = self.general.unif_colors(gb_local,"local_agg")
         self.fig_torta_local = px.pie(gb_local, values=var_f4['costo'], names='local_agg', color="local_agg" ,title='F4 acumulado por sede',color_discrete_map = colores)
         self.fig_torta_local.update_traces( textposition='inside', textinfo='percent+label')
+        self.fig_torta_local.update_layout(font_size=16)
     
     def grap_pie_lineas(self, f4_linea):
         self.fig_torta_linea = px.pie(f4_linea, values=var_f4['costo'], names=var_f4['desc_linea'], title='F4s Por línea en 2022')
@@ -189,17 +190,19 @@ class F4():
         total = self.f4_2021[var_f4['costo']].sum()
         total_graf = '${:,.0f} M '.format(total/1e6)
         self.fig_clasificado = px.bar(group_total, x=var_f4['costo'], y="Posible Causa",text=var_f4['costo'] ,text_auto='.2s',labels={var_f4['costo']: "Costo total","Posible Causa":"Posible causa"})
-        self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f"F4 acumulados - Total acumulado 2022 {total_graf}" )
+        self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f"F4 acumulados - Total acumulado 2022 {total_graf}")
+
     
     def grap_f4_local(self,group_local):
         colores = self.general.unif_colors(group_local,"local_agg")
-        self.fig_clasificado_local = px.bar(group_local, x=var_f4['costo'], y="Posible Causa",text=var_f4['costo'] ,color="local_agg" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","Posible Causa":"Posible causa","local_agg":"Local"}, color_discrete_map = colores)
-        self.fig_clasificado_local.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por local")
+        self.fig_clasificado_local = px.bar(group_local, x=var_f4['costo'], y="Posible Causa",text=var_f4['costo'],color="local_agg" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","Posible Causa":"Posible causa","local_agg":"Local"}, color_discrete_map = colores)
+        self.fig_clasificado_local.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por local",legend=dict(yanchor="top", y=0.5, xanchor="left", x=0.6), font_size=15)
     
     def grap_f4_mes_local(self,group_mes):
         colores = self.general.unif_colors(group_mes,"local_agg")
-        self.fig_clas_mes_local = px.bar(group_mes, x="mes", y=var_f4['costo'], text=var_f4['costo'] ,color="local_agg" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","mes":"Mes","local_agg":"Local"}, color_discrete_map = colores)
-        self.fig_clas_mes_local.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por mes y local")
+        orden = self.general.ord_mes(group_mes,"mes")
+        self.fig_clas_mes_local = px.bar(group_mes, x="mes", y=var_f4['costo'], text=var_f4['costo'] ,color="local_agg" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","mes":"Mes","local_agg":"Local"}, color_discrete_map = colores, category_orders= {"mes":orden})
+        self.fig_clas_mes_local.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por mes y local", font_size = 15)
 
     def grap_f4_lina_mes(self,f4_linea_mes):
         orden = self.general.ord_mes(f4_linea_mes,"mes")
@@ -244,23 +247,23 @@ class F4():
         self.fig_pant_rotas = px.bar(f4_pant_rotas, x="Marca", y= "total_precio_costo",color="mes",text_auto='.2s', category_orders={"mes":orden}, labels={"total_precio_costo":"Total costo","mes":"Mes"}, color_discrete_map = color)
 
     def save_grap(self):
-        self.fig_torta_local.write_image(f"{self.path}/images/{self.dt_string}_f4_torta.svg", engine='orca') 
-        self.ten_creac_x_año.write_image(f"{self.path}/images/{self.dt_string}_tendencia_creacion_f4_x_años.svg", width = 800, height=450, engine='orca')
-        self.grafica_f4_sem.write_image(f"{self.path}/images/{self.dt_string}_grafica_f4_sem.svg", width = 700, height=500, engine='orca')
-        self.graf_f4_pos_causa.write_image(f"{self.path}/images/{self.dt_string}_clasificacion_posibles_causas_22.svg", width = 1300, height=700, engine='orca') 
-        self.fig_clasificado.write_image(f"{self.path}/images/{self.dt_string}_grafica_total.svg", height = 600,  width =700)
+        # self.fig_torta_local.write_image(f"{self.path}/images/{self.dt_string}_f4_torta.svg", engine='orca') 
+        # self.ten_creac_x_año.write_image(f"{self.path}/images/{self.dt_string}_tendencia_creacion_f4_x_años.svg", width = 800, height=450, engine='orca')
+        # self.grafica_f4_sem.write_image(f"{self.path}/images/{self.dt_string}_grafica_f4_sem.svg", width = 700, height=500, engine='orca')
+        # self.graf_f4_pos_causa.write_image(f"{self.path}/images/{self.dt_string}_clasificacion_posibles_causas_22.svg", width = 1300, height=700, engine='orca') 
+        # self.fig_clasificado.write_image(f"{self.path}/images/{self.dt_string}_grafica_total.svg", height = 600,  width =700)
         self.fig_clasificado_local.write_image(f"{self.path}/images/{self.dt_string}_grafica_total_por_local.svg", height = 500,  width = 800,engine='orca')
-        self.fig_clas_mes_local.write_image(f"{self.path}/images/{self.dt_string}_grafica_total_por_mes.svg", height = 500,  width = 500,engine='orca')
-        self.f4_mespc.write_image(f"{self.path}/images/{self.dt_string}_tienda_mes_motivo.svg", height = 500,  width = 700,engine='orca')
-        self.f4_mespc_cd.write_image(f"{self.path}/images/{self.dt_string}_f4s_cd_mm.svg", engine='orca')
-        self.fig_torta_linea.write_image(f"{self.path}/images/{self.dt_string}_torta_linea.svg", height = 500,  width = 700,engine='orca')
-        self.fig_f4_linea_mes.write_image(f"{self.path}/images/{self.dt_string}_grafica_linea_x_mes.svg", height = 500,  width = 800,engine='orca')
-        self.fig_f4_linea_motivo.write_image(f"{self.path}/images/{self.dt_string}_linea_motivo.svg", height =600,  width = 1000,engine='orca')
-        self.fig_lin_local.write_image(f"{self.path}/images/{self.dt_string}_linea_local.svg", height =500,  width = 800, engine='orca')
-        self.fig_f4_marca.write_image(f"{self.path}/images/{self.dt_string}_grafica_averia_x_mes_y_marca.svg", height = 500,  width = 900,engine='orca')
-        self.fig_marca_locales.write_image(f"{self.path}/images/{self.dt_string}_{self.marc}_local.svg", height =500,  width = 800, engine='orca')
-        self.fig_marcas_calidad.write_image(f"{self.path}/images/{self.dt_string}_marca_calidad.svg", height =500,  width = 800, engine='orca')
-        self.fig_pant_rotas.write_image(f"{self.path}/images/{self.dt_string}_pantallas_rotas.svg", height =500,  width = 800, engine='orca')
+        # self.fig_clas_mes_local.write_image(f"{self.path}/images/{self.dt_string}_grafica_total_por_mes.svg", height = 500,  width = 500,engine='orca')
+        # self.f4_mespc.write_image(f"{self.path}/images/{self.dt_string}_tienda_mes_motivo.svg", height = 500,  width = 700,engine='orca')
+        # self.f4_mespc_cd.write_image(f"{self.path}/images/{self.dt_string}_f4s_cd_mm.svg", engine='orca')
+        # self.fig_torta_linea.write_image(f"{self.path}/images/{self.dt_string}_torta_linea.svg", height = 500,  width = 700,engine='orca')
+        # self.fig_f4_linea_mes.write_image(f"{self.path}/images/{self.dt_string}_grafica_linea_x_mes.svg", height = 500,  width = 800,engine='orca')
+        # self.fig_f4_linea_motivo.write_image(f"{self.path}/images/{self.dt_string}_linea_motivo.svg", height =600,  width = 1000,engine='orca')
+        # self.fig_lin_local.write_image(f"{self.path}/images/{self.dt_string}_linea_local.svg", height =500,  width = 800, engine='orca')
+        # self.fig_f4_marca.write_image(f"{self.path}/images/{self.dt_string}_grafica_averia_x_mes_y_marca.svg", height = 500,  width = 900,engine='orca')
+        # self.fig_marca_locales.write_image(f"{self.path}/images/{self.dt_string}_{self.marc}_local.svg", height =500,  width = 800, engine='orca')
+        # self.fig_marcas_calidad.write_image(f"{self.path}/images/{self.dt_string}_marca_calidad.svg", height =500,  width = 800, engine='orca')
+        # self.fig_pant_rotas.write_image(f"{self.path}/images/{self.dt_string}_pantallas_rotas.svg", height =500,  width = 800, engine='orca')
 
 
 def f4_figs(df, pc_order, titulo):
