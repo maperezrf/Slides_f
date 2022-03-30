@@ -24,12 +24,12 @@ def set_columns_nunique(base, var, column):
 
 def generate_structure(f):
     if f"{dt_string}_corte" not in listdir(path):
-        print("por que aca")
         mkdir(f"{path}/{dt_string}_corte")
         mkdir(f"{path}/{dt_string}_corte/images")
         mkdir(f"{path}/{dt_string}_corte/images/f3")
         mkdir(f"{path}/{dt_string}_corte/images/f4")
         mkdir(f"{path}/{dt_string}_corte/images/f11")
+        mkdir(f"{path}/{dt_string}_corte/images/classifier")
     else:
         pass
     if f == "f11":
@@ -37,7 +37,9 @@ def generate_structure(f):
     elif f == "f4":
         return f"{path}/{dt_string}_corte/images/f4"
     elif f == "f3":
-        return f"{path}/{dt_string}_corte/images/f11"
+        return f"{path}/{dt_string}_corte/images/f3"
+    elif f == "classifier":
+        return f"{path}/{dt_string}_corte/images/classifier"
 
 
 

@@ -24,8 +24,8 @@ class F11():
     def __init__(self) -> None:
         #self.f11 = pd.read_excel(dtagco['path_df'], dtype=str)
         self.f11 = pd.read_csv(dtagco['path_df'], dtype='object', sep=';')
-        self.path = generate_structure()
-        self.transform("f11")
+        self.path = generate_structure("f11")
+        self.transform()
         self.f11 = self.f11.sort_values(dtagco['fech_creacion'])
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados

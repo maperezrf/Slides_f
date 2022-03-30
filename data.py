@@ -1,5 +1,5 @@
 var_f11 = {
-    'path_df': 'C:/Users/ext_maperezr/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220328_f11.xlsx',
+    'path_df': 'C:/Users/ext_maperezr/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220328_f11.csv',
     'trend_path': 'input/tendencias.xlsx', 
     'f11_id':'NRO_F11',
     'propietario':'PROPIETARIO',

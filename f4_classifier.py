@@ -3,19 +3,18 @@ from datetime import datetime
 import numpy as np
 import constants as const
 from data import var_f4 
-from os import mkdir,listdir
-from general import GENERAL
+from general import generate_structure
+from f4 import F4
 dt_string = datetime.now().strftime('%y%m%d')
 
 class CLASSIFIER_F4():
 
-    general = GENERAL()
     dt_string = datetime.now().strftime('%y%m%d')
 
     def __init__(self):
         self.f4 = pd.read_csv(var_f4["path_df"], sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
-        self.path = self.general.generate_structure()
+        self.path = generate_structure("classifier")
         self.transform()
         self.set_local_agg()
         self.filters()
@@ -85,7 +84,6 @@ class CLASSIFIER_F4():
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc5677206 impo con nc'), 'Posible Causa'] = "Avería"
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc460039 impo con nc'), 'Posible Causa'] = "Avería"
 
-
     def set_marca(self):
         self.marcas.drop_duplicates("upc",inplace=True)
         self.f4_clas_marc = self.f4_db_res.merge(self.marcas, how="left", on="upc")
@@ -109,8 +107,6 @@ class CLASSIFIER_F4():
         print("Registrado por fechas")
         print(f"{self.registrado}\n")
     
-       
-
     def save_files(self):
         self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
@@ -127,4 +123,7 @@ class CLASSIFIER_F4():
 
     # TODO un método para las reglas de tiendas y otro para CD 
 
-f4 = CLASSIFIER_F4()
+f4_classifier = CLASSIFIER_F4()
+# f4 = F4()
+# F4.iniciar(f4_classifier.f4_clas_marc)
+
