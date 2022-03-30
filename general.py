@@ -22,19 +22,25 @@ def set_columns_nunique(base, var, column):
         base.loc[base[var]==item, var] = f'{item} {round(gb_var.loc[item, column]):,.0f}'
     return base 
 
-def generate_structure():
-    if f"{dt_string}_corte" in listdir(path):
-        if "images" not in listdir(f"{path}/{dt_string}_corte"):
-            mkdir(f"{path}/{dt_string}_corte/images")
-        else:
-            pass
+def generate_structure(f):
     if f"{dt_string}_corte" not in listdir(path):
         print("por que aca")
         mkdir(f"{path}/{dt_string}_corte")
         mkdir(f"{path}/{dt_string}_corte/images")
+        mkdir(f"{path}/{dt_string}_corte/images/f3")
+        mkdir(f"{path}/{dt_string}_corte/images/f4")
+        mkdir(f"{path}/{dt_string}_corte/images/f11")
     else:
         pass
-    return f"{path}/{dt_string}_corte"
+    if f == "f11":
+        return f"{path}/{dt_string}_corte/images/f11"
+    elif f == "f4":
+        return f"{path}/{dt_string}_corte/images/f4"
+    elif f == "f3":
+        return f"{path}/{dt_string}_corte/images/f11"
+
+
+
 
 def unif_colors(df ,column):
     unique = df[column].unique()
@@ -54,3 +60,6 @@ def ord_mes(df,column):
             if mes in i:
                 list_mes.append(i)
     return list_mes
+
+def ord_num(df,column,colum_num):
+    return df.groupby(column)[colum_num].sum().sort_values(ascending=False).reset_index()[column].unique()

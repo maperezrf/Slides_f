@@ -7,7 +7,7 @@ from   datetime import date, timedelta, datetime
 import plotly.graph_objects as go
 import numpy as np
 from data import var_f11 as dtagco
-from general import set_columns_nunique, set_columns_sum
+from general import set_columns_nunique, set_columns_sum, generate_structure
 
 class F11():
     
@@ -24,7 +24,8 @@ class F11():
     def __init__(self) -> None:
         #self.f11 = pd.read_excel(dtagco['path_df'], dtype=str)
         self.f11 = pd.read_csv(dtagco['path_df'], dtype='object', sep=';')
-        self.transform()
+        self.path = generate_structure()
+        self.transform("f11")
         self.f11 = self.f11.sort_values(dtagco['fech_creacion'])
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados
@@ -136,7 +137,7 @@ class F11():
 
         f11_empresa_sede.layout.yaxis.title.text='Total costo promedio'
         f11_empresa_sede.layout.xaxis.title.text='Mes de creación'
-        f11_empresa_sede.write_image(F"images/{self.dt_string}_f11_empresa_abiertos_sede_monto.svg",scale=1, height=800,width=800, engine='orca')
+        f11_empresa_sede.write_image(f"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_monto.svg",scale=1, height=800,width=800, engine='orca')
         
     def fig_f11_cantidad(self, df, gb_annotations, orden_grupo, orden_mes, ta):
         f11_es_cantidad = px.bar(df, x=dtagco['mes'], y=dtagco['f11_id'], color=dtagco['grupo'], text=dtagco['f11_id'], text_auto='.0f', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
@@ -152,7 +153,7 @@ class F11():
 
         f11_es_cantidad.layout.yaxis.title.text='Cantidad de folios de F11'
         f11_es_cantidad.layout.xaxis.title.text='Mes de creación'
-        f11_es_cantidad.write_image(F"images/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.svg",scale=1, height=800,width=800, engine='orca')
+        f11_es_cantidad.write_image(F"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.svg",scale=1, height=800,width=800, engine='orca')
 
     # ---------------- Trend methods 
     def get_tendencias_costo(self):
@@ -184,7 +185,7 @@ class F11():
         fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
         fig_f11_cd_trend.update_traces(textposition="bottom right")
         fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
-        fig_f11_cd_trend.write_image(f"images/{self.dt_string}_f11_trend_{local}.svg",width=650, height=400, engine='orca')
+        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_trend_{local}.svg",width=650, height=400, engine='orca')
 
     def get_tendencias_cantidad(self):
         # Cantidad 
@@ -218,7 +219,7 @@ class F11():
         fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
         fig_f11_cd_trend.update_traces(textposition="bottom right")
         fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
-        fig_f11_cd_trend.write_image(f"images/{self.dt_string}_f11_tcant_{local}.svg",width=650, height=400, engine='orca')
+        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_tcant_{local}.svg",width=650, height=400, engine='orca')
 
 # General methods 
 def fltr_empresa(df):

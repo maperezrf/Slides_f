@@ -1,5 +1,5 @@
 var_f11 = {
-    'path_df': 'C:/Users/palejparra/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220329-1548-220328_f11-output.csv',
+    'path_df': 'C:/Users/ext_maperezr/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220328_f11.xlsx',
     'trend_path': 'input/tendencias.xlsx', 
     'f11_id':'NRO_F11',
     'propietario':'PROPIETARIO',
@@ -13,7 +13,7 @@ var_f11 = {
     'grupo':'GRUPO',
     'fecha_corte':'FECHA_CORTE'}
 
-var_f4={
+var_f4 = {
     'path_df':'input/220329-0845-f4-output.csv',
     'path_df_clas':'output/220329_corte/220329_f4_clasificado.csv',
     'marcas_df':'input/Marcas.xlsx',
@@ -27,4 +27,15 @@ var_f4={
     'costo' : 'total_precio_costo',
     'desc_linea': 'descripcion_linea'
 
+}
+
+var_f3 = { 
+    'path_df':'input/220328-1650-f3-output.csv',
+    'fecha_res':'fecha_reserva',
+    'fecha_envio':'fecha_envio',
+    'fecha_anulacion':'fecha_anulacion',
+    'fecha_confirmacion':'fecha_confirmacion',
+    'estado':'descripcion6',
+    'tipo_producto':'tipo_producto',
+    'costo':'cant*costoprmd',
 }
