@@ -6,17 +6,16 @@ import numpy as np
 import constants as const
 from calendar import monthrange
 from data import var_f4
-from general import GENERAL
+from general import generate_structure, set_columns_sum, unif_colors, ord_mes
 pd.set_option('display.max_columns', 500)
 
 class F4():
     dt_string = datetime.now().strftime('%y%m%d')
-    general = GENERAL()
 
     def __init__(self) -> None:
         self.f4_2022 = pd.read_csv(var_f4["path_df_clas"],sep=";" , dtype = object)
         self.f4_2021 = pd.read_csv("input/f4_2021.csv",sep=";", dtype = object)
-        self.path = self.general.generate_structure()
+        self.path = generate_structure()
         self.f4_21_22()
         self.transform()
         self.filters()
@@ -112,31 +111,31 @@ class F4():
         # self.f4_2022_pant_rotas.to_excel(f"{self.path}_tabla_pantallas_rotas.xlsx")
 
 
-        self.general.set_columns_sum(f4_x_semanas,"Semana (fecha de reserva)",var_f4['costo'])
-        self.general.set_columns_sum(f4_x_semanas,"local_agg",var_f4['costo'])
-        self.general.set_columns_sum(f4_x_años,"año",var_f4['costo'])
-        self.general.set_columns_sum(gb_local,"local_agg",var_f4['costo'])
-        self.general.set_columns_sum(gb_f4g_graf_21, 'Posible Causa',var_f4['costo'])
-        self.general.set_columns_sum(gb_f4g_graf_21, 'local_agg',var_f4['costo'])
-        self.general.set_columns_sum(group_local, 'local_agg',var_f4['costo'])
-        self.general.set_columns_sum(group_mes, 'mes',var_f4['costo'])
-        self.general.set_columns_sum(group_mes, 'local_agg',var_f4['costo'])
-        self.general.set_columns_sum(gb_f4mespc, 'mes',var_f4['costo'])
-        self.general.set_columns_sum(gb_f4mespc, 'Posible Causa',var_f4['costo'])
-        self.general.set_columns_sum(gb_f4mespc_cd, 'mes',var_f4['costo'])
-        self.general.set_columns_sum(gb_f4mespc_cd, 'Posible Causa',var_f4['costo'])
-        self.general.set_columns_sum(f4_linea_mes, 'mes',var_f4['costo'])
-        self.general.set_columns_sum(f4_linea_mes, var_f4['desc_linea'],var_f4['costo'])
-        self.general.set_columns_sum(linea_motivo,'Posible Causa',var_f4['costo'])
-        self.general.set_columns_sum(linea_motivo, var_f4['desc_linea'],var_f4['costo'])
-        self.general.set_columns_sum(linea_local, var_f4['desc_linea'],var_f4['costo'])
-        self.general.set_columns_sum(linea_local, 'local_agg',var_f4['costo'])
-        self.general.set_columns_sum(top_10_marca, 'Marca',var_f4['costo'])
-        self.general.set_columns_sum(top_10_marca, 'mes',var_f4['costo'])
-        self.general.set_columns_sum(marcas_calidad, 'mes',var_f4['costo'])
-        self.general.set_columns_sum(marcas_calidad, 'Marca',var_f4['costo'])
-        self.general.set_columns_sum(f4_pant_rotas, 'Marca',var_f4['costo'])
-        self.general.set_columns_sum(f4_pant_rotas, 'mes',var_f4['costo'])
+        set_columns_sum(f4_x_semanas,"Semana (fecha de reserva)",var_f4['costo'])
+        set_columns_sum(f4_x_semanas,"local_agg",var_f4['costo'])
+        set_columns_sum(f4_x_años,"año",var_f4['costo'])
+        set_columns_sum(gb_local,"local_agg",var_f4['costo'])
+        set_columns_sum(gb_f4g_graf_21, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(gb_f4g_graf_21, 'local_agg',var_f4['costo'])
+        set_columns_sum(group_local, 'local_agg',var_f4['costo'])
+        set_columns_sum(group_mes, 'mes',var_f4['costo'])
+        set_columns_sum(group_mes, 'local_agg',var_f4['costo'])
+        set_columns_sum(gb_f4mespc, 'mes',var_f4['costo'])
+        set_columns_sum(gb_f4mespc, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(gb_f4mespc_cd, 'mes',var_f4['costo'])
+        set_columns_sum(gb_f4mespc_cd, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(f4_linea_mes, 'mes',var_f4['costo'])
+        set_columns_sum(f4_linea_mes, var_f4['desc_linea'],var_f4['costo'])
+        set_columns_sum(linea_motivo,'Posible Causa',var_f4['costo'])
+        set_columns_sum(linea_motivo, var_f4['desc_linea'],var_f4['costo'])
+        set_columns_sum(linea_local, var_f4['desc_linea'],var_f4['costo'])
+        set_columns_sum(linea_local, 'local_agg',var_f4['costo'])
+        set_columns_sum(top_10_marca, 'Marca',var_f4['costo'])
+        set_columns_sum(top_10_marca, 'mes',var_f4['costo'])
+        set_columns_sum(marcas_calidad, 'mes',var_f4['costo'])
+        set_columns_sum(marcas_calidad, 'Marca',var_f4['costo'])
+        set_columns_sum(f4_pant_rotas, 'Marca',var_f4['costo'])
+        set_columns_sum(f4_pant_rotas, 'mes',var_f4['costo'])
 
         self.grap_bar_sem(f4_x_semanas)
         self.grap_bar(f4_x_años)
@@ -157,19 +156,19 @@ class F4():
         self.grap_pant_rotas(f4_pant_rotas)
     
     def grap_bar_sem(self,f4_x_semanas):
-        colores = self.general.unif_colors(f4_x_semanas, "local_agg")
+        colores = unif_colors(f4_x_semanas, "local_agg")
         self.grafica_f4_sem=px.bar(f4_x_semanas, x="Semana (fecha de reserva)", y=var_f4['costo'], labels={var_f4['costo']: "Total costo","local_agg":"Local"}, text=var_f4['costo'], 
         text_auto='.2s', color = 'local_agg', title= "Creación F4 dados de baja por semana - 2022",color_discrete_map = colores)
         self.grafica_f4_sem.update_layout(legend=dict(orientation="h", yanchor="bottom", xanchor="right",x=1,y=1))
 
     def grap_bar(self, f4_x_años):
-        colores = self.general.unif_colors(f4_x_años,"año")
+        colores = unif_colors(f4_x_años,"año")
         f4_x_años[var_f4['costo']] = f4_x_años[var_f4['costo']]/1e6
         self.ten_creac_x_año = px.bar(f4_x_años,  x="mes", y=var_f4['costo'], color='año', barmode='group',text_auto=",.0f",labels={var_f4['costo']: "Costo total (Millones)","mes":"Mes de reserva ", "categoria":"Año" } ,title="Tendencia de creación F4 dados de baja según mes de reserva", color_discrete_map = colores)  
         self.ten_creac_x_año.update_layout(legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         
     def grap_pos_causa(self,gb_f4g_graf_21):
-        colores = self.general.unif_colors(gb_f4g_graf_21,"local_agg")
+        colores = unif_colors(gb_f4g_graf_21,"local_agg")
         orden = gb_f4g_graf_21.sort_values("total_precio_costo", ascending=False)["Posible Causa"].unique()
         gb_f4g_graf_21["total_precio_costo"] = gb_f4g_graf_21["total_precio_costo"]/1e6
         self.graf_f4_pos_causa = px.bar(gb_f4g_graf_21, y="Posible Causa", x=var_f4['costo'] , color = "local_agg",text=var_f4['costo'],text_auto='.2s',
@@ -177,7 +176,7 @@ class F4():
         self.graf_f4_pos_causa.update_layout(legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=1))
 
     def grap_pie(self, gb_local):
-        colores = self.general.unif_colors(gb_local,"local_agg")
+        colores = unif_colors(gb_local,"local_agg")
         self.fig_torta_local = px.pie(gb_local, values=var_f4['costo'], names='local_agg', color="local_agg" ,title='F4 acumulado por sede',color_discrete_map = colores)
         self.fig_torta_local.update_traces( textposition='inside', textinfo='percent+label')
     
@@ -192,18 +191,18 @@ class F4():
         self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f"F4 acumulados - Total acumulado 2022 {total_graf}" )
     
     def grap_f4_local(self,group_local):
-        colores = self.general.unif_colors(group_local,"local_agg")
+        colores = unif_colors(group_local,"local_agg")
         self.fig_clasificado_local = px.bar(group_local, x=var_f4['costo'], y="Posible Causa",text=var_f4['costo'] ,color="local_agg" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","Posible Causa":"Posible causa","local_agg":"Local"}, color_discrete_map = colores)
         self.fig_clasificado_local.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por local")
     
     def grap_f4_mes_local(self,group_mes):
-        colores = self.general.unif_colors(group_mes,"local_agg")
+        colores = unif_colors(group_mes,"local_agg")
         self.fig_clas_mes_local = px.bar(group_mes, x="mes", y=var_f4['costo'], text=var_f4['costo'] ,color="local_agg" ,text_auto='.2s',labels={var_f4['costo']: "Costo total","mes":"Mes","local_agg":"Local"}, color_discrete_map = colores)
         self.fig_clas_mes_local.update_layout(yaxis_categoryorder = 'total ascending',title="F4 acumulados por mes y local")
 
     def grap_f4_lina_mes(self,f4_linea_mes):
-        orden = self.general.ord_mes(f4_linea_mes,"mes")
-        colores = self.general.unif_colors(f4_linea_mes,"mes")
+        orden = ord_mes(f4_linea_mes,"mes")
+        colores = unif_colors(f4_linea_mes,"mes")
         self.fig_f4_linea_mes = px.bar(f4_linea_mes, x=var_f4["desc_linea"],y=var_f4['costo'], text=var_f4['costo'],color="mes",text_auto='.2s', barmode='group', title="Top 10 F4s por línea y mes",labels={var_f4['costo']:"Costo total",var_f4["desc_linea"]:"Línea","mes":"Mes"},color_discrete_map = colores, category_orders={'mes':orden})
         self.fig_f4_linea_mes.update_layout(legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.6))
     
@@ -212,13 +211,13 @@ class F4():
         self.fig_f4_linea_motivo.update_layout(yaxis_categoryorder = 'total ascending',title="F4 por linea con motivo")
 
     def grap_f4_linea_local(self,linea_local):
-        color = self.general.unif_colors(linea_local,"local_agg")
+        color = unif_colors(linea_local,"local_agg")
         self.fig_lin_local = px.bar(linea_local, x="descripcion_linea", y="total_precio_costo",barmode='group',color= "local_agg",title="F4 por línea por local", labels={"descripcion_linea":"Linea","total_precio_costo":"Total costo","local_agg":"Local"}, color_discrete_map = color)
         self.fig_lin_local.update_layout(legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.5))
 
     def grap_f4_top_10_marcas(self,top_10_marca):
-        color = self.general.unif_colors(top_10_marca,"mes")
-        orden = self.general.ord_mes(top_10_marca,"mes")
+        color = unif_colors(top_10_marca,"mes")
+        orden = ord_mes(top_10_marca,"mes")
         self.fig_f4_marca = px.bar(top_10_marca, x="Marca",y="total_precio_costo",text="total_precio_costo",color="mes",text_auto='.2s', barmode='group', title="Top 10 F4s Avería por marca y mes",labels={"total_precio_costo":"Costo total","descripcion_linea":"Linea","mes":"Mes"}, color_discrete_map=color, category_orders={"mes":orden})
         self.fig_f4_marca.update_layout(xaxis_categoryorder = 'total descending',legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.85))
         
@@ -227,20 +226,20 @@ class F4():
         self.marc = "barbie"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia.Marca == self.marc]
         grup_marca = marca.groupby(["desc_local","mes"])["total_precio_costo"].sum().sort_values(ascending=False).reset_index()
-        self.general.set_columns_sum(grup_marca,"mes",var_f4['costo'])
-        self.general.set_columns_sum(grup_marca,"desc_local",var_f4['costo'])
-        color = self.general.unif_colors(grup_marca,"mes")
+        set_columns_sum(grup_marca,"mes",var_f4['costo'])
+        set_columns_sum(grup_marca,"desc_local",var_f4['costo'])
+        color = unif_colors(grup_marca,"mes")
         self.fig_marca_locales = px.bar(grup_marca, x="desc_local",y="total_precio_costo",text="total_precio_costo",color="mes",text_auto='.2s', title=f"{self.marc} por local",labels={"total_precio_costo":"Costo total","desc_local":"Local","mes":"Mes"}, color_discrete_map = color)
         self.fig_marca_locales.update_layout(xaxis_categoryorder = 'total descending')
     
     def grap_marca_averia(self, marcas_calidad):
-        orden = self.general.ord_mes(marcas_calidad,"mes")
-        color = self.general.unif_colors(marcas_calidad,"mes")
+        orden = ord_mes(marcas_calidad,"mes")
+        color = unif_colors(marcas_calidad,"mes")
         self.fig_marcas_calidad = px.bar(marcas_calidad, x="Marca", y= "total_precio_costo", barmode='group',color="mes",text_auto='.2s', color_discrete_map= color, category_orders={"mes":orden}, labels={"total_precio_costo":"Total costo","mes":"Mes"})
 
     def grap_pant_rotas(self,f4_pant_rotas):
-        color= self.general.unif_colors(f4_pant_rotas,"mes")
-        orden = self.general.ord_mes(f4_pant_rotas,"mes")
+        color= unif_colors(f4_pant_rotas,"mes")
+        orden = ord_mes(f4_pant_rotas,"mes")
         self.fig_pant_rotas = px.bar(f4_pant_rotas, x="Marca", y= "total_precio_costo",color="mes",text_auto='.2s', category_orders={"mes":orden}, labels={"total_precio_costo":"Total costo","mes":"Mes"}, color_discrete_map = color)
 
     def save_grap(self):
@@ -264,8 +263,7 @@ class F4():
 
 
 def f4_figs(df, pc_order, titulo):
-    general = GENERAL()
-    colores = general.unif_colors(df,"mes")
+    colores = unif_colors(df,"mes")
     fig = px.bar(df, x="Posible Causa", y=var_f4['costo'], color='mes', barmode='group', title=titulo, 
                 text= var_f4['costo'], text_auto=",.2s", category_orders={'mes':['Ene','Feb','Mar'], 'Posible Causa':pc_order},color_discrete_map = colores,
                 labels={'mes':'Mes',var_f4['costo']: 'Total costo' , 'Posible Causa':'Posible causa'}, )

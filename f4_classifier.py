@@ -5,18 +5,17 @@ import numpy as np
 import constants as const
 from data import var_f4 
 from os import mkdir,listdir
-from general import GENERAL
+from general import generate_structure
 dt_string = datetime.now().strftime('%y%m%d')
 
 class CLASSIFIER_F4():
 
-    general = GENERAL()
     dt_string = datetime.now().strftime('%y%m%d')
 
     def __init__(self):
         self.f4 = pd.read_csv(var_f4["path_df"], sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
-        path = self.general.generate_structure()
+        path = generate_structure()
         self.transform()
         self.set_local_agg()
         self.filters()
@@ -86,7 +85,6 @@ class CLASSIFIER_F4():
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc5677206 impo con nc'), 'Posible Causa'] = "Avería"
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'destruc oc460039 impo con nc'), 'Posible Causa'] = "Avería"
 
-
     def set_marca(self):
         self.marcas.drop_duplicates("upc",inplace=True)
         self.f4_clas_marc = self.f4_db_res.merge(self.marcas, how="left", on="upc")
@@ -104,8 +102,6 @@ class CLASSIFIER_F4():
         print(f"Cantidad de registros sin clasificar marca: {self.reg_sin_marca}\n")
         print(f"{self.montos_estado}\n")
     
-       
-
     def save_files(self):
         self.f4_clas_marc.to_csv(f"output/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
