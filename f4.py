@@ -14,7 +14,7 @@ class F4():
         pass
 
     def iniciar(self,f4_clasificada):
-        self.f4_2022 = f4_clasificada # pd.read_csv(var_f4["path_df_clas"],sep=";" , dtype = object)
+        self.f4_2022 = f4_clasificada # pd.read_csv(var_f4["path_df_clas"],sep=";" , dtype = object) # f4_clasificada
         self.f4_2021 = pd.read_csv("input/f4_2021.csv",sep=";", dtype = object)
         self.path = generate_structure("f4")
         self.f4_21_22()

@@ -42,13 +42,15 @@ class F3():
     
 
     def make_groupby(self):
-        grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3["tipo_producto"],'mes'], sort =False)[var_f3['costo']].sum().reset_index()
         mkp_sede = self.f3_ab_mkp.groupby(['local_agg','mes'], sort=False)[var_f3['costo']].sum().reset_index()
+        grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3["tipo_producto"],'mes'], sort =False)[var_f3['costo']].sum().reset_index()
+
+        set_columns_sum(grupo_F3_prd_mkp, var_f3["tipo_producto"],var_f3['costo'])
+        set_columns_sum(grupo_F3_prd_mkp, "mes",var_f3['costo'])
 
         set_columns_sum(mkp_sede, 'local_agg',var_f3['costo'])
         set_columns_sum(mkp_sede, 'mes',var_f3['costo'])
-        set_columns_sum(grupo_F3_prd_mkp, var_f3["tipo_producto"],var_f3['costo'])
-        set_columns_sum(grupo_F3_prd_mkp, "mes",var_f3['costo'])
+        
         self.grap_f3_ab(grupo_F3_prd_mkp)
         self.grap_mkp_x_sede(mkp_sede)
     

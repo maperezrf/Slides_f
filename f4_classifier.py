@@ -28,17 +28,21 @@ class CLASSIFIER_F4():
     def transform(self):
         self.marcas.Marca.str.capitalize()
         self.f4.total_precio_costo = pd.to_numeric(self.f4.total_precio_costo)
+        self.f4.local = pd.to_numeric(self.f4.local)
         self.f4.loc[:, var_f4["fechas"]] = self.f4[var_f4["fechas"]].apply(lambda x: x.replace(["ene", "abr", "ago", "dic"], ["jan", "apr", "aug", "dec"], regex=True))
         for i in var_f4["fechas"]: self.f4[i] = pd.to_datetime(self.f4[i])
         self.f4 = self.f4.sort_values(var_f4['fecha_res'])
         self.f4['mes'] = self.f4[var_f4['fecha_res']].dt.strftime('%b')
         self.f4['Posible Causa'] = np.nan
+        for i in const.fechas_inv:
+            self.f4.loc[(self.f4.local == i) & (self.f4.fecha_reserva <= const.fechas_inv[i]),"mes"] = "Inventario"
+        
     
     def set_local_agg(self):
         self.f4.loc[self.f4[var_f4["local"]].isin(const.tienda), 'local_agg'] = 'TIENDA'
         self.f4.loc[self.f4[var_f4["local"]].isin(const.cd), 'local_agg'] = 'CD'
-        self.f4.loc[self.f4[var_f4["local"]] == "3001", 'local_agg'] = 'DVD ADMINISTRATIVO'
-        self.f4.loc[self.f4[var_f4["local"]] == "11", 'local_agg'] = 'VENTA EMPRESA'
+        self.f4.loc[self.f4[var_f4["local"]] == 3001, 'local_agg'] = 'DVD ADMINISTRATIVO'
+        self.f4.loc[self.f4[var_f4["local"]] == 11, 'local_agg'] = 'VENTA EMPRESA'
 
     # Filters
     def filters(self):
@@ -48,7 +52,7 @@ class CLASSIFIER_F4():
     # Methods 
     def set_posible_causa(self):
         # Filtros para tienda 
-        self.f4_db_res.loc[((self.f4_db_res['Posible Causa'].isna())) & (self.f4_db_res[var_f4['local']]=='3000'),'Posible Causa']='Conciliación NC 2021 - Local 3000'
+        self.f4_db_res.loc[((self.f4_db_res['Posible Causa'].isna())) & (self.f4_db_res[var_f4['local']]==3000),'Posible Causa']='Conciliación NC 2021 - Local 3000'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & self.f4_db_res[var_f4["destino"]].str.contains(r'pantalla\w? rota\w?|pantalla quebrada| pantalla\w? |pantalla rota'), 'Posible Causa'] = 'Pantallas rotas'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & (self.f4_db_res[var_f4["destino"]].str.contains(r'calidad|cambio|politica|devolucion cliente|danocalida') | self.f4_db_res[var_f4['desccentro_e_costo']].str.contains(r'servicio al cliente|servicio cliente|calidad')), 'Posible Causa'] = 'Calidad'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & (self.f4_db_res[var_f4['desccentro_e_costo']].str.contains(r'tester') | self.f4_db_res[var_f4["destino"]].str.contains(r'tester|tes ter|muestra')), 'Posible Causa'] = 'Testers' 
@@ -119,11 +123,12 @@ class CLASSIFIER_F4():
         if self.reg_sin_clasificar > 0:
             self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].to_excel(f"{self.path}/{self.dt_string}_f4_sin_clasificar.xlsx", index=False)
             print("Se guardo archivo con los UPCs, a los cuales no se asociaron marcas")
+        return 
 
 
     # TODO un método para las reglas de tiendas y otro para CD 
 
 f4_classifier = CLASSIFIER_F4()
-# f4 = F4()
-# F4.iniciar(f4_classifier.f4_clas_marc)
-
+f4 = F4()
+f4_clasificada = f4_classifier.f4_clas_marc
+f4.iniciar(f4_clasificada)

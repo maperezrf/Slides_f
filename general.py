@@ -29,7 +29,7 @@ def generate_structure(f):
         mkdir(f"{path}/{dt_string}_corte/images/f3")
         mkdir(f"{path}/{dt_string}_corte/images/f4")
         mkdir(f"{path}/{dt_string}_corte/images/f11")
-        mkdir(f"{path}/{dt_string}_corte/images/classifier")
+        mkdir(f"{path}/{dt_string}_corte/classifier")
     else:
         pass
     if f == "f11":
@@ -39,7 +39,7 @@ def generate_structure(f):
     elif f == "f3":
         return f"{path}/{dt_string}_corte/images/f3"
     elif f == "classifier":
-        return f"{path}/{dt_string}_corte/images/classifier"
+        return f"{path}/{dt_string}_corte/classifier"
 
 
 
@@ -54,7 +54,7 @@ def unif_colors(df ,column):
     return dic
 
 def ord_mes(df,column):
-    meses = ["Ene","Feb","Mar","Abr","May","Jun","Ago","Sep","Oct","Nov","Dic"]
+    meses = ["Inv","Ene","Feb","Mar","Abr","May","Jun","Ago","Sep","Oct","Nov","Dic"]
     col_mes = df[column].unique()
     list_mes = []
     for mes in meses:

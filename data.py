@@ -38,4 +38,5 @@ var_f3 = {
     'estado':'descripcion6',
     'tipo_producto':'tipo_producto',
     'costo':'cant*costoprmd',
+    'f3_id':"nro_devolucion"
 }
