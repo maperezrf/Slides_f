@@ -1,6 +1,6 @@
 var_f11 = {
-    'path_df': 'C:/Users/ext_maperezr/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220328_f11.csv',
-    'trend_path': 'input/tendencias.xlsx', 
+    'path_df': 'C:/Users/palejparra/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220404_f11_abiertos.csv',
+    'trend_path': 'C:/Users/palejparra/Falabella/EQUIPO-ANALYTICS - General/SEGUIMIENTO-FS/F11/tendencias.xlsx', 
     'f11_id':'NRO_F11',
     'propietario':'PROPIETARIO',
     'estado':'ESTADO',
@@ -11,11 +11,12 @@ var_f11 = {
     'mes':'MES', 
     'costo':'TOTAL_COSTO',
     'grupo':'GRUPO',
-    'fecha_corte':'FECHA_CORTE'}
+    'fecha_corte':'FECHA_CORTE', 
+    'servicio':'SERVICIO'}
 
-var_f4 = {
-    'path_df':'input/220329-0845-f4-output.csv',
-    'path_df_clas':'output/220329_corte/220329_f4_clasificado.csv',
+var_f4={
+    'path_df':'C:/Users/palejparra/Falabella/EQUIPO-ANALYTICS - General/DATA/F4/220401-1613-f4-output.csv',
+    'path_df_clas':'output/220329_f4_clasificado.csv',
     'marcas_df':'input/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
