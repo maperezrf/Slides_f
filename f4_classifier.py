@@ -6,6 +6,7 @@ from data import var_f4
 from general import generate_structure
 from f4 import F4
 dt_string = datetime.now().strftime('%y%m%d')
+pd.options.display.float_format = '${:,.0f}'.format
 
 class CLASSIFIER_F4():
 
@@ -97,8 +98,8 @@ class CLASSIFIER_F4():
         self.reg_clasificados = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].notna()].shape[0]
         self.reg_sin_marca = self.f4_clas_marc.loc[self.f4_clas_marc["Marca"].isna(), "upc"].nunique()
         self.montos_estado = self.f4.groupby([var_f4["estado"]])[[var_f4["costo"]]].sum()/1e6
-        self.reservado = self.f4.loc[self.f4[var_f4["estado"]] == "reservado"].groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum()/1e6
-        self.registrado = self.f4.loc[self.f4[var_f4["estado"]] == "registrado"].groupby([var_f4["estado"],"fecha_creacion"])[[var_f4["costo"]]].sum()/1e6
+        self.reservado = self.f4.loc[self.f4[var_f4["estado"]] == "reservado"].groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum()
+        self.registrado = self.f4.loc[self.f4[var_f4["estado"]] == "registrado"].groupby([var_f4["estado"],"fecha_creacion"])[[var_f4["costo"]]].sum()
         self.montos_estado = self.montos_estado.reset_index()
 
     def print_data(self):
@@ -129,6 +130,6 @@ class CLASSIFIER_F4():
     # TODO un método para las reglas de tiendas y otro para CD 
 
 f4_classifier = CLASSIFIER_F4()
-f4 = F4()
-f4_clasificada = f4_classifier.f4_clas_marc
-f4.iniciar(f4_clasificada)
+# f4 = F4()
+# f4_clasificada = f4_classifier.f4_clas_marc
+# f4.iniciar(f4_clasificada)
