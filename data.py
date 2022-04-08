@@ -11,7 +11,8 @@ var_f11 = {
     'mes':'MES', 
     'costo':'TOTAL_COSTO',
     'grupo':'GRUPO',
-    'fecha_corte':'FECHA_CORTE'}
+    'fecha_corte':'FECHA_CORTE', 
+    'servicio':'SERVICIO'}
 
 var_f4 = {
     'path_df':'input/220404_f4.csv',
