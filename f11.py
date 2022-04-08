@@ -13,8 +13,8 @@ class F11():
     
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
-    mes=['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21'] # Editar esta lista cada vez 
-    rango_fechas = ['2022-02-20','2022-04-05']
+    mes=['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22'] # Editar esta lista cada vez 
+    rango_fechas = ['2022-02-20','2022-04-10']
 
     f11_tcosto  = None
     f11_tm90_costo  = None
@@ -127,7 +127,7 @@ class F11():
         f11_empresa_sede = px.bar(df, x=dtagco['mes'], y=dtagco['costo'], color=dtagco['grupo'], text=dtagco['costo'], text_auto='.2s', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
         f11_empresa_sede.update_layout(barmode='stack',title_text=f"F11s empresa abiertos por sede - Total abierto {ta/1e6:,.0f}M") #,uniformtext=dict(mode="hide", minsize=10),legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         f11_empresa_sede.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
-        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.75, y1=0.75,line=dict(color="red", width=2,))
+        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.81, y1=0.75,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0] 
         f11_empresa_sede.add_annotation(x=mes_ref, y=1.2*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
         f11_empresa_sede.add_annotation(x=mes_ref, y=1.1*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
@@ -143,7 +143,7 @@ class F11():
         f11_es_cantidad = px.bar(df, x=dtagco['mes'], y=dtagco['f11_id'], color=dtagco['grupo'], text=dtagco['f11_id'], text_auto='.0f', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
         f11_es_cantidad.update_layout(barmode='stack',title_text=f"F11s empresa abiertos por sede - Total abierto {ta:,.0f} folios de F11" ) #,uniformtext=dict(mode="hide", minsize=10),legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         f11_es_cantidad.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
-        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.75, y1=1,line=dict(color="red", width=2,))
+        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.81, y1=1,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0]
         f11_es_cantidad.add_annotation(x=mes_ref, y=1100, text= f"Total > 90 días = {gb_annotations.sum()[0]:,.0f} folios", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO igual que en la lina 88
         f11_es_cantidad.add_annotation(x=mes_ref, y=1000,text= f"CD = {gb_annotations.loc['CD'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
@@ -242,4 +242,4 @@ def set_fecha_corte(df, fecha_corte=date.today()):
 
 f11 = F11()
 f11.f11_resfil()
-f11.tendencias()
+#f11.tendencias()

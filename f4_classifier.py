@@ -47,8 +47,9 @@ class CLASSIFIER_F4():
 
     # Filters
     def filters(self):
-        self.f4_db_res = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='reservado') & (self.f4[var_f4["fecha_res"]] >= "2022-01-01")].reset_index(drop=True)
-        self.f4_db_reg = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='registrado') & (self.f4["fecha_creacion"] >= "2022-01-01")].reset_index(drop=True)
+        dado_de_baja = self.fltr_dado_baja()
+        self.f4_db_res = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='reservado')].reset_index(drop=True) # & (self.f4[var_f4["fecha_res"]] >= "2022-01-01")].reset_index(drop=True)
+        self.f4_db_reg = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='registrado')].reset_index(drop=True) # & (self.f4["fecha_creacion"] >= "2022-01-01")].reset_index(drop=True)
 
     # Methods 
     def set_posible_causa(self):
@@ -71,6 +72,7 @@ class CLASSIFIER_F4():
 
         # Filtros para CD
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'patalla\w?|rota\w?|pantalla quebrada'), 'Posible Causa'] =  'Pantallas rotas'
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'suma'), 'Posible Causa'] = 'Recobro suma'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobro suppla'), 'Posible Causa'] = 'Recobro suppla'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='CD') & (self.f4_db_res[var_f4["destino"]].str.contains(r'[1][1]\d{7,} sin recupero|[1][2]\d{7,} sin recupero')), 'Posible Causa'] = 'Cierre de F11 - CD sin recupero'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'cobro\b.*\d{10}|\d{10}.*cobro\b|recupero'), 'Posible Causa'] = 'Recobro a transportadora'
@@ -98,11 +100,18 @@ class CLASSIFIER_F4():
         self.reg_clasificados = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].notna()].shape[0]
         self.reg_sin_marca = self.f4_clas_marc.loc[self.f4_clas_marc["Marca"].isna(), "upc"].nunique()
         self.montos_estado = self.f4.groupby([var_f4["estado"]])[[var_f4["costo"]]].sum()/1e6
+<<<<<<< Updated upstream
         self.reservado = self.f4.loc[self.f4[var_f4["estado"]] == "reservado"].groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum()
         self.registrado = self.f4.loc[self.f4[var_f4["estado"]] == "registrado"].groupby([var_f4["estado"],"fecha_creacion"])[[var_f4["costo"]]].sum()
+=======
+        self.reservado = self.f4.loc[self.f4[var_f4["estado"]] == "reservado"].groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum()/1e6
+        registrado = self.f4.loc[self.f4[var_f4["estado"]] == "registrado"].groupby([var_f4["estado"],"fecha_creacion"])[[var_f4["costo"]]].sum()/1e6
+>>>>>>> Stashed changes
         self.montos_estado = self.montos_estado.reset_index()
 
-    def print_data(self):
+        self.print_data(registrado)
+
+    def print_data(self, registrado):
         print(f"\nCantidad de registros clasificados posible causa: {self.reg_clasificados}")
         print(f"Cantidad de registros sin clasificar posible causa: {self.reg_sin_clasificar}")
         print(f"Cantidad de registros sin clasificar marca: {self.reg_sin_marca}\n")
@@ -110,7 +119,7 @@ class CLASSIFIER_F4():
         print("Reservado por locales")
         print(f"{self.reservado}\n")
         print("Registrado por fechas")
-        print(f"{self.registrado}\n")
+        print(f"{registrado}\n")
     
     def save_files(self):
         self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
