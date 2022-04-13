@@ -24,7 +24,6 @@ class CLASSIFIER_F4():
         self.set_posible_causa()
         self.set_marca()
         self.calc_data()
-        self.print_data()
         self.save_files()
 
     # Trasform 
@@ -49,7 +48,7 @@ class CLASSIFIER_F4():
 
     # Filters
     def filters(self):
-        dado_de_baja = self.fltr_dado_baja()
+        # dado_de_baja = self.fltr_dado_baja()
         self.f4_db_res = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='reservado')].reset_index(drop=True) # & (self.f4[var_f4["fecha_res"]] >= "2022-01-01")].reset_index(drop=True)
         self.f4_db_reg = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='registrado')].reset_index(drop=True) # & (self.f4["fecha_creacion"] >= "2022-01-01")].reset_index(drop=True)
 
@@ -116,7 +115,7 @@ class CLASSIFIER_F4():
         print("Reservado por locales")
         print(f"{self.reservado}\n")
         print("Registrado por fechas")
-        print(f"{registrado}\n")
+        print(f"{self.registrado}\n")
     
     def save_files(self):
         self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
