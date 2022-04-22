@@ -10,7 +10,8 @@ pd.set_option('display.max_columns', 500)
 class F3():
 
     dt_string = datetime.now().strftime('%y%m%d')
-    mes_1= '2022-02-28' # calculo de 30 días atras
+    mes_1 = "2022-03-19"#(datetime.now()-timedelta(days=30)).strftime('%y-%m-%d')
+   
     def __init__(self) -> None:
        self.f3=pd.read_csv(var_f3['path_df'], sep=';', dtype=object)
        self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype=str)
@@ -34,6 +35,9 @@ class F3():
         self.f3[var_f3['tipo_producto']] = self.f3[var_f3['tipo_producto']].str.capitalize()
         self.f3_tendencia['costo'] = pd.to_numeric(self.f3_tendencia['costo'])
         self.f3_tendencia['fecha ptt'] = pd.to_datetime(self.f3_tendencia['fecha ptt'], format='%Y-%m-%d')
+    
+    def get_date_max(self):
+        return self.f3[var_f3['fecha_res']].max().strftime('%d-%m-%Y')
 
     def set_local_agg(self):
         self.f3.loc[self.f3.local.isin(const.tienda), 'local_agg'] = 'TIENDA'
@@ -172,7 +176,7 @@ class F3():
             total = self.f3_ab_mkp[column].sum()/1e6
             fig = px.bar(mkp_sede, x ='mes', y=column, color='local_agg', title=f'F3 Marketplace abiertos por sede - Total costo ${total:,.0f}M', labels={ column:'Costo promedio', 'mes':'Mes de reserva', 'local_agg':'Local'}, text=column,text_auto='.2s', color_discrete_map = color )  
             fig.update_layout(legend=dict(yanchor='top', y=0.9, xanchor='left', x=0.1))
-            fig.update_yaxes(range=[0,4*1e8], constrain='domain')
+            fig.update_yaxes(range=[0,6*1e8], constrain='domain')
         elif column == var_f3['f3_id']:
             color = unif_colors(mkp_sede, 'local_agg')
             total = self.f3_ab_mkp[column].nunique()
@@ -219,15 +223,13 @@ class F3():
         return self.fig
 
     def save_graf(self):
-        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.svg' ,width=600, height=400)
-        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva_cant.svg' ,width=600, height=400)
-        self.graf_mkp_sede.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.svg',width=600, height=350)
-        self.graf_mkp_sede_num.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede_cant.svg',width=600, height=350)
-        self.graf_tend_mkp.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_Producto.svg',width=650, height=400)
-        self.graf_tend_prod.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_mkp.svg',width=650, height=400)
-        self.fig_prd_costo.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_producto_costo.svg',width=500, height=480)
-        self.fig_mkp_costo.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_mkp_costo.svg',width=500, height=480)
-        self.fig_prd_cantidad.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_prodcuto_cantidad.svg',width=500, height=480)
-        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_mkp_cantidad.svg',width=500, height=480)
-
-f3 = F3()
+        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.png' ,width=600, height=400)
+        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=400)
+        self.graf_mkp_sede.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.png',width=600, height=350)
+        self.graf_mkp_sede_num.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede_cant.png',width=600, height=350)
+        self.graf_tend_mkp.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_Producto.png',width=650, height=400)
+        self.graf_tend_prod.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_mkp.png',width=650, height=400)
+        self.fig_prd_costo.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_producto_costo.png',width=500, height=480)
+        self.fig_mkp_costo.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_mkp_costo.png',width=500, height=480)
+        self.fig_prd_cantidad.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_prodcuto_cantidad.png',width=500, height=480)
+        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_mkp_cantidad.png',width=500, height=480)
