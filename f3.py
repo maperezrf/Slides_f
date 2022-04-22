@@ -13,13 +13,13 @@ class F3():
     mes_1= '2022-02-28' # calculo de 30 días atras
     def __init__(self) -> None:
        self.f3=pd.read_csv(var_f3['path_df'], sep=';', dtype=object)
-       self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype=str, sheet_name='f3')
+       self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype=str)
        self.path = generate_structure('f3')
        self.transform()
        self.set_local_agg()
        self.filters()
        self.make_groupby()
-    #    self.save_graf()
+       self.save_graf()
 
     def transform(self):
         self.f3[var_f3['costo']] = pd.to_numeric(self.f3[var_f3['costo']])
@@ -27,14 +27,14 @@ class F3():
         fechas = [var_f3['fecha_res'], var_f3['fecha_envio'], var_f3['fecha_anulacion'],var_f3['fecha_confirmacion']]
         self.f3.loc[:, fechas] = self.f3[fechas].apply(lambda x: x.replace(['ene', 'abr', 'ago', 'dic'], ['jan', 'apr', 'aug', 'dec'], regex=True))
         for i in fechas:self.f3[i] = pd.to_datetime(self.f3[i], format='%d-%b-%Y')
+        self.f3['mes_n'] = self.f3[var_f3['fecha_res']].dt.strftime('%m')
+        self.f3['mes_n'] = pd.to_numeric(self.f3['mes_n'])
         self.f3['mes'] = self.f3[var_f3['fecha_res']].dt.strftime('%b-%y')
         self.f3 = self.f3.sort_values(var_f3['fecha_res'])
         self.f3[var_f3['tipo_producto']] = self.f3[var_f3['tipo_producto']].str.capitalize()
         self.f3_tendencia['costo'] = pd.to_numeric(self.f3_tendencia['costo'])
         self.f3_tendencia['fecha ptt'] = pd.to_datetime(self.f3_tendencia['fecha ptt'], format='%Y-%m-%d')
-        self.f3_tendencia["costo"] = self.f3_tendencia["costo"].apply(lambda x : f'{round(x/1e6):.0f}') 
-        self.f3_tendencia['costo'] = pd.to_numeric(self.f3_tendencia['costo'])
-        
+
     def set_local_agg(self):
         self.f3.loc[self.f3.local.isin(const.tienda), 'local_agg'] = 'TIENDA'
         self.f3.loc[self.f3.local.isin(const.cd), 'local_agg'] = 'CD'
@@ -48,8 +48,7 @@ class F3():
         self.f3_ab_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']] =='Market place'].reset_index(drop = True)
         self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= self.mes_1,'mayor a 30'] = 'y'
         self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp['mayor a 30'].isna(),'mayor a 30'] = 'n'
-        self.tend_prod = self.f3_tendencia.loc[self.f3_tendencia["tipo producto"] == "producto"]
-        self.tend_mkp = self.f3_tendencia.loc[self.f3_tendencia["tipo producto"] == "mkp"]
+      
     
     def make_groupby(self):
         grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort =False)[var_f3['costo']].sum().reset_index()
@@ -69,7 +68,7 @@ class F3():
         self.graf_f3_prd_mkp_num =self.calc_datos_grap_f3_ab(grupo_F3_prd_mkp_num,var_f3['f3_id'])
         self.graf_f3_prd_mkp_cost = self.calc_datos_grap_f3_ab(grupo_F3_prd_mkp,var_f3['costo'])
         self.calc_tend()
-        self.graf_tend_mkp = self.grap_tend("mkp")
+        self.graf_tend_mkp = self.grap_tend('mkp')
         self.graf_tend_prod = self.grap_tend()
        
 
@@ -137,46 +136,49 @@ class F3():
 
     def calc_tend(self):
         grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort =False)[var_f3['costo']].sum().reset_index()
-        f3_mkp_3m = pd.to_numeric('{:.0f}'.format(grupo_F3_prd_mkp.loc[(grupo_F3_prd_mkp[var_f3['tipo_producto']]=='Market place'), var_f3["costo"]].sum()/1e6))
-        f3_prd_3m = pd.to_numeric('{:.0f}'.format(grupo_F3_prd_mkp.loc[(grupo_F3_prd_mkp[var_f3['tipo_producto']]=='Producto'), var_f3["costo"]].sum()/1e6))
-        ult_fecha = self.f3_tendencia["fecha ptt"].max().strftime('%d-%m-%Y')
-        ult_mkp_ten = self.f3_tendencia.loc[(self.f3_tendencia["fecha ptt"] == ult_fecha) & (self.f3_tendencia["tipo producto"] == "mkp"),"costo"].item()
-        ult_prod_ten = self.f3_tendencia.loc[(self.f3_tendencia["fecha ptt"] == ult_fecha) & (self.f3_tendencia["tipo producto"] == "producto"),"costo"].item()
+        f3_mkp_3m = pd.to_numeric('{:.0f}'.format(grupo_F3_prd_mkp.loc[(grupo_F3_prd_mkp[var_f3['tipo_producto']]=='Market place'), var_f3['costo']].sum()/1e6))
+        f3_prd_3m = pd.to_numeric('{:.0f}'.format(grupo_F3_prd_mkp.loc[(grupo_F3_prd_mkp[var_f3['tipo_producto']]=='Producto'), var_f3['costo']].sum()/1e6))
+        ult_fecha = self.f3_tendencia['fecha ptt'].max().strftime('%d-%m-%Y')
+        ult_mkp_ten = self.f3_tendencia.loc[(self.f3_tendencia['fecha ptt'] == ult_fecha) & (self.f3_tendencia['tipo producto'] == 'mkp'),'costo'].item()
+        ult_prod_ten = self.f3_tendencia.loc[(self.f3_tendencia['fecha ptt'] == ult_fecha) & (self.f3_tendencia['tipo producto'] == 'producto'),'costo'].item()
 
         if (f3_mkp_3m != ult_mkp_ten) & (f3_prd_3m != ult_prod_ten):
             datos ={
-                "tipo producto" : ["producto","mkp"],
-                "costo" : [f3_prd_3m,f3_mkp_3m],
-                "fecha ptt" : [datetime.now(), datetime.now()]
+                'tipo producto' : ['producto','mkp'],
+                'costo' : [f3_prd_3m,f3_mkp_3m],
+                'fecha ptt' : [datetime.now(), datetime.now()]
             }
             df = pd.DataFrame(datos)
             tendencias = pd.concat([self.f3_tendencia,df])
-            tendencias.to_excel("input/tendencias_f3.xlsx",index=False)
+            tendencias.to_excel('input/tendencias_f3.xlsx',index=False)
             self.f3_tendencia = tendencias
+       
 
 
-    def grap_tend(self,tipo_producto = "producto"): 
-        if tipo_producto == "mkp":
-            titulo = "Tendencia F3 abierto tipo marketplace según fecha de corte"
+    def grap_tend(self,tipo_producto = 'producto'): 
+        self.tend_prod = self.f3_tendencia.loc[self.f3_tendencia['tipo producto'] == 'producto']
+        self.tend_mkp = self.f3_tendencia.loc[self.f3_tendencia['tipo producto'] == 'mkp']
+        if tipo_producto == 'mkp':
+            titulo = 'Tendencia F3 abierto tipo marketplace según fecha de corte'
             df = self.tend_mkp
         else:
-            titulo = "Tendencia F3 abierto tipo producto según fecha de corte"
+            titulo = 'Tendencia F3 abierto tipo producto según fecha de corte'
             df = self.tend_prod
-        self.fig = px.line(df, x="fecha ptt", y="costo", labels={'fecha ptt':'Fecha de corte', "costo": "costo promedio (Millones)" },
+        self.fig = px.line(df, x='fecha ptt', y='costo', labels={'fecha ptt':'Fecha de corte', 'costo': 'costo promedio (Millones)' },
         text='costo', color_discrete_sequence=['rgb(204, 97, 176)'], title=titulo )
-        self.fig.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
-        self.fig.update_traces(textposition="bottom center")
-        fecha_max = (df["fecha ptt"].max() + timedelta (days = 5)).strftime('%d-%m-%Y')
-        fecha_min = (df["fecha ptt"].min() - timedelta (5)).strftime('%d-%m-%Y')
-        self.fig.update_xaxes(range=[fecha_min, fecha_max], constrain="domain")
+        self.fig.update_layout(legend=dict(yanchor='top', y=1, xanchor='left', x=0.45))
+        self.fig.update_traces(textposition='bottom center')
+        fecha_max = (df['fecha ptt'].max() + timedelta (days = 5)).strftime('%d-%m-%Y')
+        fecha_min = (df['fecha ptt'].min() - timedelta (5)).strftime('%d-%m-%Y')
+        self.fig.update_xaxes(range=[fecha_min, fecha_max], constrain='domain')
         return self.fig
 
     def save_graf(self):
-        self.graf_f3_prd_mkp_cost.show()#write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.svg' ,width=600, height=400)
-        self.graf_f3_prd_mkp_num.show()#write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.svg' ,width=600, height=400)
-        self.graf_mkp_sede.show()#write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.svg',width=600, height=350)
-        self.graf_mkp_sede_num.show()#write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.svg',width=600, height=350)
-        self.graf_tend_mkp.show()#grafica_tendencia_f3.write_image(f"images_f3/{dt_string}_f3_tendencia_Producto.svg",width=650, height=400)
-        self.graf_tend_prod.show()#grafica_tendencia_f3.write_image(f"images_f3/{dt_string}_f3_tendencia_mkp.svg",width=650, height=400)
+        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.svg' ,width=600, height=400)
+        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.svg' ,width=600, height=400)
+        self.graf_mkp_sede.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.svg',width=600, height=350)
+        self.graf_mkp_sede_num.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.svg',width=600, height=350)
+        self.graf_tend_mkp.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_Producto.svg',width=650, height=400)
+        self.graf_tend_prod.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_mkp.svg',width=650, height=400)
 
 f3 = F3()

@@ -50,27 +50,30 @@ class F4():
         self.f4_2022_pant_rotas = self.f4_2022.loc[self.f4_2022["Posible Causa"]== "Pantallas rotas"]
     
     def set_week_f4(self):
-        lista_mes = self.f4_2022.mes.unique()
+        self.f4_2022.loc[self.f4_2022.mes== "Inventario" ,"mes"] = "Ene"
+        self.f4_sem = self.f4_2022.copy()
+        lista_mes = self.f4_sem.mes.unique()
         f_inicio  = datetime.strptime('2022/01/01', '%Y/%m/%d')
         f_cortes = f_inicio
         for mes in enumerate(lista_mes):
             sem = 0
-            while f_cortes <= self.f4_2022.loc[self.f4_2022.mes == mes[1], var_f4['fecha_res']].max():
+            while f_cortes < self.f4_sem.loc[self.f4_sem.mes == mes[1], var_f4['fecha_res']].max():
                 sem = sem + 1
                 f_cortes = f_inicio + timedelta(days = 7)
                 if sem == 4:
                     dias = monthrange(2011,mes[0]+1)[1]
                     if dias == 28:
-                        pass
+                        f_cortes = f_cortes - timedelta(days = 4)
                     elif dias == 30:
-                        f_cortes = f_cortes + timedelta(days = 2)
+                        # f_cortes = f_cortes + timedelta(days = 1) # TODO revisar para meses de 30 dias 
+                        pass
                     elif dias == 31:
-                        f_cortes = f_cortes + timedelta(days = 3)
-                self.f4_2022.loc[(self.f4_2022[var_f4["fecha_res"]] >= f_inicio) & (self.f4_2022[var_f4["fecha_res"]] <= f_cortes), "Semana (fecha de reserva)"] = f"S{sem}{f_cortes.strftime('%b')}"
-                f_inicio = f_cortes
+                        f_cortes = f_cortes - timedelta(days = 1)
+                self.f4_sem.loc[(self.f4_sem[var_f4["fecha_res"]] >= f_inicio) & (self.f4_sem[var_f4["fecha_res"]] <= f_cortes), "Semana (fecha de reserva)"] = f"S{sem}{f_cortes.strftime('%b')}"
+                f_inicio = f_cortes + timedelta(days = 1)
 
     def make_groupby(self):
-        f4_x_semanas = self.f4_2022.groupby(["local_agg", "Semana (fecha de reserva)"], sort =False)[var_f4['costo']].sum().reset_index()
+        f4_x_semanas =  self.f4_sem.groupby(["local_agg", "Semana (fecha de reserva)"], sort =False)[var_f4['costo']].sum().reset_index()
         f4_x_años = self.f4_21_22.groupby(["año", "mes"],sort=False)[var_f4['costo']].sum().reset_index()
         gb_local = self.f4_2022.groupby('local_agg')[var_f4['costo']].sum().reset_index()
         gb_f4g_graf_21 = self.f4_2022.groupby(['mes', "Posible Causa", "local_agg"]).agg({var_f4['costo']:"sum"}).reset_index()
@@ -111,10 +114,10 @@ class F4():
         gb_f4mes_tot = gb_f4mes_tot.loc[gb_f4mes_tot['Posible Causa'].isin(orden_pc_tot)]
         
 
-        # top_10_marca.to_excel(f"{self.path}_tabla_top_10_marca.xlsx")
-        # marcas_calidad.to_excel(f"{self.path}_tabla_marca_calidad.xlsx")
-        # f4_pant_rotas.to_excel(f"{self.path}_pantallas_rotas.xlsx")
-        # self.f4_2022_pant_rotas.to_excel(f"{self.path}_tabla_pantallas_rotas.xlsx")
+        top_10_marca.to_excel(f"{self.path}_tabla_top_10_marca.xlsx")
+        marcas_calidad.to_excel(f"{self.path}_tabla_marca_calidad.xlsx")
+        f4_pant_rotas.to_excel(f"{self.path}_pantallas_rotas.xlsx")
+        self.f4_2022_pant_rotas.to_excel(f"{self.path}_tabla_pantallas_rotas.xlsx")
 
         set_columns_sum(f4_x_semanas,"Semana (fecha de reserva)",var_f4['costo'])
         set_columns_sum(f4_x_semanas,"local_agg",var_f4['costo'])
@@ -181,7 +184,7 @@ class F4():
         orden = gb_f4g_graf_21.sort_values("total_precio_costo", ascending=False)["Posible Causa"].unique()
         gb_f4g_graf_21["total_precio_costo"] = gb_f4g_graf_21["total_precio_costo"]/1e6
         self.graf_f4_pos_causa = px.bar(gb_f4g_graf_21, y="Posible Causa", x=var_f4['costo'] , color = "local_agg",text=var_f4['costo'],text_auto='.2s',
-        title= f"Posibles causas de F4 2022 dados de baja por locales - Total costo $ {gb_f4g_graf_21[var_f4['costo']].sum():,.0f} M ", labels={"Posible Causa":"Posibles causas",var_f4['costo']:"Costo total (Millones)", "local_agg":"Local", 'mes':'Mes de reserva'}, facet_col='mes', category_orders={'Posible Causa':orden, 'mes':['Ene', 'Feb', 'Mar']}, color_discrete_map = colores)
+        title= f"Posibles causas de F4 2022 dados de baja por locales - Total costo $ {gb_f4g_graf_21[var_f4['costo']].sum():,.0f} M ", labels={"Posible Causa":"Posibles causas",var_f4['costo']:"Costo total (Millones)", "local_agg":"Local", 'mes':'Mes de reserva'}, facet_col='mes', category_orders={'Posible Causa':orden, 'mes':['Inventario','Ene', 'Feb', 'Mar']}, color_discrete_map = colores)
         self.graf_f4_pos_causa.update_layout(legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=1))
 
     def grap_pie(self, gb_local):

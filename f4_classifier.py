@@ -11,9 +11,11 @@ pd.options.display.float_format = '${:,.0f}'.format
 class CLASSIFIER_F4():
 
     dt_string = datetime.now().strftime('%y%m%d')
+    f4_db_res = None
+    f4_db_reg = None
 
     def __init__(self):
-        self.f4 = pd.read_csv(var_f4["path_df"], sep=';', dtype=str)
+        self.f4 = pd.read_csv(var_f4['path_df'], sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
         self.path = generate_structure("classifier")
         self.transform()
@@ -100,7 +102,7 @@ class CLASSIFIER_F4():
         self.reg_clasificados = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].notna()].shape[0]
         self.reg_sin_marca = self.f4_clas_marc.loc[self.f4_clas_marc["Marca"].isna(), "upc"].nunique()
         self.montos_estado = self.f4.groupby([var_f4["estado"]])[[var_f4["costo"]]].sum()/1e6
-        self.reservado = self.f4.loc[self.f4[var_f4["estado"]] == "reservado"].groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum()
+        self.reservado = self.f4_db_res.groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum()
         self.registrado = self.f4.loc[self.f4[var_f4["estado"]] == "registrado"].groupby([var_f4["estado"],"fecha_creacion"])[[var_f4["costo"]]].sum()
         self.montos_estado = self.montos_estado.reset_index()
 
@@ -119,8 +121,10 @@ class CLASSIFIER_F4():
     def save_files(self):
         self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
+        self.f4_clas_marc.loc[(self.f4_clas_marc.local_agg == 'CD')&(self.f4[var_f4["fecha_res"]] < "2022-03-31")].to_csv(f"{self.path}/{self.dt_string}_f4_clasificado_CD.csv",sep=";" , index=False)
         self.f4_db_reg.to_excel(f"{self.path}/{self.dt_string}_f4_registrados.xlsx", index=False)
         print("Se guardo archivo de F4s en estado registrado")
+        self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
         if self.reg_sin_marca > 0:
             upc = self.f4_clas_marc.loc[self.f4_clas_marc["Marca"].isna(), "upc"].unique().tolist()
             pd.DataFrame(upc,columns=["UPC"]).to_excel(f"{self.path}/{self.dt_string}_UPCs_nuevos.xlsx", index=False)
@@ -128,12 +132,13 @@ class CLASSIFIER_F4():
         if self.reg_sin_clasificar > 0:
             self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].to_excel(f"{self.path}/{self.dt_string}_f4_sin_clasificar.xlsx", index=False)
             print("Se guardo archivo con los UPCs, a los cuales no se asociaron marcas")
+        
         return 
 
 
     # TODO un método para las reglas de tiendas y otro para CD 
 
 f4_classifier = CLASSIFIER_F4()
-# f4 = F4()
-# f4_clasificada = f4_classifier.f4_clas_marc
-# f4.iniciar(f4_clasificada)
+f4 = F4()
+f4_clasificada = f4_classifier.f4_clas_marc 
+f4.iniciar(f4_clasificada)
