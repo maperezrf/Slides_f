@@ -2,8 +2,6 @@ from os import mkdir,listdir
 from datetime import datetime
 import constants as const
 
-
-dt_string = datetime.now().strftime('%y%m%d')
 path = "output"
 
 def set_columns_sum(base, var, column):    
@@ -22,7 +20,7 @@ def set_columns_nunique(base, var, column):
         base.loc[base[var]==item, var] = f'{item} {round(gb_var.loc[item, column]):,.0f}'
     return base 
 
-def generate_structure(f):
+def generate_structure(f, dt_string):
     if f"{dt_string}_corte" not in listdir(path):
         mkdir(f"{path}/{dt_string}_corte")
         mkdir(f"{path}/{dt_string}_corte/images")
@@ -32,17 +30,16 @@ def generate_structure(f):
         mkdir(f"{path}/{dt_string}_corte/classifier")
     else:
         pass
-    if f == "f11":
-        return f"{path}/{dt_string}_corte/images/f11"
-    elif f == "f4":
-        return f"{path}/{dt_string}_corte/images/f4"
-    elif f == "f3":
-        return f"{path}/{dt_string}_corte/images/f3"
-    elif f == "classifier":
-        return f"{path}/{dt_string}_corte/classifier"
-
-
-
+    
+    # TODO los siguientes paths deben quedar dentro de cada clase, ejemplo la de F3
+    # if f == "f11":
+    #     return f"{path}/{dt_string}_corte/images/f11"
+    # elif f == "f4":
+    #     return f"{path}/{dt_string}_corte/images/f4"
+    # elif f == "f3":
+    #     return f"{path}/{dt_string}_corte/images/f3"
+    # elif f == "classifier":
+    #     return f"{path}/{dt_string}_corte/classifier"
 
 def unif_colors(df ,column):
     unique = df[column].unique()

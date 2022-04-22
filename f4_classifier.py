@@ -8,6 +8,11 @@ from f4 import F4
 dt_string = datetime.now().strftime('%y%m%d')
 pd.options.display.float_format = '${:,.0f}'.format
 
+# A tener en cuenta: 
+# TODO 1. Entre método y método solo un espacio de separación 
+# TODO 2. cuando hay signo "=" dejar un espacio antes y después  
+# TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
+
 class CLASSIFIER_F4():
 
     dt_string = datetime.now().strftime('%y%m%d')
@@ -93,7 +98,7 @@ class CLASSIFIER_F4():
 
     def set_marca(self):
         self.marcas.drop_duplicates("upc",inplace=True)
-        self.f4_clas_marc = self.f4_db_res.merge(self.marcas, how="left", on="upc")
+        self.f4_clas_marc = self.f4_db_res.merge(self.marcas, how="left", on="upc") # TODO si f4_clas_marc es variable global entonces debe ir en el init o en inialización 
 
     def calc_data_print(self):
         reg_sin_clasificar = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].shape[0]

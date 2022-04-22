@@ -7,15 +7,20 @@ import constants as const
 from data import var_f3
 pd.set_option('display.max_columns', 500)
 
+# A tener en cuenta: 
+# TODO 1. Entre método y método solo un espacio de separación 
+# TODO 2. cuando hay signo "=" dejar un espacio antes y después  
+# TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
+
 class F3():
 
     dt_string = datetime.now().strftime('%y%m%d')
-    mes_1 = "2022-03-19"#(datetime.now()-timedelta(days=30)).strftime('%y-%m-%d')
    
-    def __init__(self) -> None:
+    def __init__(self, fr, fc) -> None:
+       self.fecha_riesgo = fr
        self.f3=pd.read_csv(var_f3['path_df'], sep=';', dtype=object)
-       self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype=str)
-       self.path = generate_structure('f3')
+       self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype=str) # TODO leer path desde var_f3
+       self.path = f"output/{fc}_corte/images/f3"
        self.transform()
        self.set_local_agg()
        self.filters()
@@ -23,8 +28,9 @@ class F3():
        self.save_graf()
 
     def transform(self):
+        # F3 planilla
         self.f3[var_f3['costo']] = pd.to_numeric(self.f3[var_f3['costo']])
-        self.f3[var_f3['local']] = pd.to_numeric(self.f3[var_f3['local']])
+        self.f3[var_f3['local']] = pd.to_numeric(self.f3[var_f3['local']]) # TODO no convertir a numérico 
         fechas = [var_f3['fecha_res'], var_f3['fecha_envio'], var_f3['fecha_anulacion'],var_f3['fecha_confirmacion']]
         self.f3.loc[:, fechas] = self.f3[fechas].apply(lambda x: x.replace(['ene', 'abr', 'ago', 'dic'], ['jan', 'apr', 'aug', 'dec'], regex=True))
         for i in fechas:self.f3[i] = pd.to_datetime(self.f3[i], format='%d-%b-%Y')
@@ -33,6 +39,8 @@ class F3():
         self.f3['mes'] = self.f3[var_f3['fecha_res']].dt.strftime('%b-%y')
         self.f3 = self.f3.sort_values(var_f3['fecha_res'])
         self.f3[var_f3['tipo_producto']] = self.f3[var_f3['tipo_producto']].str.capitalize()
+
+        # F3 tendencias
         self.f3_tendencia['costo'] = pd.to_numeric(self.f3_tendencia['costo'])
         self.f3_tendencia['fecha ptt'] = pd.to_datetime(self.f3_tendencia['fecha ptt'], format='%Y-%m-%d')
     
@@ -45,13 +53,15 @@ class F3():
         self.f3.loc[self.f3.local_agg.isna(), 'local_agg'] = 'OTROS'
 
     def filters(self):
-        self.f3_2021 = self.f3.loc[self.f3[var_f3['fecha_res']]>='2021-01-01'].reset_index(drop = True)
-        self.f3_abierto = self.f3.loc[self.f3[var_f3['estado']].isin(['enviado','reservado'])].reset_index(drop = True)
-        f3_cerrados = self.f3.loc[self.f3[var_f3['estado']].isin(['anulado','confirmado'])].reset_index(drop = True)
-        self.f3_ab_pr_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']].isin(['Producto','Market place'])].reset_index(drop = True)
-        self.f3_mayor_30 = self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= self.mes_1].reset_index(drop = True)
-        self.f3_ab_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']] =='Market place'].reset_index(drop = True)
-        self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= self.mes_1,'mayor a 30'] = 'y'
+        self.f3_2021 = self.f3.loc[self.f3[var_f3['fecha_res']]>='2021-01-01'].reset_index(drop = True)  # TODO leer desde var_f3 = fecha_inicial
+        self.f3_abierto = self.f3.loc[self.f3[var_f3['estado']].isin(['enviado','reservado'])].reset_index(drop = True)  # TODO leer desde var_f3 = abiertos
+        f3_cerrados = self.f3.loc[self.f3[var_f3['estado']].isin(['anulado','confirmado'])].reset_index(drop = True) # TODO leer desde var_f3 = cerrados
+        
+        self.f3_ab_pr_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']].isin(['Producto','Market place'])].reset_index(drop = True)  # TODO leer desde var_f3 = filtro_tp # TODO si es variable global entonces debe ir en el init o en inialización 
+        self.f3_mayor_30 = self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= self.fecha_riesgo].reset_index(drop = True)  # TODO esta var se inicializa aquí pero luego no se usa
+        self.f3_ab_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']] =='Market place'].reset_index(drop = True) # TODO si es variable global entonces debe ir en el init o en inialización 
+
+        self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= self.fecha_riesgo,'mayor a 30'] = 'y'
         self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp['mayor a 30'].isna(),'mayor a 30'] = 'n'
         self.set_cortes(f3_cerrados)
 
@@ -103,7 +113,6 @@ class F3():
         graf_F3_cerr_prd.update_yaxes(range=[0, df[column].max() + (df[column].max() * 0.25)], constrain='domain')
         return graf_F3_cerr_prd
 
-
     def make_groupby(self):
         grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort =False)[var_f3['costo']].sum().reset_index()
         grupo_F3_prd_mkp_num = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort =False)[var_f3['f3_id']].nunique().reset_index()
@@ -151,22 +160,9 @@ class F3():
         fig = px.bar(grupo_F3_prd_mkp, x='mes', y=axes_y, labels={'mes':'Mes de reserva', var_f3['costo']: 'Costo promedio', var_f3['tipo_producto']:'Tipo producto'}, 
         text=axes_y, text_auto='.2s', color = var_f3['tipo_producto'], color_discrete_sequence=['rgb(36, 121, 108)','rgb(204, 97, 176)'], title = titulo, category_orders={var_f3['tipo_producto']:orden, 'mes':orden_mes })
         fig.update_layout(legend=dict(yanchor='top', y=0.98, xanchor='left', x=1))
-        fig.add_shape(type='rect',
-            xref='paper', yref='paper',
-            x0=0, y0=0,
-            x1=0.9, y1=1,
-            line=dict(
-                color='red',
-                width=2,
-            ))
-        fig.add_annotation(x=orden_mes[0], y= (range_y * 15/100) + range_y,
-                text= f'Total > 30 días = {f3_total_3m}',
-                showarrow=False,
-                font = dict (color = 'red',size = 15))
-        fig.add_annotation(x=orden_mes[0], y= range_y,
-                text= f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}',
-                showarrow=False,
-                font = dict (color = 'red',size = 12))
+        fig.add_shape(type='rect', xref='paper', yref='paper', x0=0, y0=0, x1=0.9, y1=1, line=dict(color='red',width=2, ))
+        fig.add_annotation(x=orden_mes[0], y= (range_y * 15/100) + range_y, text= f'Total > 30 días = {f3_total_3m}', showarrow=False, font = dict (color = 'red',size = 15))
+        fig.add_annotation(x=orden_mes[0], y= range_y, text= f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}', showarrow=False, font = dict (color = 'red',size = 12))
         fig.update_annotations(align='left')
         return fig
     
@@ -222,7 +218,7 @@ class F3():
         self.fig.update_xaxes(range=[fecha_min, fecha_max], constrain='domain')
         return self.fig
 
-    def save_graf(self):
+    def save_graf(self): 
         self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.png' ,width=600, height=400)
         self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=400)
         self.graf_mkp_sede.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.png',width=600, height=350)

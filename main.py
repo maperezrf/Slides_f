@@ -4,18 +4,32 @@ from f3 import F3
 from f4_classifier import CLASSIFIER_F4
 from f4 import F4
 from datetime import datetime
+from general import generate_structure
 dt_string = datetime.now().strftime('%y%m%d')
 
-f3 = F3()
-path_f3 = f3.path
-fecha_corte_f3 = f3.get_date_max()
+# A tener en cuenta: 
+# TODO 1. Entre método y método solo un espacio de separación 
+# TODO 2. cuando hay signo "=" dejar un espacio antes y después  
+# TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
+
+
+# Datos a modificar antes de la ejecución del código
+fecha_riesgo_f3 = "2022-03-19" 
+fecha_corte = '220422'
+
+generate_structure(fecha_corte)
+
+# Inicio
+f3 = F3(fecha_riesgo_f3)
+path_f3 = f3.path #TODO pasar a método get_path()
+fecha_corte_f3 = f3.get_date_max() #TODO ingresar fecha por usuario AAAA-MM-DD
 
 f4_classifier = CLASSIFIER_F4()
+f4_clasificada = f4_classifier.f4_clas_marc #TODO pasar a método get_f4_classified()
 f4 = F4()
-f4_clasificada = f4_classifier.f4_clas_marc 
 f4.iniciar(f4_clasificada)
-path_f4 = f4.path 
-fecha_corte_f4 = f4.get_date_max()
+path_f4 = f4.path #TODO pasar a método get_path()
+fecha_corte_f4 = f4.get_date_max() #TODO unificar con fecha de corte de fecha_corte_f3
 f4_cd,f4_tienda,f4_dvd,f4_venta,reservado = f4_classifier.calculos()
 
 seguimiento_fs = Presentation("input/plantilla_seg_fs.pptx")  # Leer presentacion 
