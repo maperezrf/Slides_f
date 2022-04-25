@@ -20,7 +20,7 @@ def set_columns_nunique(base, var, column):
         base.loc[base[var]==item, var] = f'{item} {round(gb_var.loc[item, column]):,.0f}'
     return base 
 
-def generate_structure(f, dt_string):
+def generate_structure(dt_string):
     if f"{dt_string}_corte" not in listdir(path):
         mkdir(f"{path}/{dt_string}_corte")
         mkdir(f"{path}/{dt_string}_corte/images")

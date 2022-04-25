@@ -14,13 +14,13 @@ dt_string = datetime.now().strftime('%y%m%d')
 
 
 # Datos a modificar antes de la ejecución del código
-fecha_riesgo_f3 = "2022-03-19" 
+fecha_riesgo_f3 = "2022-03-30" 
 fecha_corte = '220422'
 
 generate_structure(fecha_corte)
 
 # Inicio
-f3 = F3(fecha_riesgo_f3)
+f3 = F3(fecha_riesgo_f3,fecha_corte)
 path_f3 = f3.path #TODO pasar a método get_path()
 fecha_corte_f3 = f3.get_date_max() #TODO ingresar fecha por usuario AAAA-MM-DD
 

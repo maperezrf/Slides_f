@@ -49,6 +49,8 @@ class CLASSIFIER_F4():
         self.f4.loc[self.f4[var_f4["local"]].isin(const.cd), 'local_agg'] = 'CD'
         self.f4.loc[self.f4[var_f4["local"]] == 3001, 'local_agg'] = 'DVD ADMINISTRATIVO'
         self.f4.loc[self.f4[var_f4["local"]] == 11, 'local_agg'] = 'VENTA EMPRESA'
+        self.f4.loc[self.f4[var_f4["local"]] == 99, 'local_agg'] = 'ADMINISTRATIVO'
+        self.f4.loc[self.f4[var_f4["local"]].isna(), 'local_agg'] = 'OTROS'
 
     # Filters
     def filters(self):

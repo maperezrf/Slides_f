@@ -31,7 +31,7 @@ var_f4 = {
 }
 
 var_f3 = { 
-    'path_df': 'input/220418_f3.csv',
+    'path_df': 'input/220425_f3.csv',
     'fecha_res':'fecha_reserva',
     'fecha_envio':'fecha_envio',
     'fecha_anulacion':'fecha_anulacion',
@@ -40,5 +40,10 @@ var_f3 = {
     'tipo_producto':'tipo_producto',
     'costo':'cant*costoprmd',
     'f3_id':'nro_devolucion',
-    'local': 'local'
+    'local': 'local',
+    'fecha_inicial':'2021-01-01',
+    'abiertos': ['enviado', 'reservado'],
+    'cerrados' : ['anulado', 'confirmado'],
+    'tipo_tp' : ['Producto','Market place'],
+
 }
