@@ -14,21 +14,23 @@ pd.set_option('display.max_columns', 500)
 
 class F4():
 
-    dt_string = datetime.now().strftime('%y%m%d')
-
     def __init__(self) -> None:
-        pass
+        fecha_corte = None
 
-    def iniciar(self,f4_clasificada): # TODO unificar con el _init_()
+    def iniciar(self,f4_clasificada,fc): # TODO unificar con el _init_()
+        self.fecha_corte = fc
         self.f4_2022 =  f4_clasificada
         self.f4_2021 = pd.read_csv("input/f4_2021.csv",sep =";", dtype = object) # TODO leer path desde var_f3
-        self.path = generate_structure("f4") # TODO  modificar como F3 para que generar estructura quede en main 
+        self.path = f"output/{fc}_corte/images/f4"
         self.f4_21_22()
         self.transform()
         self.filters()
         self.set_week_f4()
         self.make_groupby()
         self.save_grap()
+
+    def get_path(self):
+        return self.path
 
     def f4_21_22(self):
         self.f4_2022["año"] = "2022" # TODO leer desde var_f4
@@ -46,9 +48,6 @@ class F4():
         col_str = ["desc_local","Marca","descripcion_linea"] # TODO leer desde var_f4
         for col in col_str : self.f4_21_22[col] = self.f4_21_22[col].str.capitalize()
         self.f4_21_22.descripcion_linea = self.f4_21_22.linea.str.upper() + ' - ' + self.f4_21_22.descripcion_linea # TODO leer desde var_f4
-    
-    def get_date_max(self):
-        return self.f4_21_22[var_f4['fecha_res']].max().strftime('%d-%m-%Y')
 
     def filters(self):
         self.f4_2022 = self.f4_21_22.loc[self.f4_21_22[var_f4['fecha_res']] >= "2022-01-01" ].reset_index(drop=True)  # TODO leer desde var_f4 = fecha_inicial
@@ -290,28 +289,28 @@ class F4():
     def grap_pant_rotas(self,f4_pant_rotas):
         color = unif_colors(f4_pant_rotas,"mes") # TODO leer desde var_f4
         orden = ord_mes(f4_pant_rotas,"mes") # TODO leer desde var_f4
-        self.fig_pant_rotas = px.bar(f4_pant_rotas, xv = "Marca", y = var_f4['costo'],color = "mes",text_auto = '.2s', category_orders = {"mes":orden}, labels = {var_f4['costo']:"Total costo","mes":"Mes"}, color_discrete_map = color) # TODO leer desde var_f4
+        self.fig_pant_rotas = px.bar(f4_pant_rotas, x = "Marca", y = var_f4['costo'],color = "mes",text_auto = '.2s', category_orders = {"mes":orden}, labels = {var_f4['costo']:"Total costo","mes":"Mes"}, color_discrete_map = color) # TODO leer desde var_f4
         self.fig_pant_rotas.update_layout(legend = dict(yanchor = "bottom",xanchor = "left", orientation = "h",y = 1))
 
     def save_grap(self):
-        self.fig_torta_local.write_image(f"{self.path}/{self.dt_string}_f4_torta.png", engine = 'orca') 
-        self.ten_creac_x_año.write_image(f"{self.path}/{self.dt_string}_f4_tendencia_creacion_f4_x_años.png", width = 800, height = 450, engine = 'orca')
-        self.grafica_f4_sem.write_image(f"{self.path}/{self.dt_string}_f4_grafica_f4_sem.png", width = 700, height = 500, engine = 'orca')
-        self.graf_f4_pos_causa.write_image(f"{self.path}/{self.dt_string}_f4_clasificacion_posibles_causas_22.png", width = 1300, height = 700, engine = 'orca') 
-        self.fig_clasificado.write_image(f"{self.path}/{self.dt_string}_f4_grafica_total.png", height = 600,  width = 700)
-        self.fig_clasificado_local.write_image(f"{self.path}/{self.dt_string}_f4_grafica_total_por_local.png", height = 500,  width = 800,engine = 'orca')
-        self.fig_clas_mes_local.write_image(f"{self.path}/{self.dt_string}_f4_grafica_total_por_mes.png", height = 500,  width = 500,engine = 'orca')
-        self.f4_mespc.write_image(f"{self.path}/{self.dt_string}_f4_tienda_mes_motivo.png", height = 500,  width = 700,engine = 'orca')
-        self.f4_mespc_cd.write_image(f"{self.path}/{self.dt_string}_f4s_cd_mm.png", engine = 'orca')
-        self.fig_torta_linea.write_image(f"{self.path}/{self.dt_string}_f4_torta_linea.png", height = 800,  width = 700,engine = 'orca')
-        self.fig_f4_linea_mes.write_image(f"{self.path}/{self.dt_string}_f4_grafica_linea_x_mes.png", height = 700,  width = 800,engine = 'orca')
-        self.fig_f4_linea_motivo.write_image(f"{self.path}/{self.dt_string}_f4_linea_motivo.png", height = 800,  width = 1000,engine = 'orca')
-        self.fig_lin_local.write_image(f"{self.path}/{self.dt_string}_f4_linea_local.png", height = 700,  width = 800, engine = 'orca')
-        self.fig_f4_marca.write_image(f"{self.path}/{self.dt_string}_f4_grafica_averia_x_mes_y_marca.png", height = 700,  width = 900,engine = 'orca')
-        self.fig_marca_locales.write_image(f"{self.path}/{self.dt_string}_f4_{self.marc}_local.png", height = 600,  width = 500, engine = 'orca')
-        self.fig_marcas_calidad.write_image(f"{self.path}/{self.dt_string}_f4_marca_calidad.png", height = 700,  width = 800, engine = 'orca')
-        self.fig_pant_rotas.write_image(f"{self.path}/{self.dt_string}_f4_pantallas_rotas.png", height = 500,  width = 800, engine = 'orca')
-        self.f4_mespc_tot.write_image(f"{self.path}/{self.dt_string}_mes_f4_motivo_compañia.png", height = 700,  width = 800, engine = 'orca')
+        self.fig_torta_local.write_image(f"{self.path}/{self.fecha_corte}_f4_torta.png", engine = 'orca') 
+        self.ten_creac_x_año.write_image(f"{self.path}/{self.fecha_corte}_f4_tendencia_creacion_f4_x_años.png", width = 800, height = 450, engine = 'orca')
+        self.grafica_f4_sem.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_f4_sem.png", width = 700, height = 500, engine = 'orca')
+        self.graf_f4_pos_causa.write_image(f"{self.path}/{self.fecha_corte}_f4_clasificacion_posibles_causas_22.png", width = 1300, height = 700, engine = 'orca') 
+        self.fig_clasificado.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_total.png", height = 600,  width = 700)
+        self.fig_clasificado_local.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_total_por_local.png", height = 500,  width = 800,engine = 'orca')
+        self.fig_clas_mes_local.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_total_por_mes.png", height = 500,  width = 500,engine = 'orca')
+        self.f4_mespc.write_image(f"{self.path}/{self.fecha_corte}_f4_tienda_mes_motivo.png", height = 500,  width = 700,engine = 'orca')
+        self.f4_mespc_cd.write_image(f"{self.path}/{self.fecha_corte}_f4s_cd_mm.png", engine = 'orca')
+        self.fig_torta_linea.write_image(f"{self.path}/{self.fecha_corte}_f4_torta_linea.png", height = 800,  width = 700,engine = 'orca')
+        self.fig_f4_linea_mes.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_linea_x_mes.png", height = 700,  width = 800,engine = 'orca')
+        self.fig_f4_linea_motivo.write_image(f"{self.path}/{self.fecha_corte}_f4_linea_motivo.png", height = 800,  width = 1000,engine = 'orca')
+        self.fig_lin_local.write_image(f"{self.path}/{self.fecha_corte}_f4_linea_local.png", height = 700,  width = 800, engine = 'orca')
+        self.fig_f4_marca.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_averia_x_mes_y_marca.png", height = 700,  width = 900,engine = 'orca')
+        self.fig_marca_locales.write_image(f"{self.path}/{self.fecha_corte}_f4_{self.marc}_local.png", height = 600,  width = 500, engine = 'orca')
+        self.fig_marcas_calidad.write_image(f"{self.path}/{self.fecha_corte}_f4_marca_calidad.png", height = 700,  width = 800, engine = 'orca')
+        self.fig_pant_rotas.write_image(f"{self.path}/{self.fecha_corte}_f4_pantallas_rotas.png", height = 500,  width = 800, engine = 'orca')
+        self.f4_mespc_tot.write_image(f"{self.path}/{self.fecha_corte}_mes_f4_motivo_compañia.png", height = 700,  width = 800, engine = 'orca')
 
 def f4_figs(df, pc_order, titulo):
     orden = ord_mes(df,"mes") # TODO leer desde var_f4

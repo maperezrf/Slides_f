@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 from   datetime import timedelta, datetime
 from calendar import monthrange
-from general import set_columns_sum, unif_colors, ord_mes,ord_num,set_columns_nunique
+from general import set_columns_sum, unif_colors, ord_mes,ord_num,set_columns_nunique,generate_structure
 import constants as const
 from data import var_f3
 pd.set_option('display.max_columns', 500)
@@ -14,13 +14,14 @@ pd.set_option('display.max_columns', 500)
 
 class F3():
 
-    dt_string = datetime.now().strftime('%y%m%d')
+    fecha_corte = datetime.now().strftime('%y%m%d')
     f3_ab_mkp = None
     f3_ab_pr_mkp = None
-    
+    fecha_corte = None   
 
     def __init__(self, fr, fc) -> None:
        self.fecha_riesgo = fr
+       self.fecha_corte = fc
        self.f3 = pd.read_csv(var_f3['path_df'], sep = ';', dtype = object)
        self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype = str) # TODO leer path desde var_f3
        self.path = f"output/{fc}_corte/images/f3"
@@ -29,6 +30,9 @@ class F3():
        self.filters()
        self.make_groupby()
        self.save_graf()
+
+    def get_path(self):
+        return self.path
 
     def transform(self):
         # F3 planilla
@@ -45,9 +49,6 @@ class F3():
         # F3 tendencias
         self.f3_tendencia['costo'] = pd.to_numeric(self.f3_tendencia['costo'])
         self.f3_tendencia['fecha ptt'] = pd.to_datetime(self.f3_tendencia['fecha ptt'], format='%Y-%m-%d')
-    
-    def get_date_max(self):
-        return self.f3[var_f3['fecha_res']].max().strftime('%d-%m-%Y')
 
     def set_local_agg(self):
         self.f3.loc[self.f3.local.isin(const.tienda), 'local_agg'] = 'TIENDA'
@@ -106,7 +107,7 @@ class F3():
     def grap_cortes(self, df, column, titulo, etiquetas):
         orden_y = ord_mes(df, 'Cortes_cerra', "f3")
         orden_x = ord_num(df, var_f3['estado'],column)
-        graf_F3_cerr_prd = px.bar(df, x ='Cortes_cerra', y = column, labels = etiquetas, text = column, text_auto ='.2s', category_orders = {var_f3['estado']:orden_x, "Cortes_cerra":orden_y}, color_discrete_sequence = ['rgb(118 78, 159)','rgb(218, 165, 27)'], title = titulo)
+        graf_F3_cerr_prd = px.bar(df, x ='Cortes_cerra', y = column, labels = etiquetas, text = column, color=column, text_auto ='.2s', category_orders = {var_f3['estado']:orden_x, "Cortes_cerra":orden_y}, color_discrete_sequence = ['rgb(118 78, 159)','rgb(218, 165, 27)'], title = titulo)
         graf_F3_cerr_prd.update_layout(legend = dict(yanchor = "bottom", xanchor = "left", orientation = "h", y = 1))
         graf_F3_cerr_prd.update_yaxes(range = [0, df[column].max() + (df[column].max() * 0.25)], constrain ='domain')
         return graf_F3_cerr_prd
@@ -215,13 +216,13 @@ class F3():
         return self.fig
 
     def save_graf(self): 
-        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva.png' ,width=600, height=400)
-        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.dt_string}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=400)
-        self.graf_mkp_sede.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede.png',width=600, height=350)
-        self.graf_mkp_sede_num.write_image(f'{self.path}/{self.dt_string}_f3_abierto_sede_cant.png',width=600, height=350)
-        self.graf_tend_mkp.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_Producto.png',width=650, height=400)
-        self.graf_tend_prod.write_image(f'{self.path}/{self.dt_string}_f3_tendencia_mkp.png',width=650, height=400)
-        self.fig_prd_costo.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_producto_costo.png',width=500, height=480)
-        self.fig_mkp_costo.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_mkp_costo.png',width=500, height=480)
-        self.fig_prd_cantidad.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_prodcuto_cantidad.png',width=500, height=480)
-        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.dt_string}_f3_Cerrado_mkp_cantidad.png',width=500, height=480)
+        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva.png' ,width=600, height=400)
+        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=400)
+        self.graf_mkp_sede.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede.png',width=600, height=350)
+        self.graf_mkp_sede_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede_cant.png',width=600, height=350)
+        self.graf_tend_mkp.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_Producto.png',width=650, height=400)
+        self.graf_tend_prod.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_mkp.png',width=650, height=400)
+        self.fig_prd_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_Cerrado_producto_costo.png',width=500, height=480)
+        self.fig_mkp_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_Cerrado_mkp_costo.png',width=500, height=480)
+        self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_Cerrado_prodcuto_cantidad.png',width=500, height=480)
+        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_Cerrado_mkp_cantidad.png',width=500, height=480)

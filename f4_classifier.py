@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import numpy as np
+from sklearn.datasets import fetch_california_housing
 import constants as const
 from data import var_f4 
 from general import generate_structure
@@ -18,11 +19,13 @@ class CLASSIFIER_F4():
     dt_string = datetime.now().strftime('%y%m%d')
     f4_db_res = None
     f4_db_reg = None
+    fecha_corte = None
 
-    def __init__(self):
+    def __init__(self,fc):
         self.f4 = pd.read_csv(var_f4['path_df'], sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
-        self.path = generate_structure("classifier")
+        self.fecha_corte = fc
+        self.path = f'output/{fc}_corte/classifier'
         self.transform()
         self.set_local_agg()
         self.filters()
@@ -129,17 +132,17 @@ class CLASSIFIER_F4():
         self.save_files(reg_sin_marca,reg_sin_clasificar)
 
     def save_files(self,reg_sin_clasificar,reg_sin_marca):
-        self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
+        self.f4_clas_marc.to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
-        self.f4_clas_marc.loc[(self.f4_clas_marc.local_agg == 'CD')&(self.f4[var_f4["fecha_res"]] < "2022-03-31")].to_csv(f"{self.path}/{self.dt_string}_f4_clasificado_CD.csv",sep=";" , index=False)
-        self.f4_db_reg.to_excel(f"{self.path}/{self.dt_string}_f4_registrados.xlsx", index=False)
+        self.f4_clas_marc.loc[(self.f4_clas_marc.local_agg == 'CD')&(self.f4[var_f4["fecha_res"]] < "2022-03-31")].to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado_CD.csv",sep=";" , index=False)
+        self.f4_db_reg.to_excel(f"{self.path}/{self.fecha_corte}_f4_registrados.xlsx", index=False)
         print("Se guardo archivo de F4s en estado registrado")
-        self.f4_clas_marc.to_csv(f"{self.path}/{self.dt_string}_f4_clasificado.csv",sep=";" , index=False)
+        self.f4_clas_marc.to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado.csv",sep=";" , index=False)
         if reg_sin_marca > 0:
             upc = self.f4_clas_marc.loc[self.f4_clas_marc["Marca"].isna(), "upc"].unique().tolist()
-            pd.DataFrame(upc,columns=["UPC"]).to_excel(f"{self.path}/{self.dt_string}_UPCs_nuevos.xlsx", index=False)
+            pd.DataFrame(upc,columns=["UPC"]).to_excel(f"{self.path}/{self.fecha_corte}_UPCs_nuevos.xlsx", index=False)
             print("Se genero un archivo con los UPCs, a los cuales no se asociaron marcas")
         if reg_sin_clasificar > 0:
-            self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].to_excel(f"{self.path}/{self.dt_string}_f4_sin_clasificar.xlsx", index=False)
+            self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].to_excel(f"{self.path}/{self.fecha_corte}_f4_sin_clasificar.xlsx", index=False)
             print("Se guardo archivo con los UPCs, a los cuales no se asociaron marcas")
 
