@@ -1,9 +1,7 @@
 # Libraries
 import pandas as pd
 import plotly.express as px
-from   datetime import date, timedelta, datetime
-import plotly.graph_objects as go
-import numpy as np
+from   datetime import datetime
 from data import var_f11 as dtagco
 from general import set_columns_nunique, set_columns_sum, generate_structure
 
@@ -12,22 +10,29 @@ class F11():
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
     mes=['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22'] # Editar esta lista cada vez 
-    rango_fechas = ['2022-02-20','2022-04-25']
+    rango_fechas = []
 
     f11_tcosto  = None
     f11_tm90_costo  = None
     f11_tcant = None
     f11_tm90_cant = None 
 
-    def __init__(self) -> None:
+    def __init__(self, rd_fechas) -> None:
+        self.rango_fechas = rd_fechas
         #self.f11 = pd.read_excel(dtagco['path_df'], dtype=str)
         self.f11 = pd.read_csv(dtagco['path_df'], dtype='object', sep=';')
-        self.path = generate_structure("f11")
+        dt_string_delete = '220502'
+        self.path = f"output/{dt_string_delete}_corte/images/f11"
+        generate_structure("f11", dt_string_delete)
         self.transform()
         self.f11 = self.f11.sort_values(dtagco['fech_creacion'])
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados
         self.print_numbers()
+
+    def get_max_trend_date(self):
+        self.load_trend_files()
+        return pd.to_datetime(self.f11_tcosto[dtagco['fecha_corte']], format='%Y-%m-%d').max()
 
     def get_f11(self):
         return self.f11_rf
@@ -61,27 +66,29 @@ class F11():
         self.f11_tm90_cant = pd.read_excel(dtagco['trend_path'], sheet_name='f11_abiertos_m90_cant')
 
     def get_f11_cutoff(self):
+        print('parte 0 ')
         gb_f11_gm = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['costo']].sum().reset_index()
         gb_f11_gm_m90 = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['costo']].sum().reset_index()
         gb_f11_gm_cant = self.f11_rf.groupby([dtagco['grupo'], dtagco['mes']], sort=False)[dtagco['f11_id']].nunique().reset_index()
         gb_f11_gm_m90_cant = self.f11_m90.groupby([dtagco['grupo'], dtagco['mes']])[dtagco['f11_id']].nunique().reset_index()
 
+        print('parte 1 ')
         gb_f11_gm = set_fecha_corte(gb_f11_gm)
         gb_f11_gm_m90 = set_fecha_corte(gb_f11_gm_m90)
         gb_f11_gm_cant = set_fecha_corte(gb_f11_gm_cant)
         gb_f11_gm_m90_cant = set_fecha_corte(gb_f11_gm_m90_cant)
-
+        print('parte 2 ')
         self.f11_tcosto = pd.concat([self.f11_tcosto, gb_f11_gm], axis=0)
         self.f11_tm90_costo = pd.concat([self.f11_tm90_costo, gb_f11_gm_m90], axis=0)
         self.f11_tcant = pd.concat([self.f11_tcant, gb_f11_gm_cant], axis=0)
         self.f11_tm90_cant = pd.concat([self.f11_tm90_cant, gb_f11_gm_m90_cant], axis=0)
-
+        print('parte 3 ')
         # Transform 
         self.f11_tcosto = transform_df_trend(self.f11_tcosto, dtagco['costo'])
         self.f11_tm90_costo = transform_df_trend(self.f11_tm90_costo, dtagco['costo'])
         self.f11_tcant = transform_df_trend(self.f11_tcant, dtagco['f11_id'])
         self.f11_tm90_cant = transform_df_trend(self.f11_tm90_cant, dtagco['f11_id'])
-
+        print('parte 4 ')
         writer = pd.ExcelWriter(dtagco['trend_path'], engine='xlsxwriter')
         self.f11_tcosto.to_excel(writer, sheet_name='f11_abiertos_costo', index=False)
         self.f11_tm90_costo.to_excel(writer, sheet_name='f11_abiertos_m90_costo', index=False)
@@ -91,7 +98,6 @@ class F11():
 
     def tendencias(self):
         self.load_trend_files()
-        self.get_f11_cutoff()
         self.get_tendencias_costo()
         self.get_tendencias_cantidad()
 
@@ -125,7 +131,7 @@ class F11():
         f11_empresa_sede = px.bar(df, x=dtagco['mes'], y=dtagco['costo'], color=dtagco['grupo'], text=dtagco['costo'], text_auto='.2s', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
         f11_empresa_sede.update_layout(barmode='stack',title_text=f"F11s empresa abiertos por sede - Total abierto {ta/1e6:,.0f}M") #,uniformtext=dict(mode="hide", minsize=10),legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         f11_empresa_sede.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
-        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.77, y1=0.75,line=dict(color="red", width=2,))
+        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.81, y1=0.8,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0] 
         f11_empresa_sede.add_annotation(x=mes_ref, y=1.2*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
         f11_empresa_sede.add_annotation(x=mes_ref, y=1.1*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
@@ -141,7 +147,7 @@ class F11():
         f11_es_cantidad = px.bar(df, x=dtagco['mes'], y=dtagco['f11_id'], color=dtagco['grupo'], text=dtagco['f11_id'], text_auto='.0f', category_orders={dtagco['grupo']:orden_grupo, dtagco['mes']:orden_mes})
         f11_es_cantidad.update_layout(barmode='stack',title_text=f"F11s empresa abiertos por sede - Total abierto {ta:,.0f} folios de F11" ) #,uniformtext=dict(mode="hide", minsize=10),legend=dict(yanchor="top", y=0.95, xanchor="left", x=0.1))
         f11_es_cantidad.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
-        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.77, y1=0.8,line=dict(color="red", width=2,))
+        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.81, y1=0.8,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0]
         f11_es_cantidad.add_annotation(x=mes_ref, y=1100, text= f"Total > 90 días = {gb_annotations.sum()[0]:,.0f} folios", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO igual que en la lina 88
         f11_es_cantidad.add_annotation(x=mes_ref, y=1000,text= f"CD = {gb_annotations.loc['CD'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 12), xanchor='left')
@@ -183,7 +189,9 @@ class F11():
         fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
         fig_f11_cd_trend.update_traces(textposition="bottom right")
         fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
-        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_trend_{local}.svg",width=650, height=400, engine='orca')
+        # nuevos 
+        fig_f11_cd_trend.update_layout(margin_r=20, margin_t=60)
+        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_trend_{local}.svg",width=550, height=400, engine='orca')
 
     def get_tendencias_cantidad(self):
         # Cantidad 
@@ -217,7 +225,8 @@ class F11():
         fig_f11_cd_trend.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0.45))
         fig_f11_cd_trend.update_traces(textposition="bottom right")
         fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
-        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_tcant_{local}.svg",width=650, height=400, engine='orca')
+        fig_f11_cd_trend.update_layout(margin_r=20, margin_t=60)
+        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_tcant_{local}.svg",width=550, height=400, engine='orca')
 
 # General methods 
 def fltr_empresa(df):
@@ -234,10 +243,6 @@ def transform_df_trend(df, value):
     df[dtagco['fecha_corte']] = pd.to_datetime(df[dtagco['fecha_corte']], format='%Y-%m-%d')
     return df 
 
-def set_fecha_corte(df, fecha_corte=date.today()):
+def set_fecha_corte(df, fecha_corte=datetime.now().strftime("%Y-%m-%d")):
     df['FECHA_CORTE']= fecha_corte
     return df
-
-f11 = F11()
-f11.f11_resfil()
-f11.tendencias()
