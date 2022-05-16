@@ -31,16 +31,6 @@ def generate_structure(dt_string):
     else:
         pass
     
-    # TODO los siguientes paths deben quedar dentro de cada clase, ejemplo la de F3
-    # if f == "f11":
-    #     return f"{path}/{dt_string}_corte/images/f11"
-    # elif f == "f4":
-    #     return f"{path}/{dt_string}_corte/images/f4"
-    # elif f == "f3":
-    #     return f"{path}/{dt_string}_corte/images/f3"
-    # elif f == "classifier":
-    #     return f"{path}/{dt_string}_corte/classifier"
-
 def unif_colors(df ,column):
     unique = df[column].unique()
     dic = {}
@@ -54,7 +44,7 @@ def ord_mes(df,column,f = "general"):
     if f == "general":
         meses = ["Inv","Ene","Feb","Mar","Abr","May","Jun","Ago","Sep","Oct","Nov","Dic"]
     elif f == "f3":
-        meses =['Dic 15', 'Dic 31','Ene 17','Ene 31','Mar 01','Mar 16','Mar 28','Abr 05','Abr 12']
+        meses =['Dic 15', 'Dic 31','Ene 17','Ene 31','Mar 01','Mar 16','Mar 28','Abr 05','Abr 12','Abr 19','Abr 26','May 03','May 10']
     col_mes = df[column].unique()
     list_mes = []
     for mes in meses:

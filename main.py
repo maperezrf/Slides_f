@@ -11,11 +11,11 @@ from general import generate_structure
 # TODO 2. cuando hay signo "=" dejar un espacio antes y después  
 # TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
 
-fecha_corte = input("Ingrese la fecha de corte, formato -> AAMMDD: ") #[x] ingresar fecha por usuario AAAA-MM-DD
+fecha_corte = input("Ingrese la fecha de corte, formato -> AAAA-MM-DD: ") #[x] ingresar fecha por usuario AAAA-MM-DD
 
 # Datos a modificar antes de la ejecución del código
 
-fecha_riesgo_f3 = "2022-03-30" 
+fecha_riesgo_f3 = "2022-04-30" 
 
 generate_structure(fecha_corte)
 
@@ -26,8 +26,7 @@ path_f3 = f3.get_path() #[x] pasar a método get_path()
 f4_classifier = CLASSIFIER_F4(fecha_corte)
 f4_clasificada = f4_classifier.f4_clas_marc #TODO pasar a método get_f4_classified()
 
-f4 = F4()
-f4.iniciar(f4_clasificada,fecha_corte)
+f4 = F4(f4_clasificada,fecha_corte)
 path_f4 = f4.path #TODO pasar a método get_path()
 #[x] unificar con fecha de corte de fecha_corte_f3
 f4_cd,f4_tienda,f4_dvd,f4_venta,reservado = f4_classifier.calculos()
@@ -47,7 +46,7 @@ for i in  range(8,17):
 def slide_f3_costo():
     f3 = seguimiento_fs.slides[7]
     f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_abiertos_fecha_reserva.png",Cm(0.9),Cm(1.81),width=Cm(10.78), height=Cm(7.5))
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_Cerrado_producto_costo.png",Cm(13.52),Cm(1.37),width=Cm(9.16), height=Cm(7.94))
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_tendencia_Producto.png",Cm(13.52),Cm(1.37),width=Cm(10.64), height=Cm(7.94))
     f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_Cerrado_producto_costo.png",Cm(23.74),Cm(1.42),width=Cm(8.65), height=Cm(8.3))
     f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_abierto_sede.png",Cm(1.12),Cm(10.88),width=Cm(11.47), height=Cm(6.7))
     f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_tendencia_mkp.png",Cm(13.28),Cm(10.88),width=Cm(10.88), height=Cm(6.7))
@@ -101,19 +100,20 @@ def f4_mot_sede():
 
 def f4_mes_moti():
     f4_mes_moti = seguimiento_fs.slides[11]
-    f4_mes_moti.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_tienda_mes_motivo.png", Cm(0.34),Cm(2.88),width = Cm(16.03), height = Cm(14.02))
+
+    f4_mes_moti.shapes.add_picture(f"{path_f4}/{fecha_corte}_mes_f4_motivo_compañia.png", Cm(0.34),Cm(2.88),width = Cm(16.03), height = Cm(14.02))
     f4_mes_moti.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4s_cd_mm.png", Cm(19.5),Cm(0.61),width = Cm(11.59), height = Cm(8.27))
     f4_mes_moti.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_tienda_mes_motivo.png", Cm(19.13),Cm(9.19),width = Cm(11.72), height = Cm(8.38))
 
 def f4_linea_año():
     f4_linea_año = seguimiento_fs.slides[12]
     f4_linea_año.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_torta_linea.png", Cm(1.61),Cm(2.26),width = Cm(13.18), height = Cm(15.06))
-    f4_linea_año.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_linea_local.png", Cm(14.79),Cm(1.89),width = Cm(17.46), height = Cm(15.27))
+    f4_linea_año.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_grafica_linea_x_mes.png", Cm(14.79),Cm(1.89),width = Cm(17.46), height = Cm(15.27))
 
 def f4_linea_motivo():
     f4_linea_motivo = seguimiento_fs.slides[13]
     f4_linea_motivo.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_linea_motivo.png", Cm(0.21),Cm(2.39),width = Cm(16.47), height = Cm(13.19))
-    f4_linea_motivo.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_grafica_linea_x_mes.png", Cm(15.56),Cm(1.61),width = Cm(17.66), height = Cm(15.41))
+    f4_linea_motivo.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_linea_local.png", Cm(15.56),Cm(1.61),width = Cm(17.66), height = Cm(15.41))
 
 def f4_averias():
     f4_linea_motivo = seguimiento_fs.slides[14]

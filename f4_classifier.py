@@ -1,10 +1,8 @@
 import pandas as pd
 from datetime import datetime
 import numpy as np
-from sklearn.datasets import fetch_california_housing
 import constants as const
 from data import var_f4 
-from general import generate_structure
 from f4 import F4
 dt_string = datetime.now().strftime('%y%m%d')
 pd.options.display.float_format = '${:,.0f}'.format
@@ -64,6 +62,7 @@ class CLASSIFIER_F4():
     # Methods 
     def set_posible_causa(self):
         # Filtros para tienda 
+        self.f4_db_res.loc[((self.f4_db_res['Posible Causa'].isna())) & (self.f4_db_res[var_f4['f4_id']].isin(const.f4_dup)),'Posible Causa']= 'F4 duplicado generado por CI'
         self.f4_db_res.loc[((self.f4_db_res['Posible Causa'].isna())) & (self.f4_db_res[var_f4['local']]==3000),'Posible Causa']='Conciliación NC 2021 - Local 3000'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & self.f4_db_res[var_f4["destino"]].str.contains(r'pantalla\w? rota\w?|pantalla quebrada| pantalla\w? |pantalla rota'), 'Posible Causa'] = 'Pantallas rotas'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='TIENDA') & (self.f4_db_res[var_f4["destino"]].str.contains(r'calidad|cambio|politica|devolucion cliente|danocalida') | self.f4_db_res[var_f4['desccentro_e_costo']].str.contains(r'servicio al cliente|servicio cliente|calidad')), 'Posible Causa'] = 'Calidad'
@@ -77,18 +76,19 @@ class CLASSIFIER_F4():
 
         # Locales DVD, ADMIN y VENTA EMPRESA
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='DVD ADMINISTRATIVO') & (self.f4_db_res[var_f4["destino"]].str.contains(r'[1][1]\d{7,}')), 'Posible Causa'] = 'Cierre de F11 - DVD sin recupero'
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='ADMINISTRATIVO') & (self.f4_db_res[var_f4["destino"]].str.contains(r"cobro a deprisa")), 'Posible Causa'] = 'Recobro a transportadora (Administrativo)'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='ADMINISTRATIVO'), 'Posible Causa'] = 'Avería'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='VENTA EMPRESA'), 'Posible Causa'] = 'Venta empresa' 
 
         # Filtros para CD
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'patalla\w?|rota\w?|pantalla quebrada'), 'Posible Causa'] =  'Pantallas rotas'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'suma'), 'Posible Causa'] = 'Recobro suma'
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobro suppla'), 'Posible Causa'] = 'Recobro suppla'
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobro suppla'), 'Posible Causa'] = 'Recobro DHL'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='CD') & (self.f4_db_res[var_f4["destino"]].str.contains(r'[1][1]\d{7,} sin recupero|[1][2]\d{7,} sin recupero')), 'Posible Causa'] = 'Cierre de F11 - CD sin recupero'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'cobro\b.*\d{10}|\d{10}.*cobro\b|recupero'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobro\b.*\d{10}|\d{10}.*recobro\b'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'recobrado\b.*\d{10}|\d{10}.*recobrado\b'), 'Posible Causa'] = 'Recobro a transportadora'
-        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & (self.f4_db_res[var_f4["destino"]] == 'oc inferiores usd250 recibo'), 'Posible Causa'] = "Avería"
+        self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & (self.f4_db_res[var_f4["destino"]] == 'oc importaci inferior a 250 ud'), 'Posible Causa'] = "Avería"
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & self.f4_db_res[var_f4["destino"]].str.contains(r'prestamo\w?'), 'Posible Causa'] = 'Prestamo no devuelto'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg =='CD') & (self.f4_db_res[var_f4["destino"]].str.contains("baja por danoaveria en dvl")), 'Posible Causa'] = 'DVL'
         self.f4_db_res.loc[self.f4_db_res['Posible Causa'].isna() & (self.f4_db_res.local_agg == "CD") & self.f4_db_res[var_f4["destino"]].str.contains(r'cambio agil'), 'Posible Causa'] = 'Cambio ágil'

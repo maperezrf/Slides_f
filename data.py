@@ -17,8 +17,9 @@ var_f11 = {
     'servicio':'SERVICIO'}
 
 var_f4 = {
-    'path_df':"input/220418_f4.csv",
+    'path_df':"input/220516-1518-f4-output.csv",
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
+    'f4_id':'nro_red_inventario',
     'marcas_df':'input/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
@@ -29,11 +30,10 @@ var_f4 = {
     'local' : 'local',
     'costo' : 'total_precio_costo',
     'desc_linea': 'descripcion_linea'
-
 }
 
 var_f3 = { 
-    'path_df': 'input/220425_f3.csv',
+    'path_df': 'input/220516-1517-f3-output.csv',
     'fecha_res':'fecha_reserva',
     'fecha_envio':'fecha_envio',
     'fecha_anulacion':'fecha_anulacion',
@@ -47,5 +47,4 @@ var_f3 = {
     'abiertos': ['enviado', 'reservado'],
     'cerrados' : ['anulado', 'confirmado'],
     'tipo_tp' : ['Producto','Market place'],
-
 }

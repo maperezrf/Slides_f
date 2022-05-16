@@ -14,10 +14,7 @@ pd.set_option('display.max_columns', 500)
 
 class F4():
 
-    def __init__(self) -> None:
-        fecha_corte = None
-
-    def iniciar(self,f4_clasificada,fc): # TODO unificar con el _init_()
+    def __init__(self,f4_clasificada,fc) -> None:
         self.fecha_corte = fc
         self.f4_2022 =  f4_clasificada
         self.f4_2021 = pd.read_csv("input/f4_2021.csv",sep =";", dtype = object) # TODO leer path desde var_f3
@@ -73,8 +70,7 @@ class F4():
                     if dias == 28:
                         f_cortes = f_cortes - timedelta(days = 4)
                     elif dias == 30:
-                        # f_cortes = f_cortes + timedelta(days = 1) # TODO revisar para meses de 30 dias 
-                        pass 
+                        f_cortes = f_cortes - timedelta(days = 2) 
                     elif dias == 31:
                         f_cortes = f_cortes - timedelta(days = 1)
                 self.f4_sem.loc[(self.f4_sem[var_f4["fecha_res"]] >= f_inicio) & (self.f4_sem[var_f4["fecha_res"]] <= f_cortes), "Semana (fecha de reserva)"] = f"S{sem}{f_cortes.strftime('%b')}"
@@ -265,7 +261,7 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = "outside")
     
     def grap_marca_esp(self):
-        self.marc = "Barbie"
+        self.marc = "Samsung"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia.Marca == self.marc]
         top_5_loc = marca.groupby(["desc_local","mes"])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()["desc_local"].unique()[0:5]
         grup_marca = marca.groupby(["desc_local","mes"])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()
