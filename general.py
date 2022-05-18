@@ -42,7 +42,7 @@ def unif_colors(df ,column):
 
 def ord_mes(df,column,f = "general"):
     if f == "general":
-        meses = ["Inv","Ene","Feb","Mar","Abr","May","Jun","Ago","Sep","Oct","Nov","Dic"]
+        meses = ["Inv","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
     elif f == "f3":
         meses =['Dic 15', 'Dic 31','Ene 17','Ene 31','Mar 01','Mar 16','Mar 28','Abr 05','Abr 12','Abr 19','Abr 26','May 03','May 10']
     col_mes = df[column].unique()

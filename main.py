@@ -3,6 +3,7 @@ from pptx.util import Cm,Pt
 from f3 import F3
 from f4_classifier import CLASSIFIER_F4
 from f4 import F4
+from data import var_main
 from datetime import datetime
 from general import generate_structure
 
@@ -31,7 +32,7 @@ path_f4 = f4.path #TODO pasar a método get_path()
 #[x] unificar con fecha de corte de fecha_corte_f3
 f4_cd,f4_tienda,f4_dvd,f4_venta,reservado = f4_classifier.calculos()
 
-seguimiento_fs = Presentation("input/plantilla_seg_fs.pptx")  # Leer presentacion 
+seguimiento_fs = Presentation(var_main['pat_plantilla'])  # Leer presentacion 
 
 def update_date(n_slide,fecha_corte): 
     slide = seguimiento_fs.slides[n_slide]
@@ -57,8 +58,8 @@ def slide_f4():
     f4 = seguimiento_fs.slides[8]
     f4.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_tendencia_creacion_f4_x_años.png", Cm(2.01),Cm(0.58),width = Cm(16.17), height = Cm(9.08)   )
     f4.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_grafica_f4_sem.png", Cm(19.55), Cm(0.57), width = Cm(13.29), height = Cm(9.6))
-    f4.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_grafica_total_por_mes.png", Cm(14.03), Cm(9.91), width = Cm(7.62), height = Cm(7.62)   )
-    f4.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_torta.png", Cm(20.85), Cm(10.69), width = Cm(9.82), height = Cm(7))
+    f4.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_grafica_total_por_mes.png", Cm(13.03), Cm(10.07), width = Cm(7.62), height = Cm(7.62)   )
+    f4.shapes.add_picture(f"{path_f4}/{fecha_corte}_f4_torta.png", Cm(22.84), Cm(10.23), width = Cm(10), height = Cm(7.13))
     tb_reserva = f4.shapes.add_textbox(Cm(1.21),Cm(15.28),width=Cm(1), height=Cm(0.1))
     tx_text_reserva = tb_reserva.text_frame.add_paragraph() 
     tx_text_reserva.text = f"Reservado {reservado}"

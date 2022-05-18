@@ -149,7 +149,6 @@ class F3():
             set_columns_sum(df, var_f3['tipo_producto'], column)
             set_columns_sum(df, 'mes',column)
             titulo = f'F3 abiertos según fecha de reserva - Total ${round(df[column].sum()/1e6):,.0f}M'
-            
         if column ==  var_f3['f3_id']:
             f3_mkp_3m = df.loc[(df[var_f3['tipo_producto']] == 'Market place') & (df['mayor a 30'] == 'y'), column].sum()
             f3_prd_3m = df.loc[(df[var_f3['tipo_producto']] == 'Producto') & (df['mayor a 30'] == 'y'), column].sum()
@@ -164,11 +163,12 @@ class F3():
         range_y = grupo_F3_prd_mkp[axes_y].max()
         orden_mes = grupo_F3_prd_mkp.mes.unique()
         fig = px.bar(grupo_F3_prd_mkp, x = 'mes', y = axes_y, labels = {'mes':'Mes de reserva', var_f3['costo']: 'Costo promedio', var_f3['tipo_producto']:'Tipo producto'}, text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_sequence = ['rgb(36, 121, 108)','rgb(204, 97, 176)'], title = titulo, category_orders = {var_f3['tipo_producto']:orden, 'mes':orden_mes })
-        fig.update_layout(legend = dict(yanchor = 'top', y = 0.98, xanchor = 'left', x = 1))
-        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.87, y1 = 1, line = dict(color = 'red', width = 2, ))
-        fig.add_annotation(x = orden_mes[0], y = (range_y * 15/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 15))
-        fig.add_annotation(x = orden_mes[0], y = range_y, text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}', showarrow = False, font = dict (color = 'red',size = 12))
+        fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1),font=dict(size = 15))    
+        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.82, y1 = 1, line = dict(color = 'red', width = 2))
+        fig.add_annotation(x = orden_mes[0], y = (range_y * 60/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 15))
+        fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}', showarrow = False, font = dict (color = 'red',size = 12))
         fig.update_annotations(align = 'left')
+        fig.update_yaxes(range = [0,grupo_F3_prd_mkp[axes_y].max() + (grupo_F3_prd_mkp[axes_y].max() * 0.7)], constrain = 'domain')
         return fig
     
     def grap_mkp_x_sede(self, mkp_sede, column):
