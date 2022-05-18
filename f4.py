@@ -111,12 +111,17 @@ class F4():
         lista_marcas = marcas_calidad.Marca.unique()[0:10] # TODO para llamar una columna usa ['col'] TODO leer desde var_f4
         marcas_calidad = marcas_calidad.loc[marcas_calidad.Marca.isin(lista_marcas)].reset_index(drop = True)  # TODO para llamar una columna usa ['col'] TODO leer desde var_f4
         f4_pant_rotas= self.f4_2022_pant_rotas.groupby(["Marca","mes"])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
-        list_pant = f4_pant_rotas.Marca.unique()[0:5]  # TODO para llamar una columna usa ['col'] TODO leer desde var_f4
-        f4_pant_rotas.loc[f4_pant_rotas.Marca.isin(list_pant)]  # TODO para llamar una columna usa ['col'] TODO leer desde var_f4
         orden_pc_tot = self.f4_2022.groupby('Posible Causa')['total_precio_costo'].sum().sort_values(ascending = False).head(7).keys()  # TODO leer desde var_f4
         gb_f4mes_tot = self.f4_2022.groupby(['mes','Posible Causa'])['total_precio_costo'].sum().reset_index() # TODO leer desde var_f4
         gb_f4mes_tot = gb_f4mes_tot.loc[gb_f4mes_tot['Posible Causa'].isin(orden_pc_tot)] # TODO leer desde var_f4
         
+        self.tb_averias = self.make_tables_top_10(top_10_marca)
+        self.tb_p_rotas = self.make_tables_top_10(f4_pant_rotas)
+        self.tb_calidad = self.make_tables_top_10(marcas_calidad)
+
+
+
+
         top_10_marca.to_excel(f"{self.path}_tabla_top_10_marca.xlsx")
         marcas_calidad.to_excel(f"{self.path}_tabla_marca_calidad.xlsx")
         f4_pant_rotas.to_excel(f"{self.path}_pantallas_rotas.xlsx")
@@ -289,25 +294,49 @@ class F4():
         self.fig_pant_rotas = px.bar(f4_pant_rotas, x = "Marca", y = var_f4['costo'],color = "mes",text_auto = '.2s', category_orders = {"mes" : orden, "Marca" : orden_y}, labels = {var_f4['costo']:"Total costo","mes":"Mes"}, color_discrete_map = color) # TODO leer desde var_f4
         self.fig_pant_rotas.update_layout(legend = dict(yanchor = "bottom",xanchor = "left", orientation = "h",y = 1),font=dict(size=15),title={'text':"Top 10 F4's marcas por calidad",'y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
 
+    def make_tables_top_10(self,df):
+        pt_df = df.pivot_table(index="Marca", columns="mes",values="total_precio_costo",aggfunc="sum",margins_name='Total',fill_value=0,margins=True).reset_index()
+        pt_df.sort_values("Total", ascending=False)
+        pt_df = pd.concat([pt_df.loc[pt_df.Marca!= "Total"].sort_values("Total",ascending=False), pt_df.loc[pt_df.Marca=="Total"]]) 
+        pt_df = pt_df[["Marca"]+ord_mes(df,"mes")+["Total"]]
+        columns = pt_df.columns.to_list()
+        listado = []
+        for i in columns:
+            listado.append(pt_df[i].tolist())
+        import plotly.graph_objects as go
+        font_color =  ['rgb(0,0,0)' if x == 'Total' else 'rgb(0,0,0)' for x in listado[0]]
+        color_fill=  ['rgb(229,236,246)' if x == 'Total' else 'rgb(255,255,255)' for x in listado[0]]
+        fig = go.Figure(data=[go.Table(header=dict(values = pt_df.columns.to_list(),font=dict(size=14,color=['rgb(0,0,0)'], family='Arial Black'),line = dict(color='rgb(50,50,50)'),fill=dict(color='rgb(229,236,246)')),
+                        cells = dict(values=listado,
+                        format = [None, "$.2s"],font = dict(size = 13, color = [font_color]),height = 30,fill= dict(color=[color_fill]),line = dict(color='rgb(50,50,50)')))
+                            ])
+        fig.update_layout( margin = dict(r=1,l=0,t=0,b=0))
+        return fig
+
     def save_grap(self):  
-        self.fig_torta_local.write_image(f"{self.path}/{self.fecha_corte}_f4_torta.png", engine = 'orca') 
-        self.ten_creac_x_año.write_image(f"{self.path}/{self.fecha_corte}_f4_tendencia_creacion_f4_x_años.png", width = 800, height = 450, engine = 'orca')
-        self.grafica_f4_sem.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_f4_sem.png", width = 700, height = 500, engine = 'orca')
-        self.graf_f4_pos_causa.write_image(f"{self.path}/{self.fecha_corte}_f4_clasificacion_posibles_causas_22.png", width = 1300, height = 700, engine = 'orca') 
-        self.fig_clasificado.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_total.png", height = 600,  width = 700)
-        self.fig_clasificado_local.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_total_por_local.png", height = 600,  width = 1000,engine = 'orca')
-        self.fig_clas_mes_local.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_total_por_mes.png", height = 500,  width = 500,engine = 'orca')
-        self.f4_mespc.write_image(f"{self.path}/{self.fecha_corte}_f4_tienda_mes_motivo.png", height = 500,  width = 700,engine = 'orca')
-        self.f4_mespc_cd.write_image(f"{self.path}/{self.fecha_corte}_f4s_cd_mm.png", engine = 'orca')
-        self.fig_torta_linea.write_image(f"{self.path}/{self.fecha_corte}_f4_torta_linea.png", height = 800,  width = 700,engine = 'orca')
-        self.fig_f4_linea_mes.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_linea_x_mes.png", height = 700,  width = 900,engine = 'orca')
+        self.fig_torta_local.write_image(f"{self.path}/{self.fecha_corte}_torta.png", engine = 'orca') 
+        self.ten_creac_x_año.write_image(f"{self.path}/{self.fecha_corte}_tendencia_creacion_f4_x_años.png", width = 800, height = 450, engine = 'orca')
+        self.grafica_f4_sem.write_image(f"{self.path}/{self.fecha_corte}_grafica_f4_sem.png", width = 700, height = 500, engine = 'orca')
+        self.graf_f4_pos_causa.write_image(f"{self.path}/{self.fecha_corte}_clasificacion_posibles_causas_22.png", width = 1300, height = 700, engine = 'orca') 
+        self.fig_clasificado.write_image(f"{self.path}/{self.fecha_corte}_grafica_total.png", height = 600,  width = 700)
+        self.fig_clasificado_local.write_image(f"{self.path}/{self.fecha_corte}_grafica_total_por_local.png", height = 600,  width = 1000,engine = 'orca')
+        self.fig_clas_mes_local.write_image(f"{self.path}/{self.fecha_corte}_grafica_total_por_mes.png", height = 500,  width = 500,engine = 'orca')
+        self.f4_mespc.write_image(f"{self.path}/{self.fecha_corte}_tienda_mes_motivo.png", height = 500,  width = 700,engine = 'orca')
+        self.f4_mespc_cd.write_image(f"{self.path}/{self.fecha_corte}_cd_mm.png", engine = 'orca')
+        self.fig_torta_linea.write_image(f"{self.path}/{self.fecha_corte}_torta_linea.png", height = 800,  width = 700,engine = 'orca')
+        self.fig_f4_linea_mes.write_image(f"{self.path}/{self.fecha_corte}_grafica_linea_x_mes.png", height = 700,  width = 900,engine = 'orca')
         self.fig_f4_linea_motivo.write_image(f"{self.path}/{self.fecha_corte}_f4_linea_motivo.png", height = 800,  width = 1000,engine = 'orca')
-        self.fig_lin_local.write_image(f"{self.path}/{self.fecha_corte}_f4_linea_local.png", height = 700,  width = 800, engine = 'orca')
-        self.fig_f4_marca.write_image(f"{self.path}/{self.fecha_corte}_f4_grafica_averia_x_mes_y_marca.png", height = 900,  width = 900,engine = 'orca')
-        self.fig_marca_locales.write_image(f"{self.path}/{self.fecha_corte}_f4_{self.marc}_local.png", height = 600,  width = 500, engine = 'orca')
-        self.fig_marcas_calidad.write_image(f"{self.path}/{self.fecha_corte}_f4_marca_calidad.png", height = 700,  width = 800, engine = 'orca')
-        self.fig_pant_rotas.write_image(f"{self.path}/{self.fecha_corte}_f4_pantallas_rotas.png", height = 500,  width = 800, engine = 'orca')
+        self.fig_lin_local.write_image(f"{self.path}/{self.fecha_corte}_linea_local.png", height = 700,  width = 800, engine = 'orca')
+        self.fig_f4_marca.write_image(f"{self.path}/{self.fecha_corte}_grafica_averia_x_mes_y_marca.png", height = 900,  width = 900,engine = 'orca')
+        self.fig_marca_locales.write_image(f"{self.path}/{self.fecha_corte}_{self.marc}_local.png", height = 600,  width = 500, engine = 'orca')
+        self.fig_marcas_calidad.write_image(f"{self.path}/{self.fecha_corte}_marca_calidad.png", height = 700,  width = 800, engine = 'orca')
+        self.fig_pant_rotas.write_image(f"{self.path}/{self.fecha_corte}_pantallas_rotas.png", height = 500,  width = 800, engine = 'orca')
         self.f4_mespc_tot.write_image(f"{self.path}/{self.fecha_corte}_mes_f4_motivo_compañia.png", height = 700,  width = 800, engine = 'orca')
+        self.tb_averias.write_image(f"{self.path}/{self.fecha_corte}_tabla_averias.png",height = 370,  width = 900, engine = 'orca')
+        self.tb_p_rotas.write_image(f"{self.path}/{self.fecha_corte}_tabla_pantallas_rotas.png",height = 280,  width = 900, engine = 'orca')
+        self.tb_calidad.write_image(f"{self.path}/{self.fecha_corte}_tabla_calidad.png",height = 370,  width = 900, engine = 'orca')
+        
+       
 
 def f4_figs(df, pc_order, titulo):
     orden = ord_mes(df,"mes") # TODO leer desde var_f4
@@ -319,4 +348,3 @@ def f4_figs(df, pc_order, titulo):
     fig.update_yaxes(range=[0, df[var_f4['costo']].max() + (df[var_f4['costo']].max() * 0.40)], constrain='domain')
     fig.update_traces(textangle=90, textposition= "outside")
     return fig
-

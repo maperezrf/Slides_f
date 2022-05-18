@@ -1,6 +1,6 @@
 from config.user_path import user
 
-var_main = {'pat_plantilla':f"C:/Users/{user}/OneDrive - Falabella/General/SEGUIMIENTO-FS/repositorio f's"}
+var_main = {f'C:/Users/{user}/OneDrive - Falabella/General/SEGUIMIENTO-FS/repositorio_fs'}
 
 var_f11 = {
     'path_df': f'C:/Users/{user}/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220502_f11.csv',
@@ -22,7 +22,7 @@ var_f4 = {
     'path_df':f"C:/Users/{user}/OneDrive - Falabella/General/DATA/F4/220516-1518-f4-output.csv",
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'nro_red_inventario',
-    'marcas_df':f"C:/Users/{user}/OneDrive - Falabella/General/SEGUIMIENTO-FS/repositorio f's/Marcas.xlsx",
+    'marcas_df':f'C:/Users/ext_maperezr/OneDrive - Falabella/General/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
     'tipo_redinv' : 'tipo_redinv',
