@@ -1,8 +1,12 @@
-from config.user_path import user
+from config.user_path import path_ea
+
+var_global ={
+    'path_cortes':f'{path_ea}/SEGUIMIENTO-FS/cortes'
+}
 
 var_f11 = {
-    'path_df': f'C:/Users/{user}/Falabella/EQUIPO-ANALYTICS - General/DATA/F11/220502_f11.csv',
-    'trend_path': f'C:/Users/{user}/Falabella/EQUIPO-ANALYTICS - General/SEGUIMIENTO-FS/F11/tendencias.xlsx', 
+    'path_df': f'{path_ea}/DATA/F11/',
+    'trend_path': f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/tendencias_f11.xlsx', 
     'f11_id':'NRO_F11',
     'propietario':'PROPIETARIO',
     'estado':'ESTADO',
@@ -14,11 +18,12 @@ var_f11 = {
     'costo':'TOTAL_COSTO',
     'grupo':'GRUPO',
     'fecha_corte':'FECHA_CORTE', 
-    'servicio':'SERVICIO'}
+    'servicio':'SERVICIO',
+    'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ]}
 
 var_f4 = {
-    'path_df':"input/220418_f4.csv",
-    'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
+    'path_df':"input/220509-2134-f4-output.csv",
+    'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado_33.csv',
     'marcas_df':'input/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
@@ -29,11 +34,11 @@ var_f4 = {
     'local' : 'local',
     'costo' : 'total_precio_costo',
     'desc_linea': 'descripcion_linea'
-
 }
 
 var_f3 = { 
-    'path_df': 'input/220425_f3.csv',
+    'path_df':f'{path_ea}/DATA/F3/', # 'input/220509-2137-f3-output.csv'
+    'trend_path':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/tendencias_f3.xlsx/' ,
     'fecha_res':'fecha_reserva',
     'fecha_envio':'fecha_envio',
     'fecha_anulacion':'fecha_anulacion',
@@ -46,6 +51,5 @@ var_f3 = {
     'fecha_inicial':'2021-01-01',
     'abiertos': ['enviado', 'reservado'],
     'cerrados' : ['anulado', 'confirmado'],
-    'tipo_tp' : ['Producto','Market place'],
-
+    'tipo_tp' : ['Producto','Market place']
 }

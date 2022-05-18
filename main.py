@@ -15,13 +15,13 @@ fecha_corte = input("Ingrese la fecha de corte, formato -> AAMMDD: ") #[x] ingre
 
 # Datos a modificar antes de la ejecución del código
 
-fecha_riesgo_f3 = "2022-03-30" 
+fecha_riesgo_f3 = "2022-04-30" 
 
 generate_structure(fecha_corte)
 
 # Inicio
-f3 = F3(fecha_riesgo_f3,fecha_corte)
-path_f3 = f3.get_path() #[x] pasar a método get_path()
+#f3 = F3(fecha_riesgo_f3,fecha_corte)
+#path_f3 = f3.get_path() #[x] pasar a método get_path()
 
 f4_classifier = CLASSIFIER_F4(fecha_corte)
 f4_clasificada = f4_classifier.f4_clas_marc #TODO pasar a método get_f4_classified()
