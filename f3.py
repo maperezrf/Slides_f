@@ -1,9 +1,9 @@
 import pandas as pd
 import plotly.express as px
 from   datetime import timedelta, datetime
-from general import set_columns_sum, unif_colors, ord_mes,ord_num,set_columns_nunique,generate_structure
+from general import set_columns_sum, unif_colors, ord_mes,ord_num,set_columns_nunique
 import constants as const
-from data import var_f3
+from data import var_f3, var_global
 pd.set_option('display.max_columns', 500)
 
 # A tener en cuenta: 
@@ -22,8 +22,8 @@ class F3():
        self.fecha_riesgo = fr
        self.fecha_corte = fc
        self.f3 = pd.read_csv(var_f3['path_df'], sep = ';', dtype = object)
-       self.f3_tendencia = pd.read_excel('input/tendencias_f3.xlsx', dtype = str) # TODO leer path desde var_f3
-       self.path = f"output/{fc}_corte/images/f3"
+       self.f3_tendencia = pd.read_excel(var_f3['trend_path'], dtype = str) # [x] leer path desde var_f3
+       self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f3"
        self.transform()
        self.set_local_agg()
        self.filters()
