@@ -12,8 +12,11 @@ from general import generate_structure
 # TODO 2. cuando hay signo "=" dejar un espacio antes y después  
 # TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
 
-fecha_corte = input("Ingrese la fecha de corte, formato -> AAAA-MM-DD: ") #[x] ingresar fecha por usuario AAAA-MM-DD
+print('librerias')
 
+fecha_corte = input("Ingrese la fecha de corte, formato -> AAAA-MM-DD: ") # TODO pasar a formato de fecha 
+
+f3_file = input('Ingrese nombre de archivo de f3 .csv: ')
 # Datos a modificar antes de la ejecución del código
 
 fecha_riesgo_f3 = "2022-04-30" 
@@ -21,15 +24,18 @@ fecha_riesgo_f3 = "2022-04-30"
 generate_structure(fecha_corte)
 
 # Inicio
-#f3 = F3(fecha_riesgo_f3,fecha_corte)
-#path_f3 = f3.get_path() #[x] pasar a método get_path()
+f3 = F3(fecha_riesgo_f3,fecha_corte, f3_file)
+path_f3 = f3.get_path()
+
+print('f3')
 
 f4_classifier = CLASSIFIER_F4(fecha_corte)
 f4_clasificada = f4_classifier.f4_clas_marc #TODO pasar a método get_f4_classified()
 
+print('f4')
+
 f4 = F4(f4_clasificada,fecha_corte)
 path_f4 = f4.path #TODO pasar a método get_path()
-#[x] unificar con fecha de corte de fecha_corte_f3
 f4_cd,f4_tienda,f4_dvd,f4_venta,reservado = f4_classifier.calculos()
 
 seguimiento_fs = Presentation(var_main['pat_plantilla'])  # Leer presentacion 
@@ -46,12 +52,14 @@ for i in  range(8,17):
 
 def slide_f3_costo():
     f3 = seguimiento_fs.slides[7]
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_abiertos_fecha_reserva.png",Cm(0.9),Cm(1.81),width=Cm(10.78), height=Cm(7.5))
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_tendencia_Producto.png",Cm(13.52),Cm(1.37),width=Cm(10.64), height=Cm(7.94))
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_Cerrado_producto_costo.png",Cm(23.74),Cm(1.42),width=Cm(8.65), height=Cm(8.3))
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_abierto_sede.png",Cm(1.12),Cm(10.88),width=Cm(11.47), height=Cm(6.7))
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_tendencia_mkp.png",Cm(13.28),Cm(10.88),width=Cm(10.88), height=Cm(6.7))
-    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_Cerrado_mkp_costo.png",Cm(23.74),Cm(10.18),width=Cm(9.25), height=Cm(7.71))
+    #Producto
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_abiertos_fecha_reserva.png", Cm(0.4), Cm(1.81), height=Cm(7.5)) 
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_tendencia_Producto.png", Cm(13),Cm(1.37), height=Cm(7)) 
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_cerrado_producto_costo.png", Cm(24), Cm(1.42), height=Cm(8))
+    #Marketplace
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_abierto_sede.png", Cm(0.4), Cm(10), height=Cm(7.5)) 
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_tendencia_mkp.png", Cm(13), Cm(10.5), height=Cm(7)) 
+    f3.shapes.add_picture(f"{path_f3}/{fecha_corte}_f3_cerrado_mkp_costo.png", Cm(24), Cm(10.18), height=Cm(8))
     update_date(7, fecha_corte)
 
 def slide_f4():
@@ -138,5 +146,4 @@ f4_linea_motivo()
 f4_averias()
 f4_calidad()
 f4_panatallas_rotas()
-seguimiento_fs.save(f"output/{fecha_corte}seguimiento_fs.pptx")
-
+seguimiento_fs.save(f"output/{fecha_corte}_seguimiento_fs.pptx")
