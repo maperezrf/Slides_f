@@ -25,7 +25,7 @@ var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/220516-1518-f4-output.csv",
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'nro_red_inventario',
-    'marcas_df':f"{path_ea}/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx",
+    'marcas_df':f"{path_ea}/SEGUIMIENTO-FS/repositorio_fs/marcas.xlsx",
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
     'tipo_redinv' : 'tipo_redinv',
