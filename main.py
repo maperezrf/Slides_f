@@ -4,15 +4,16 @@ from f3 import F3
 from f4_classifier import CLASSIFIER_F4
 from f4 import F4
 from data import var_main
-from datetime import datetime
 from general import generate_structure
+from f11 import F11
+from datetime import datetime, timedelta
 
 # A tener en cuenta: 
 # TODO 1. Entre método y método solo un espacio de separación 
 # TODO 2. cuando hay signo "=" dejar un espacio antes y después  
 # TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
 
-fecha_corte = input("Ingrese la fecha de corte, formato -> AAAA-MM-DD: ") #[x] ingresar fecha por usuario AAAA-MM-DD
+fecha_corte = input("Ingrese la fecha de corte, formato -> AA-MM-DD: ") #[x] ingresar fecha por usuario AAAA-MM-DD
 
 # Datos a modificar antes de la ejecución del código
 
@@ -21,16 +22,49 @@ fecha_riesgo_f3 = "2022-04-30"
 generate_structure(fecha_corte)
 
 # Inicio
+print("Generando graficas de f3's....")
 f3 = F3(fecha_riesgo_f3,fecha_corte)
 path_f3 = f3.get_path() #[x] pasar a método get_path()
 
+print("Generando clasificacion de f4's....")
 f4_classifier = CLASSIFIER_F4(fecha_corte)
 f4_clasificada = f4_classifier.f4_clas_marc #TODO pasar a método get_f4_classified()
 
+print("Generando graficas de f4's....")
 f4 = F4(f4_clasificada,fecha_corte)
 path_f4 = f4.path #TODO pasar a método get_path()
 #[x] unificar con fecha de corte de fecha_corte_f3
 f4_cd,f4_tienda,f4_dvd,f4_venta,reservado = f4_classifier.calculos()
+
+
+df_name = input('Ingrese nombre de archivo de f11 abiertos .csv: ')
+
+frizq = datetime.strptime('2022-02-20', '%Y-%m-%d')
+frder = datetime.strptime(fecha_corte, '%Y-%m-%d') + timedelta(days=10)
+rango_de_fechas = [frizq, frder]
+
+generate_structure(fecha_corte)
+
+f11 = F11(rango_de_fechas, fecha_corte, df_name)
+
+def menu_f11():
+    print('# -------------------------')
+    print('# Menú F11')
+    print('  Seleccione una opción: ')
+    print(f'   1. Generar corte de F11 (último corte = {f11.get_max_trend_date()})')
+    print('   2. Gráficar f11 y tendencias')
+    print('   0. Salir')
+
+selection = None
+while selection != '0': 
+    menu_f11()
+    selection = input('Rta: ')
+
+    if selection == '1':
+        f11.get_f11_cutoff()
+    elif selection =='2': 
+        f11.f11_resfil()
+        f11.tendencias()
 
 seguimiento_fs = Presentation(var_main['pat_plantilla'])  # Leer presentacion 
 
@@ -139,4 +173,3 @@ f4_averias()
 f4_calidad()
 f4_panatallas_rotas()
 seguimiento_fs.save(f"output/{fecha_corte}seguimiento_fs.pptx")
-

@@ -1,18 +1,19 @@
-from config.user_path import path_ea, user 
+from config.user_path import  user 
 
 var_global ={
-    'path_cortes':f'{path_ea}/SEGUIMIENTO-FS/cortes'
+    'path_cortes':f'{user}/General/SEGUIMIENTO-FS/cortes'
 }
-
-var_main = {f'C:/Users/{user}/OneDrive - Falabella/General/SEGUIMIENTO-FS/repositorio_fs'}
+var_main = {f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/plantilla_seg_fs.pptx'}
 
 var_f11 = {
-    'path_df': f'{path_ea}/DATA/F11/',
-    'trend_path': f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/tendencias_f11.xlsx', 
+    'path_df': f'{user}/General/DATA/F11/',
+    'trend_path': f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/tendencias_f11.xlsx', 
     'f11_id':'NRO_F11',
     'propietario':'PROPIETARIO',
     'estado':'ESTADO',
+    'dias':'DIAS',
     'prop_empresa':'EMPRESA',
+    'prop_cliente':'CLIENTE',
     'fech_creacion':'FECHA_CREACION',
     'estados_abiertos':['Despachado','Espera Retiro Clte.','Ingresado','Entrega parcial'],
     'fecha_inicial':'2021-01-01', 
@@ -24,10 +25,10 @@ var_f11 = {
     'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ]}
 
 var_f4 = {
-    'path_df':f"C:/Users/{user}/OneDrive - Falabella/General/DATA/F4/220516-1518-f4-output.csv",
+    'path_df':f"{user}/General/DATA/F4/220516-1518-f4-output.csv",
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'nro_red_inventario',
-    'marcas_df':f'C:/Users/ext_maperezr/OneDrive - Falabella/General/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
+    'marcas_df':f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
     'fechas' : ['fecha_creacion', 'fecha_reserva'],
     'fecha_res' : 'fecha_reserva',
     'tipo_redinv' : 'tipo_redinv',
@@ -40,8 +41,8 @@ var_f4 = {
 }
 
 var_f3 = { 
-    'path_df':f'{path_ea}/DATA/F3/', # 'input/220509-2137-f3-output.csv'
-    'trend_path':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/tendencias_f3.xlsx/' ,
+    'path_df':f'{user}/General/DATA/F3/220516-1517-f3-output.csv',
+    'trend_path':f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/tendencias_f3.xlsx' ,
     'fecha_res':'fecha_reserva',
     'fecha_envio':'fecha_envio',
     'fecha_anulacion':'fecha_anulacion',

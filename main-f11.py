@@ -9,7 +9,7 @@ df_name = input('Ingrese nombre de archivo de f11 abiertos .csv: ')
 corte = input('Ingrese fecha corte (AAMMDD): ')
 
 frizq = datetime.strptime('2022-02-20', '%Y-%m-%d')
-frder = datetime.strptime(corte, '%y%m%d') + timedelta(days=10)
+frder = datetime.strptime(corte, '%Y-%m-%d') + timedelta(days=10)
 rango_de_fechas = [frizq, frder]
 
 generate_structure(corte)

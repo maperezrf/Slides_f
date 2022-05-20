@@ -3,7 +3,8 @@ import pandas as pd
 import plotly.express as px
 from   datetime import datetime
 from data import var_f11, var_global
-from general import set_columns_nunique, set_columns_sum
+from general import set_columns_nunique, set_columns_sum, make_tables
+import plotly.graph_objects as go
 
 class F11():
     
@@ -22,6 +23,7 @@ class F11():
         self.path = f"{var_global['path_cortes']}/{fcorte}_corte/images/f11"
         self.transform()
         self.f11 = self.f11.sort_values(var_f11['fech_creacion'])
+        self.set_antiguedad()
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados
         self.print_numbers()
@@ -43,6 +45,7 @@ class F11():
         self.f11[var_f11['mes']] = self.f11[var_f11['fech_creacion']].dt.strftime('%b-%y')
         # Numbers 
         self.f11[var_f11['costo']] = pd.to_numeric(self.f11[var_f11['costo']])
+        self.f11[var_f11['dias']]= pd.to_numeric(self.f11[var_f11['dias']])
         # Text
 
     ## ------ Filters
@@ -52,6 +55,14 @@ class F11():
         f11_st_rf12 = fltr_tipo_f11(f11_empresa)
         f11_emp_abiertos = fltr_abiertos(f11_st_rf12)
         return f11_emp_abiertos
+
+    def set_antiguedad(self):
+        self.f11.loc[self.f11['DIAS'] <30, 'age'] = 'Menor a 30' 
+        self.f11.loc[(self.f11['DIAS']>=30)&(self.f11['DIAS']<=60), 'age'] ='30 a 60'
+        self.f11.loc[(self.f11['DIAS']>=60)&(self.f11['DIAS']<=90), 'age'] ='61 a 90'
+        self.f11.loc[(self.f11['DIAS']>=90)&(self.f11['DIAS']<=120), 'age'] ='91 a 120'
+        self.f11.loc[(self.f11['DIAS']>=120)&(self.f11['DIAS']<=180), 'age'] ='121 a 180'
+        self.f11.loc[(self.f11['DIAS']>=181), 'age'] = 'Mayor a 181'
 
     def fltr_riesgo(self, df):
         return df.loc[df[var_f11['mes']].isin(self.mes)].reset_index(drop=True) # TODO mejorar estructura
@@ -129,6 +140,18 @@ class F11():
         total_abierto_cant = gb_f11_gm_cant[var_f11['f11_id']].sum()
         gb_f11_3m_cant_grupo = self.f11_m90.groupby(var_f11['grupo'])[var_f11['f11_id']].nunique().reset_index().set_index(var_f11['grupo']) # Calcula los totales de costo por grupo 
         self.fig_f11_cantidad(gb_f11_gm_cant, gb_f11_3m_cant_grupo, orden_grupo_cant, orden_mes_cant, total_abierto_cant)
+        
+        #Generación tablas 
+        f11_initial = fltr_fecha_desde(self.f11)
+        f11_abiertos = fltr_abiertos(f11_initial)
+        f11_empresa = fltr_empresa(f11_abiertos)
+        f11_cliente = fltr_cliente(f11_abiertos)
+        f11_emp_cd = f11_empresa.loc[f11_empresa[var_f11['grupo']] == 'CD']
+        f11_emp_no_cd = f11_empresa.loc[~f11_empresa[var_f11['grupo']].isin(['CD', 'BODEGA PRODUCTO EN PROCESO'])]
+        f11_cl_cd = f11_cliente.loc[f11_cliente[var_f11['grupo']] == 'CD']
+        f11_cl_no_cd = f11_cliente.loc[~f11_cliente[var_f11['grupo']].isin(['CD', 'BODEGA PRODUCTO EN PROCESO'])]
+
+        self.generate_tables(f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd)
 
     def fig_f11_costo(self, df, gb_annotations, orden_grupo, orden_mes, ta):
         f11_empresa_sede = px.bar(df, x=var_f11['mes'], y=var_f11['costo'], color=var_f11['grupo'], text=var_f11['costo'], text_auto='.2s', category_orders={var_f11['grupo']:orden_grupo, var_f11['mes']:orden_mes})
@@ -165,6 +188,25 @@ class F11():
         f11_es_cantidad.layout.yaxis.title.text='Cantidad de folios de F11'
         f11_es_cantidad.layout.xaxis.title.text='Mes de creación'
         f11_es_cantidad.write_image(F"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.svg",scale=1, height=800,width=850, engine='orca')
+
+    def generate_tables(self,f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd):
+        tb_emp_gen = make_tables(f11_empresa,'SERVICIO','GRUPO','TOTAL_COSTO')
+        tb_cl_gen = make_tables(f11_cliente,'SERVICIO','GRUPO','TOTAL_COSTO')
+        tb_emp_gen_ant = make_tables(f11_empresa,'SERVICIO','age','TOTAL_COSTO','ant')
+        tb_cl_gen_ant = make_tables(f11_cliente,'SERVICIO','age','TOTAL_COSTO','ant')
+        tb_emp_cd = make_tables(f11_emp_cd,'SERVICIO','age','TOTAL_COSTO','ant')
+        tb_emp_no_cd = make_tables(f11_emp_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
+        tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
+        tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
+
+        tb_emp_gen.write_image(f'{self.path}/{self.dt_string}tb_emp_gral.png',height = 265, width = 1100)
+        tb_cl_gen.write_image(f'{self.path}/{self.dt_string}tb_cl_gral.png',height = 265, width = 1100)
+        tb_emp_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_cd.png',height = 265, width = 1000)
+        tb_emp_no_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_no_cd.png',height = 265, width = 1000)
+        tb_cl_no_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_no_cd.png',height = 265, width = 1000)
+        tb_cl_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_cd.png',height = 265, width = 1000)
+        tb_emp_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_emp_ant.png',height = 265, width = 1000)
+        tb_cl_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_cl_ant.png',height = 265, width = 1000)
 
     # ---------------- Trend methods 
     def get_tendencias_costo(self):
@@ -244,6 +286,9 @@ def fltr_tipo_f11(df):
 
 def fltr_empresa(df):
     return df.loc[df[var_f11['propietario']] == var_f11['prop_empresa']].reset_index(drop=True)
+
+def fltr_cliente(df):
+    return df.loc[df[var_f11['propietario']] == var_f11['prop_cliente']].reset_index(drop=True)
 
 def fltr_abiertos(df):
     return df.loc[df[var_f11['estado']].isin(var_f11['estados_abiertos'])].reset_index(drop=True)
