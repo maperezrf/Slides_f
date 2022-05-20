@@ -3,7 +3,11 @@ from config.user_path import  user
 var_global ={
     'path_cortes':f'{user}/General/SEGUIMIENTO-FS/cortes'
 }
-var_main = {f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/plantilla_seg_fs.pptx'}
+
+var_main = {
+    'pat_plantilla':f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/plantilla_seg_fs.pptx'
+    }
+
 
 var_f11 = {
     'path_df': f'{user}/General/DATA/F11/',
@@ -25,7 +29,7 @@ var_f11 = {
     'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ]}
 
 var_f4 = {
-    'path_df':f"{user}/General/DATA/F4/220516-1518-f4-output.csv",
+    'path_df':f"{user}/General/DATA/F4/",
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'nro_red_inventario',
     'marcas_df':f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
@@ -41,7 +45,7 @@ var_f4 = {
 }
 
 var_f3 = { 
-    'path_df':f'{user}/General/DATA/F3/220516-1517-f3-output.csv',
+    'path_df':f'{user}/General/DATA/F3/',
     'trend_path':f'{user}/General/SEGUIMIENTO-FS/repositorio_fs/tendencias_f3.xlsx' ,
     'fecha_res':'fecha_reserva',
     'fecha_envio':'fecha_envio',

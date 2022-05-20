@@ -1,10 +1,10 @@
 from os import mkdir,listdir 
-from datetime import datetime
 import constants as const
 import pandas as pd 
 import plotly.graph_objects as go
 from data import var_global
 path = var_global["path_cortes"]
+
 
 def set_columns_sum(base, var, column):    
     lista = base.loc[base[var].notna()][var].unique()
@@ -23,13 +23,13 @@ def set_columns_nunique(base, var, column):
     return base 
 
 def generate_structure(dt_string):
-    if f"{dt_string}_corte" not in listdir(path):
-        mkdir(f"{path}/{dt_string}_corte")
-        mkdir(f"{path}/{dt_string}_corte/images")
-        mkdir(f"{path}/{dt_string}_corte/images/f3")
-        mkdir(f"{path}/{dt_string}_corte/images/f4")
-        mkdir(f"{path}/{dt_string}_corte/images/f11")
-        mkdir(f"{path}/{dt_string}_corte/classifier")
+    if f"{dt_string}_corte" not in listdir(var_global['path_cortes']):
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f3")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f4")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f11")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/classifier")
     else:
         pass
     

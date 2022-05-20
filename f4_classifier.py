@@ -19,8 +19,8 @@ class CLASSIFIER_F4():
     f4_db_reg = None
     fecha_corte = None
 
-    def __init__(self,fc):
-        self.f4 = pd.read_csv(var_f4['path_df'], sep=';', dtype=str)
+    def __init__(self, fc, f4_name):
+        self.f4 = pd.read_csv(var_f4['path_df'] + f4_name +".csv", sep=';', dtype=str)
         self.marcas = pd.read_excel(var_f4["marcas_df"], dtype=str)
         self.fecha_corte = fc
         self.path = f"{var_global['path_cortes']}/{fc}_corte/classifier" #'output/{fc}_corte/classifier'
