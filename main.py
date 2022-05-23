@@ -10,6 +10,10 @@ from ppt import PPTPY
 # Datos a modificar antes de la ejecución del código
 fecha_corte = input("Ingrese la fecha de corte, formato -> AAAA-MM-DD: ") # TODO pasar a formato de fecha 
 f3_file = input('Ingrese nombre de archivo de f3 .csv: ')
+f4_file = input('Ingrese nombre de archivo de f4 .csv: ')
+f11_file = input('Ingrese nombre de archivo de f11 abiertos .csv: ')
+# Datos a modificar antes de la ejecución del código
+
 fecha_riesgo_f3 = "2022-04-30" 
 
 generate_structure(fecha_corte)

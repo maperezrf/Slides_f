@@ -2,8 +2,8 @@ import pandas as pd
 import plotly.express as px
 from   datetime import timedelta, datetime
 from calendar import monthrange
-from data import var_f4
-from general import  set_columns_sum, unif_colors, ord_mes, ord_num
+from data import var_f4, var_global
+from general import  set_columns_sum, unif_colors, ord_mes, ord_num, make_tables
 import plotly.graph_objects as go
 pd.set_option('display.max_columns', 500)
 
@@ -19,7 +19,7 @@ class F4():
         self.fecha_corte = fc
         self.f4_2022 =  f4_clasificada
         self.f4_2021 = pd.read_csv('input/f4_2021.csv',sep =';', dtype = object) # TODO leer path desde var_f3
-        self.path = f'output/{fc}_corte/images/f4'
+        self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f4"
         self.f4_21_22()
         self.transform()
         self.filters()
@@ -116,11 +116,11 @@ class F4():
         gb_f4mes_tot = self.f4_2022.groupby(['mes','Posible Causa'])['total_precio_costo'].sum().reset_index() # TODO leer desde var_f4
         gb_f4mes_tot = gb_f4mes_tot.loc[gb_f4mes_tot['Posible Causa'].isin(orden_pc_tot)] # TODO leer desde var_f4
         
-        self.tb_averias = make_tables_top_10(top_10_marca)
-        self.tb_p_rotas = make_tables_top_10(f4_pant_rotas)
-        self.tb_calidad = make_tables_top_10(marcas_calidad)
-        self.tb_loc_pant = make_tables_top_10(self.grap_pant_rotas, 'loc')
-        self.tb_prod_pant = make_tables_top_10(self.grap_pant_rotas, 'prod')
+        self.tb_averias = make_tables(top_10_marca, "Marca", "mes", "total_precio_costo","meses")
+        self.tb_p_rotas = make_tables(f4_pant_rotas, "Marca", "mes", "total_precio_costo","meses")
+        self.tb_calidad = make_tables(marcas_calidad, "Marca", "mes", "total_precio_costo","meses")
+        self.tb_loc_pant = make_tables(self.f4_2022_pant_rotas, "desc_local", None,"total_precio_costo","loc")
+        self.tb_prod_pant = make_tables(self.f4_2022_pant_rotas, "descripcion_producto", None,"total_precio_costo","prod")
 
         set_columns_sum(f4_x_semanas,'Semana (fecha de reserva)',var_f4['costo'])
         set_columns_sum(f4_x_semanas,'local_agg',var_f4['costo'])
@@ -291,6 +291,7 @@ class F4():
 
 
     def save_grap(self):  
+        print("Guardando graficas f4's....")
         self.fig_torta_local.write_image(f'{self.path}/{self.fecha_corte}_torta.png', engine = 'orca') 
         self.ten_creac_x_año.write_image(f'{self.path}/{self.fecha_corte}_tendencia_creacion_f4_x_años.png', width = 800, height = 450, engine = 'orca')
         self.grafica_f4_sem.write_image(f'{self.path}/{self.fecha_corte}_grafica_f4_sem.png', width = 700, height = 500, engine = 'orca')
@@ -314,33 +315,6 @@ class F4():
         self.tb_calidad.write_image(f'{self.path}/{self.fecha_corte}_tabla_calidad.png',height = 370,  width = 900, engine = 'orca')
         self.tb_loc_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_loc_pant.png',height = 600,  width = 400, engine = 'orca')
         self.tb_prod_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_prod_pant.png',height = 340,  width = 600, engine = 'orca')
-        
-def make_tables_top_10(df,type='top_10'):
-    if type == 'top_10':
-        pt_df = df.pivot_table(index='Marca', columns='mes',values='total_precio_costo',aggfunc='sum',margins_name='Total',fill_value=0,margins=True).reset_index()
-        pt_df = pd.concat([pt_df.loc[pt_df.Marca!= 'Total'].sort_values('Total',ascending=False), pt_df.loc[pt_df.Marca=='Total']]) 
-        pt_df = pt_df[['Marca']+ord_mes(df,'mes')+['Total']]
-    elif type == 'loc':
-        pt_df = aux.pivot_table(index='desc_local',values='total_precio_costo',aggfunc='sum',margins=True, margins_name='Total').reset_index()
-        pt_df.rename(columns={'desc_local':'Local','total_precio_costo':'Total'},inplace=True)
-        pt_df = pd.concat([pt_df.loc[pt_df['Local']!= 'Total'].sort_values('Total',ascending=False), pt_df.loc[pt_df['Local']=='Total']])
-    elif type == "prod":
-        pt_df = aux.pivot_table(index="descripcion_producto",values="total_precio_costo",aggfunc="sum").reset_index().sort_values("total_precio_costo",ascending=False)
-        pt_df.rename(columns={"descripcion_producto":"Producto","total_precio_costo":"Total"},inplace=True)
-        pt_df = pt_df.head(10)
-
-    columns = pt_df.columns.to_list()
-    listado = []
-    for i in columns:
-        listado.append(pt_df[i].tolist())
-    font_color =  ['rgb(0,0,0)' if x == 'Total' else 'rgb(0,0,0)' for x in listado[0]]
-    color_fill=  ['rgb(229,236,246)' if x == 'Total' else 'rgb(255,255,255)' for x in listado[0]]
-    fig = go.Figure(data=[go.Table(header=dict(values = pt_df.columns.to_list(),font=dict(size=14,color=['rgb(0,0,0)'], family='Arial Black'),line = dict(color='rgb(50,50,50)'),fill=dict(color='rgb(229,236,246)')),
-                    cells = dict(values=listado,
-                    format = [None, '$.2s'],font = dict(size = 13, color = [font_color]),align='center', height = 30,fill= dict(color=[color_fill]),line = dict(color='rgb(50,50,50)')))
-                        ])
-    fig.update_layout( margin = dict(r=1,l=0,t=0,b=0))
-    return fig
     
 def f4_figs(df, pc_order, titulo):
     orden = ord_mes(df,'mes') # TODO leer desde var_f4
