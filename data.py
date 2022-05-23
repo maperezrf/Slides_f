@@ -1,6 +1,7 @@
 from config.user_path import path_ea, user 
 
-var_global ={'path_cortes':f'{path_ea}/SEGUIMIENTO-FS/cortes/'}
+var_global ={'path_cortes':f'{path_ea}/SEGUIMIENTO-FS/cortes/',
+'path_ppts':f'{path_ea}/SEGUIMIENTO-FS/presentaciones/'}
 
 var_main = {'pat_plantilla':f"{path_ea}/SEGUIMIENTO-FS/repositorio_fs/plantilla_seg_fs.pptx"}
 

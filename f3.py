@@ -65,19 +65,24 @@ class F3():
         self.set_cortes(f3_cerrados)
 
     def set_cortes(self, f3_cerrado):
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2021-12-15') & (f3_cerrado['fecha_confirmacion'] <= '2021-12-31') | (f3_cerrado['fecha_anulacion'] >= '2021-12-15') & (f3_cerrado['fecha_anulacion']  <= '2021-12-31'), 'Cortes_cerra'] ='Dic 15 - Dic 31'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2021-12-31') & (f3_cerrado['fecha_confirmacion']  <= '2022-01-17') | (f3_cerrado['fecha_anulacion'] >= '2021-12-31') & (f3_cerrado['fecha_anulacion']  <= '2022-01-17'), 'Cortes_cerra'] ='Dic 31 - Ene 17'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-01-17') & (f3_cerrado['fecha_confirmacion']  <= '2022-01-31') | (f3_cerrado['fecha_anulacion'] >= '2022-01-17') & (f3_cerrado['fecha_anulacion']  <= '2022-01-31'), 'Cortes_cerra'] ='Ene 17 - Ene 31'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-01-31') & (f3_cerrado['fecha_confirmacion']  <= '2022-03-01') | (f3_cerrado['fecha_anulacion'] >= '2022-01-31') & (f3_cerrado['fecha_anulacion']  <= '2022-03-01'), 'Cortes_cerra'] ='Ene 31 - Mar 01'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-03-01') & (f3_cerrado['fecha_confirmacion']  <= '2022-03-16') | (f3_cerrado['fecha_anulacion'] >= '2022-03-01') & (f3_cerrado['fecha_anulacion']  <= '2022-03-16'), 'Cortes_cerra'] ='Mar 01 - Mar 16'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-03-16') & (f3_cerrado['fecha_confirmacion']  <= '2022-03-28') | (f3_cerrado['fecha_anulacion'] >= '2022-03-16') & (f3_cerrado['fecha_anulacion']  <= '2022-03-28'), 'Cortes_cerra'] ='Mar 16 - Mar 28'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-03-28') & (f3_cerrado['fecha_confirmacion']  <= '2022-04-05') | (f3_cerrado['fecha_anulacion'] >= '2022-03-28') & (f3_cerrado['fecha_anulacion']  <= '2022-04-05'), 'Cortes_cerra'] ='Mar 28 - Abr 05'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-04-05') & (f3_cerrado['fecha_confirmacion']  <= '2022-04-12') | (f3_cerrado['fecha_anulacion'] >= '2022-04-05') & (f3_cerrado['fecha_anulacion']  <= '2022-04-12'), 'Cortes_cerra'] ='Abr 05 - Abr 12'   
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-04-12') & (f3_cerrado['fecha_confirmacion']  <= '2022-04-19') | (f3_cerrado['fecha_anulacion'] >= '2022-04-12') & (f3_cerrado['fecha_anulacion']  <= '2022-04-19'), 'Cortes_cerra'] ='Abr 12 - Abr 19'   
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-04-19') & (f3_cerrado['fecha_confirmacion']  <= '2022-04-26') | (f3_cerrado['fecha_anulacion'] >= '2022-04-19') & (f3_cerrado['fecha_anulacion']  <= '2022-04-26'), 'Cortes_cerra'] ='Abr 19 - Abr 26'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-04-26') & (f3_cerrado['fecha_confirmacion']  <= '2022-05-03') | (f3_cerrado['fecha_anulacion'] >= '2022-04-26') & (f3_cerrado['fecha_anulacion']  <= '2022-05-03'), 'Cortes_cerra'] ='Abr 26 - May 03'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-05-03') & (f3_cerrado['fecha_confirmacion']  <= '2022-05-10') | (f3_cerrado['fecha_anulacion'] >= '2022-05-03') & (f3_cerrado['fecha_anulacion']  <= '2022-05-10'), 'Cortes_cerra'] ='May 03 - May 10'        
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-05-10') & (f3_cerrado['fecha_confirmacion']  <= '2022-05-16') | (f3_cerrado['fecha_anulacion'] >= '2022-05-10') & (f3_cerrado['fecha_anulacion']  <= '2022-05-16'), 'Cortes_cerra'] ='May 10 - May 16'        
+        
+        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2021-12-15') & (f3_cerrado['fecha_confirmacion'] <= '2021-12-31') | (f3_cerrado['fecha_anulacion'] >= '2021-12-15') & (f3_cerrado['fecha_anulacion']  <= '2021-12-31'), 'Cortes_cerra'] ='Dic 15 - Dic 31'
+        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2021-12-31') & (f3_cerrado['fecha_confirmacion']  <= '2022-01-17') | (f3_cerrado['fecha_anulacion'] > '2021-12-31') & (f3_cerrado['fecha_anulacion']  <= '2022-01-17'), 'Cortes_cerra'] ='Dic 31 - Ene 17'
+        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-01-17') & (f3_cerrado['fecha_confirmacion']  <= '2022-01-31') | (f3_cerrado['fecha_anulacion'] > '2022-01-17') & (f3_cerrado['fecha_anulacion']  <= '2022-01-31'), 'Cortes_cerra'] ='Ene 17 - Ene 31'
+        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-01-31') & (f3_cerrado['fecha_confirmacion']  <= '2022-03-01') | (f3_cerrado['fecha_anulacion'] > '2022-01-31') & (f3_cerrado['fecha_anulacion']  <= '2022-03-01'), 'Cortes_cerra'] ='Ene 31 - Mar 01' 
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-01') & (f3_cerrado['fecha_confirmacion']  < '2022-03-08') | (f3_cerrado['fecha_anulacion'] >= '2022-03-01') & (f3_cerrado['fecha_anulacion']  < '2022-03-08'), 'Cortes_cerra'] = '01-07 Mar'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-08') & (f3_cerrado['fecha_confirmacion']  < '2022-03-15') | (f3_cerrado['fecha_anulacion'] >= '2022-03-08') & (f3_cerrado['fecha_anulacion']  < '2022-03-15'), 'Cortes_cerra'] = '08-14 Mar'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-15') & (f3_cerrado['fecha_confirmacion']  < '2022-03-22') | (f3_cerrado['fecha_anulacion'] >= '2022-03-15') & (f3_cerrado['fecha_anulacion']  < '2022-03-22'), 'Cortes_cerra'] = '15-21 Mar'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-22') & (f3_cerrado['fecha_confirmacion']  < '2022-03-29') | (f3_cerrado['fecha_anulacion'] >= '2022-03-22') & (f3_cerrado['fecha_anulacion']  < '2022-03-29'), 'Cortes_cerra'] = '22-28 Mar'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-29') & (f3_cerrado['fecha_confirmacion']  < '2022-04-05') | (f3_cerrado['fecha_anulacion'] >= '2022-03-29') & (f3_cerrado['fecha_anulacion']  < '2022-04-05'), 'Cortes_cerra'] = '29-04 Abr'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-05') & (f3_cerrado['fecha_confirmacion']  < '2022-04-12') | (f3_cerrado['fecha_anulacion'] >= '2022-04-05') & (f3_cerrado['fecha_anulacion']  < '2022-04-12'), 'Cortes_cerra'] = '05-11 Abr'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-12') & (f3_cerrado['fecha_confirmacion']  < '2022-04-19') | (f3_cerrado['fecha_anulacion'] >= '2022-04-12') & (f3_cerrado['fecha_anulacion']  < '2022-04-19'), 'Cortes_cerra'] = '12-18 Abr'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-19') & (f3_cerrado['fecha_confirmacion']  < '2022-04-26') | (f3_cerrado['fecha_anulacion'] >= '2022-04-19') & (f3_cerrado['fecha_anulacion']  < '2022-04-26'), 'Cortes_cerra'] = '19-25 Abr'
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-26') & (f3_cerrado['fecha_confirmacion']  < '2022-05-03') | (f3_cerrado['fecha_anulacion'] >= '2022-04-26') & (f3_cerrado['fecha_anulacion']  < '2022-05-03'), 'Cortes_cerra'] = '26-02 May' 
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-05-03') & (f3_cerrado['fecha_confirmacion']  < '2022-05-10') | (f3_cerrado['fecha_anulacion'] >= '2022-05-03') & (f3_cerrado['fecha_anulacion']  < '2022-05-10'), 'Cortes_cerra'] = '03-09 May'         
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-05-10') & (f3_cerrado['fecha_confirmacion']  < '2022-05-17') | (f3_cerrado['fecha_anulacion'] >= '2022-05-10') & (f3_cerrado['fecha_anulacion']  < '2022-05-17'), 'Cortes_cerra'] = '10-16 May' 
+        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-05-17') & (f3_cerrado['fecha_confirmacion']  < '2022-05-24') | (f3_cerrado['fecha_anulacion'] >= '2022-05-17') & (f3_cerrado['fecha_anulacion']  < '2022-05-24'), 'Cortes_cerra'] = '17-23 May' 
+
         self.fig_prd_costo = self.calc_cierres('producto', f3_cerrado, 'costo')
         self.fig_mkp_costo = self.calc_cierres('mkp', f3_cerrado, 'costo')
         self.fig_prd_cantidad = self.calc_cierres('producto', f3_cerrado, 'cantidad')
@@ -179,6 +184,7 @@ class F3():
         graf_F3_cerr_prd.update_layout(legend = dict(yanchor = "bottom", xanchor = "left", orientation = "h", y = 1))
         graf_F3_cerr_prd.update_yaxes(range = [0, df[column].max() + (df[column].max() * 0.25)], constrain ='domain')
         graf_F3_cerr_prd.update_layout(font=dict(size = 14))   
+        graf_F3_cerr_prd.update_layout(margin_r=20, margin_t=60)
         return graf_F3_cerr_prd
 
     def grap_f3_ab(self, grupo_F3_prd_mkp, orden, axes_y, f3_total_3m, f3_mkp_3m, f3_prd_3m, titulo):
@@ -188,7 +194,8 @@ class F3():
             text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_sequence = ['rgb(36, 121, 108)','rgb(204, 97, 176)'], title = titulo, 
             category_orders = {var_f3['tipo_producto']:orden, 'mes':orden_mes })
         fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1))
-        fig.update_layout(font=dict(size = 14))    
+        fig.update_layout(font=dict(size = 14))   
+        fig.update_layout(margin_r=20, margin_t=60)
         fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.82, y1 = 1, line = dict(color = 'red', width = 2))
         fig.add_annotation(x = orden_mes[0], y = (range_y * 60/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 14))
         fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}', 
@@ -205,6 +212,7 @@ class F3():
                 labels = { column:'Costo promedio', 'mes':'Mes de reserva', 'local_agg':'Local'}, text = column,text_auto = '.2s', color_discrete_map = color )  
             fig.update_layout(legend = dict(yanchor ='top', y=0.9, xanchor = 'left', x = 0.1))
             fig.update_yaxes(range = [0,6*1e8], constrain='domain')
+            fig.update_layout(margin_r=20, margin_t=60)
         elif column == var_f3['f3_id']:
             color = unif_colors(mkp_sede, 'local_agg')
             total = self.f3_ab_mkp[column].nunique()
@@ -212,12 +220,14 @@ class F3():
                 labels = { column:'Costo promedio', 'mes':'Mes de reserva', 'local_agg':'Local'}, text = column,text_auto = '.s', color_discrete_map = color )  
             fig.update_layout(legend = dict(yanchor = 'top', y = 0.9, xanchor = 'left', x=0.1))
             fig.update_yaxes(range = [0,1100], constrain = 'domain')
+            fig.update_layout(margin_r=20, margin_t=60)
         fig.update_layout(font=dict(size=14))
         return fig
 
     def grap_tend(self, tipo_producto = 'producto'): 
-        tend_prod = self.f3_tendencia.loc[self.f3_tendencia['tipo producto'] == 'producto']
-        tend_mkp = self.f3_tendencia.loc[self.f3_tendencia['tipo producto'] == 'mkp']
+        trend = self.f3_tendencia.loc[self.f3_tendencia['fecha ptt'] >= '2022-03-01']
+        tend_prod = trend.loc[trend['tipo producto'] == 'producto']
+        tend_mkp = trend.loc[trend['tipo producto'] == 'mkp']
         if tipo_producto == 'mkp':
             titulo = 'Tendencia F3 abierto tipo marketplace'
             df = tend_mkp
@@ -230,6 +240,7 @@ class F3():
         fig.update_layout(legend = dict(yanchor = 'top', y = 1, xanchor ='left', x = 0.45))
         fig.update_layout(font=dict(size=14))
         fig.update_traces(textposition = 'bottom center')
+        fig.update_layout(margin_r=20, margin_t=60)
         fecha_max = (df['fecha ptt'].max() + timedelta (days = 5)).strftime('%d-%m-%Y')
         fecha_min = (df['fecha ptt'].min() - timedelta (5)).strftime('%d-%m-%Y')
         fig.update_xaxes(range = [fecha_min, fecha_max], constrain = 'domain')
@@ -237,14 +248,17 @@ class F3():
 
     # Saving graphs 
     def save_graf(self): 
-        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva.png' ,width=690, height=400, engine='orca')
-        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=400, engine='orca')
-        self.graf_mkp_sede.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede.png',width=600, height=350, engine='orca')
+        # Graphs x cost
+        self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva.png' ,width=600, height=400, engine='orca')
+        self.graf_mkp_sede.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede.png',width=600, height=400, engine='orca')
+        self.graf_tend_mkp.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_mkp.png',width=500, height=400, engine='orca')
+        self.graf_tend_prod.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_Producto.png',width=500, height=400, engine='orca')
+        self.fig_prd_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_producto_costo.png',width=500, height=400, engine='orca')
+        self.fig_mkp_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_costo.png',width=500, height=400, engine='orca')
+
+        # Graphs x cant
+        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=350, engine='orca')
         self.graf_mkp_sede_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede_cant.png',width=600, height=350, engine='orca')
-        self.graf_tend_mkp.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_mkp.png',width=850, height=500, engine='orca')
-        self.graf_tend_prod.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_Producto.png',width=850, height=500, engine='orca')
-        self.fig_prd_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_producto_costo.png',width=500, height=480, engine='orca')
-        self.fig_mkp_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_costo.png',width=500, height=480, engine='orca')
-        self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_prodcuto_cantidad.png',width=500, height=480, engine='orca')
-        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_cantidad.png',width=500, height=480, engine='orca')
-        print('se guardaron las imgs')
+        self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_prodcuto_cantidad.png',width=500, height=350, engine='orca')
+        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_cantidad.png',width=500, height=350, engine='orca')
+        print('Se guardaron las imgs!')
