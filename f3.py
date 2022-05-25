@@ -1,8 +1,11 @@
 import pandas as pd
 import plotly.express as px
+import calendar
+import dateutil.relativedelta
 from   datetime import timedelta, datetime
-from general import set_columns_sum, unif_colors, ord_mes,ord_num,set_columns_nunique
+from general import set_columns_sum, unif_colors, ord_mes,ord_num,set_columns_nunique, make_tables
 import constants as const
+import plotly.graph_objects as go
 from data import var_f3, var_global
 pd.set_option('display.max_columns', 500)
 
@@ -13,8 +16,7 @@ class F3():
     f3_ab_pr_mkp = None
     fecha_corte = None   
 
-    def __init__(self, fr, fc, f3_name) -> None:
-       self.fecha_riesgo = fr
+    def __init__(self, fc, f3_name) -> None:
        self.fecha_corte = fc
        
        self.f3 = pd.read_csv(var_f3['path_df'] + f3_name + '.csv', sep = ';', dtype = object)
@@ -56,39 +58,32 @@ class F3():
 
     def filters(self):
         self.f3_2021 = self.f3.loc[self.f3[var_f3['fecha_res']] >= var_f3['fecha_inicial']].reset_index(drop = True)  # [x] leer desde var_f3 = fecha_inicial
-        self.f3_abierto = self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['abiertos'])].reset_index(drop = True)  # [x] leer desde var_f3 = abiertos
         f3_cerrados = self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['cerrados'])].reset_index(drop = True) # [x] leer desde var_f3 = cerrados        
-        self.f3_ab_pr_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']].isin(var_f3['tipo_tp'])].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
-        self.f3_ab_mkp = self.f3_abierto.loc[self.f3_abierto[var_f3['tipo_producto']] ==var_f3['tipo_tp'][1]].reset_index(drop = True) # [x] si es variable global entonces debe ir en el init o en inialización 
-        self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= self.fecha_riesgo,'mayor a 30'] = 'y'
+        self.f3_ab_pr_mkp =self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['abiertos'])].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
+        self.f3_ab_mkp = self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['tipo_producto']] ==var_f3['tipo_tp'][1]].reset_index(drop = True) # [x] si es variable global entonces debe ir en el init o en inialización 
+        self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= set_fecha_riesgo(),'mayor a 30'] = 'y'
         self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp['mayor a 30'].isna(), 'mayor a 30'] = 'n'
         self.set_cortes(f3_cerrados)
 
     def set_cortes(self, f3_cerrado):
-        
-        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2021-12-15') & (f3_cerrado['fecha_confirmacion'] <= '2021-12-31') | (f3_cerrado['fecha_anulacion'] >= '2021-12-15') & (f3_cerrado['fecha_anulacion']  <= '2021-12-31'), 'Cortes_cerra'] ='Dic 15 - Dic 31'
-        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2021-12-31') & (f3_cerrado['fecha_confirmacion']  <= '2022-01-17') | (f3_cerrado['fecha_anulacion'] > '2021-12-31') & (f3_cerrado['fecha_anulacion']  <= '2022-01-17'), 'Cortes_cerra'] ='Dic 31 - Ene 17'
-        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-01-17') & (f3_cerrado['fecha_confirmacion']  <= '2022-01-31') | (f3_cerrado['fecha_anulacion'] > '2022-01-17') & (f3_cerrado['fecha_anulacion']  <= '2022-01-31'), 'Cortes_cerra'] ='Ene 17 - Ene 31'
-        #f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] > '2022-01-31') & (f3_cerrado['fecha_confirmacion']  <= '2022-03-01') | (f3_cerrado['fecha_anulacion'] > '2022-01-31') & (f3_cerrado['fecha_anulacion']  <= '2022-03-01'), 'Cortes_cerra'] ='Ene 31 - Mar 01' 
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-01') & (f3_cerrado['fecha_confirmacion']  < '2022-03-08') | (f3_cerrado['fecha_anulacion'] >= '2022-03-01') & (f3_cerrado['fecha_anulacion']  < '2022-03-08'), 'Cortes_cerra'] = '01-07 Mar'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-08') & (f3_cerrado['fecha_confirmacion']  < '2022-03-15') | (f3_cerrado['fecha_anulacion'] >= '2022-03-08') & (f3_cerrado['fecha_anulacion']  < '2022-03-15'), 'Cortes_cerra'] = '08-14 Mar'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-15') & (f3_cerrado['fecha_confirmacion']  < '2022-03-22') | (f3_cerrado['fecha_anulacion'] >= '2022-03-15') & (f3_cerrado['fecha_anulacion']  < '2022-03-22'), 'Cortes_cerra'] = '15-21 Mar'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-22') & (f3_cerrado['fecha_confirmacion']  < '2022-03-29') | (f3_cerrado['fecha_anulacion'] >= '2022-03-22') & (f3_cerrado['fecha_anulacion']  < '2022-03-29'), 'Cortes_cerra'] = '22-28 Mar'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-03-29') & (f3_cerrado['fecha_confirmacion']  < '2022-04-05') | (f3_cerrado['fecha_anulacion'] >= '2022-03-29') & (f3_cerrado['fecha_anulacion']  < '2022-04-05'), 'Cortes_cerra'] = '29-04 Abr'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-05') & (f3_cerrado['fecha_confirmacion']  < '2022-04-12') | (f3_cerrado['fecha_anulacion'] >= '2022-04-05') & (f3_cerrado['fecha_anulacion']  < '2022-04-12'), 'Cortes_cerra'] = '05-11 Abr'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-12') & (f3_cerrado['fecha_confirmacion']  < '2022-04-19') | (f3_cerrado['fecha_anulacion'] >= '2022-04-12') & (f3_cerrado['fecha_anulacion']  < '2022-04-19'), 'Cortes_cerra'] = '12-18 Abr'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-19') & (f3_cerrado['fecha_confirmacion']  < '2022-04-26') | (f3_cerrado['fecha_anulacion'] >= '2022-04-19') & (f3_cerrado['fecha_anulacion']  < '2022-04-26'), 'Cortes_cerra'] = '19-25 Abr'
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-04-26') & (f3_cerrado['fecha_confirmacion']  < '2022-05-03') | (f3_cerrado['fecha_anulacion'] >= '2022-04-26') & (f3_cerrado['fecha_anulacion']  < '2022-05-03'), 'Cortes_cerra'] = '26-02 May' 
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-05-03') & (f3_cerrado['fecha_confirmacion']  < '2022-05-10') | (f3_cerrado['fecha_anulacion'] >= '2022-05-03') & (f3_cerrado['fecha_anulacion']  < '2022-05-10'), 'Cortes_cerra'] = '03-09 May'         
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-05-10') & (f3_cerrado['fecha_confirmacion']  < '2022-05-17') | (f3_cerrado['fecha_anulacion'] >= '2022-05-10') & (f3_cerrado['fecha_anulacion']  < '2022-05-17'), 'Cortes_cerra'] = '10-16 May' 
-        f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= '2022-05-17') & (f3_cerrado['fecha_confirmacion']  < '2022-05-24') | (f3_cerrado['fecha_anulacion'] >= '2022-05-17') & (f3_cerrado['fecha_anulacion']  < '2022-05-24'), 'Cortes_cerra'] = '17-23 May' 
+        orden_x = []
+        fecha_in = "2022-03-01"
+        f_in = datetime.strptime(fecha_in,'%Y-%m-%d')
+        f_fin = f_in + timedelta(days=7)
+        while f_fin <= datetime.now():
+            f_fin = f_in + timedelta(days=7)
+            day = f_in.strftime("%d")
+            mes = (f_fin - timedelta(days=1)).strftime("%d-%b")
+            f3_cerrado.loc[(f3_cerrado['fecha_confirmacion'] >= f_in) & (f3_cerrado['fecha_confirmacion']  < f_fin) | (f3_cerrado['fecha_anulacion'] >= f_in) & (f3_cerrado['fecha_anulacion']  < f_fin), 'Cortes_cerra'] = f'{day}-{mes}'
+            orden_x.append(f'{day}-{mes}')
+            f_in = f_fin
 
-        self.fig_prd_costo = self.calc_cierres('producto', f3_cerrado, 'costo')
-        self.fig_mkp_costo = self.calc_cierres('mkp', f3_cerrado, 'costo')
-        self.fig_prd_cantidad = self.calc_cierres('producto', f3_cerrado, 'cantidad')
-        self.fig_mkp_cantidad =  self.calc_cierres('mkp', f3_cerrado, 'cantidad') 
+        self.fig_prd_costo = self.calc_cierres('producto', f3_cerrado, 'costo',orden_x)
+        self.fig_mkp_costo = self.calc_cierres('mkp', f3_cerrado, 'costo',orden_x)
+        self.fig_prd_cantidad = self.calc_cierres('producto', f3_cerrado, 'cantidad',orden_x)
+        self.fig_mkp_cantidad =  self.calc_cierres('mkp', f3_cerrado, 'cantidad',orden_x) 
 
-    def calc_cierres(self, t_producto, f3_cerrado, tip_group): 
+    def calc_cierres(self, t_producto, f3_cerrado, tip_group,orden_x): 
         # TODO pasar a un solo método
         # Validar tipo 
         if t_producto == 'producto':
@@ -107,7 +102,7 @@ class F3():
             etiquetas = {'Cortes_cerra':'Cortes de cierre', 'cant*costoprmd': 'Costo promedio', 'descripcion6': 'Estado'}
             set_columns_sum(grup_df, 'Cortes_cerra', var_f3['costo'])
             set_columns_sum(grup_df, var_f3['estado'], var_f3['costo'])
-            return self.grap_cortes(grup_df, var_f3['costo'], titulo, etiquetas)
+            return self.grap_cortes(grup_df, var_f3['costo'], titulo, etiquetas,orden_x)
         elif tip_group == 'cantidad':
             grup_df = df.groupby([var_f3['estado'], 'Cortes_cerra'], sort = False)[var_f3['f3_id']].nunique().reset_index()
             total = grup_df[var_f3['f3_id']].sum()
@@ -115,7 +110,7 @@ class F3():
             etiquetas = {'Cortes_cerra':'Cortes de cierre', var_f3['f3_id']: 'Cantidad', 'descripcion6': 'Estado' }
             set_columns_nunique(grup_df, 'Cortes_cerra', var_f3['f3_id'])
             set_columns_nunique(grup_df, var_f3['estado'], var_f3['f3_id']) 
-            return self.grap_cortes(grup_df, var_f3['f3_id'], titulo, etiquetas) 
+            return self.grap_cortes(grup_df, var_f3['f3_id'], titulo, etiquetas, orden_x) 
 
     def make_groupby(self):
         grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['costo']].sum().reset_index()
@@ -176,8 +171,8 @@ class F3():
             self.f3_tendencia = tendencias
 
     # Gráficas 
-    def grap_cortes(self, df, column, titulo, etiquetas):
-        orden_y = ord_mes(df, 'Cortes_cerra', "f3")
+    def grap_cortes(self, df, column, titulo, etiquetas, orden_c):
+        orden_y = ord_mes(df, 'Cortes_cerra', "f3", orden_c)
         orden_x = ord_num(df, var_f3['estado'],column)
         graf_F3_cerr_prd = px.bar(df, x='Cortes_cerra', y=column, labels = etiquetas, text = column, text_auto='.2s',  category_orders={var_f3['estado']:orden_x,
             "Cortes_cerra":orden_y}, color = 'descripcion6', color_discrete_sequence=['rgb(118, 78, 159)','rgb(218, 165, 27)'], title = titulo)
@@ -195,11 +190,10 @@ class F3():
             category_orders = {var_f3['tipo_producto']:orden, 'mes':orden_mes })
         fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1))
         fig.update_layout(font=dict(size = 14))   
-        fig.update_layout(margin_r=20, margin_t=60)
-        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.82, y1 = 1, line = dict(color = 'red', width = 2))
+        fig.update_layout(margin_r = 20, margin_t = 60)
+        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.85, y1 = 1, line = dict(color = 'red', width = 2))
         fig.add_annotation(x = orden_mes[0], y = (range_y * 60/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 14))
-        fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}', 
-            showarrow = False, font = dict (color = 'red',size = 14))
+        fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}',showarrow = False, font = dict (color = 'red',size = 14))
         fig.update_annotations(align = 'left')
         fig.update_yaxes(range = [0,grupo_F3_prd_mkp[axes_y].max() + (grupo_F3_prd_mkp[axes_y].max() * 0.7)], constrain = 'domain')
         return fig
@@ -246,8 +240,22 @@ class F3():
         fig.update_xaxes(range = [fecha_min, fecha_max], constrain = 'domain')
         return fig
 
+    def generate_table(self):
+        for dia in ["dias_res","dias_env"]:
+            self.f3_ab_pr_mkp[dia] = (self.f3_ab_pr_mkp["fecha_reserva"].max() - self.f3_ab_pr_mkp["fecha_reserva"] )
+            self.f3_ab_pr_mkp[dia] = self.f3_ab_pr_mkp[dia].apply(lambda x :x.days )
+            self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[dia] <30, 'age'] = 'Menor a 30' 
+            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=30) & (self.f3_ab_pr_mkp[dia]<=60), 'age'] ='30 a 60'
+            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=60) & (self.f3_ab_pr_mkp[dia]<=90), 'age'] ='61 a 90'
+            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=90) & (self.f3_ab_pr_mkp[dia]<=120), 'age'] ='91 a 120'
+            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=120), 'age'] ='Mayor a 121'
+        f3_ab = self.f3_ab_pr_mkp.rename(columns={'descripcion6':'Estado'})
+        f3_ab['Estado'] = f3_ab['Estado'].str.capitalize()  
+        return make_tables(f3_ab,'Estado','age','cant*costoprmd','ant_f3')
+
     # Saving graphs 
     def save_graf(self): 
+        pass
         # Graphs x cost
         self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva.png' ,width=600, height=400, engine='orca')
         self.graf_mkp_sede.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede.png',width=600, height=400, engine='orca')
@@ -255,6 +263,7 @@ class F3():
         self.graf_tend_prod.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_Producto.png',width=500, height=400, engine='orca')
         self.fig_prd_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_producto_costo.png',width=500, height=400, engine='orca')
         self.fig_mkp_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_costo.png',width=500, height=400, engine='orca')
+        self.generate_table().write_image(f'{self.path}/{self.fecha_corte}_f3_tabla_res_env.png',width=800, height=100, engine='orca')
 
         # Graphs x cant
         self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=350, engine='orca')
@@ -262,3 +271,10 @@ class F3():
         self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_prodcuto_cantidad.png',width=500, height=350, engine='orca')
         self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_cantidad.png',width=500, height=350, engine='orca')
         print('Se guardaron las imgs!')
+
+
+def set_fecha_riesgo():
+    year = (datetime.now() - dateutil.relativedelta.relativedelta(months=1)).strftime("%Y")
+    month = (datetime.now() - dateutil.relativedelta.relativedelta(months=1)).strftime("%m")
+    day = calendar.monthrange(int(year), int(month))[1]
+    return  f'{year}-{month}-{day}'

@@ -5,6 +5,7 @@ import constants as const
 from data import var_f4, var_global
 from f4 import F4
 dt_string = datetime.now().strftime('%y%m%d')
+
 pd.options.display.float_format = '${:,.0f}'.format
 
 # A tener en cuenta: 
@@ -18,6 +19,7 @@ class CLASSIFIER_F4():
     f4_db_res = None
     f4_db_reg = None
     fecha_corte = None
+    f4_clas_marc = None
 
     def __init__(self, fc, f4_name):
         self.f4 = pd.read_csv(var_f4['path_df'] + f4_name +".csv", sep=';', dtype=str)
@@ -58,7 +60,15 @@ class CLASSIFIER_F4():
         # dado_de_baja = self.fltr_dado_baja()
         self.f4_db_res = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='reservado')].reset_index(drop=True) # & (self.f4[var_f4["fecha_res"]] >= "2022-01-01")].reset_index(drop=True)
         self.f4_db_reg = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4[var_f4['estado']] =='registrado')].reset_index(drop=True) # & (self.f4["fecha_creacion"] >= "2022-01-01")].reset_index(drop=True)
+        #otros tipos 
+        self.f4_tp_res = self.f4.loc[(self.f4[var_f4["tipo_redinv"]] != "dado de baja") & (self.f4[var_f4['estado']] =='reservado')].reset_index(drop=True)
 
+    def get_f4_tp_res(self):
+        return self.f4_tp_res
+
+    def get_marca(self):
+        return self.f4_clas_marc
+        
     # Methods 
     def set_posible_causa(self):
         # Filtros para tienda 
@@ -103,7 +113,7 @@ class CLASSIFIER_F4():
 
     def set_marca(self):
         self.marcas.drop_duplicates("upc",inplace=True)
-        self.f4_clas_marc = self.f4_db_res.merge(self.marcas, how="left", on="upc") # TODO si f4_clas_marc es variable global entonces debe ir en el init o en inialización 
+        self.f4_clas_marc = self.f4_db_res.merge(self.marcas, how="left", on="upc") # [x] si f4_clas_marc es variable global entonces debe ir en el init o en inialización 
 
     def calc_data_print(self):
         reg_sin_clasificar = self.f4_clas_marc.loc[self.f4_clas_marc["Posible Causa"].isna()].shape[0]
