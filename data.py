@@ -3,6 +3,8 @@ from config.user_path import  user, path_ea
 var_global ={'path_cortes':f'{path_ea}/SEGUIMIENTO-FS/cortes/',
 'path_ppts':f'{path_ea}/SEGUIMIENTO-FS/presentaciones/'}
 
+var_main = {'pat_plantilla':f"{path_ea}/SEGUIMIENTO-FS/repositorio_fs/plantilla_seg_fs.pptx"}
+
 var_f11 = {
     'path_df': f'{path_ea}/DATA/F11/',
     'trend_path': f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/tendencias_f11.xlsx', 
@@ -10,6 +12,7 @@ var_f11 = {
     'propietario':'PROPIETARIO',
     'estado':'ESTADO',
     'prop_empresa':'EMPRESA',
+    'prop_cliente':'CLIENTE',
     'fech_creacion':'FECHA_CREACION',
     'estados_abiertos':['Despachado','Espera Retiro Clte.','Ingresado','Entrega parcial'],
     'fecha_inicial':'2021-01-01', 
@@ -18,7 +21,8 @@ var_f11 = {
     'grupo':'GRUPO',
     'fecha_corte':'FECHA_CORTE', 
     'servicio':'SERVICIO',
-    'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ]}
+    'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ], 
+    'dias':'DIAS'}
 
 var_f4 = {
     'path_df':f"{user}/General/DATA/F4/",

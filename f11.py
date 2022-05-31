@@ -150,7 +150,6 @@ class F11():
         f11_emp_no_cd = f11_empresa.loc[~f11_empresa[var_f11['grupo']].isin(['CD', 'BODEGA PRODUCTO EN PROCESO'])]
         f11_cl_cd = f11_cliente.loc[f11_cliente[var_f11['grupo']] == 'CD']
         f11_cl_no_cd = f11_cliente.loc[~f11_cliente[var_f11['grupo']].isin(['CD', 'BODEGA PRODUCTO EN PROCESO'])]
-
         self.generate_tables(f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd)
 
     def fig_f11_costo(self, df, gb_annotations, orden_grupo, orden_mes, ta):
@@ -199,14 +198,14 @@ class F11():
         tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
         tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
 
-        tb_emp_gen.write_image(f'{self.path}/{self.dt_string}tb_emp_gral.png',height = 265, width = 1100)
-        tb_cl_gen.write_image(f'{self.path}/{self.dt_string}tb_cl_gral.png',height = 265, width = 1100)
-        tb_emp_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_cd.png',height = 265, width = 1000)
-        tb_emp_no_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_no_cd.png',height = 265, width = 1000)
-        tb_cl_no_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_no_cd.png',height = 265, width = 1000)
-        tb_cl_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_cd.png',height = 265, width = 1000)
-        tb_emp_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_emp_ant.png',height = 265, width = 1000)
-        tb_cl_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_cl_ant.png',height = 265, width = 1000)
+        tb_emp_gen.write_image(f'{self.path}/{self.dt_string}tb_emp_gral.png',height = 265, width = 1100, engine='orca')
+        tb_cl_gen.write_image(f'{self.path}/{self.dt_string}tb_cl_gral.png',height = 265, width = 1100, engine='orca')
+        tb_emp_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_cd.png',height = 265, width = 1000, engine='orca')
+        tb_emp_no_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_no_cd.png',height = 265, width = 1000, engine='orca')
+        tb_cl_no_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_no_cd.png',height = 265, width = 1000, engine='orca')
+        tb_cl_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_cd.png',height = 265, width = 1000, engine='orca')
+        tb_emp_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_emp_ant.png',height = 265, width = 1000, engine='orca')
+        tb_cl_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_cl_ant.png',height = 265, width = 1000, engine='orca')
 
     # ---------------- Trend methods 
     def get_tendencias_costo(self):
