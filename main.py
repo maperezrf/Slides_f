@@ -27,7 +27,7 @@ def menu_f11(f11_df):
 def f3():
     f3_file = input('Ingrese nombre de archivo de f3 .csv (n, de lo contrario): ')
     if f3_file != 'n':
-        f3 = F3(fecha_riesgo_f3, fecha_corte, f3_file)
+        f3 = F3(fecha_corte, f3_file)
         return f3.get_path()
     else:
         return ''
@@ -36,12 +36,12 @@ def f4():
     f4_file = input('Ingrese nombre de archivo de f4 .csv (n, de lo contrario): ')
     if f4_file != 'n':
         # F4 Clasificador
-        f4_classifier = CLASSIFIER_F4(fecha_corte)
-        f4_clasificada = f4_classifier.f4_clas_marc #TODO pasar a método get_f4_classified() #PRIORITARIO=23MAYO
+        f4_classifier = CLASSIFIER_F4(fecha_corte, f4_file)
+        f4_clasificada = f4_classifier.get_marca()
 
         # F4
         f4 = F4(f4_clasificada,fecha_corte)
-        path_f4 = f4.path #TODO pasar a método get_path() #PRIORITARIO=23MAYO
+        path_f4 = f4.get_path()
         f4_calcs = f4_classifier.calculos() 
         return path_f4, f4_calcs
     else:

@@ -42,11 +42,11 @@ def unif_colors(df ,column):
                 dic[i] = const.p_colores[local]
     return dic
 
-def ord_mes(df,column,f = "general"):
+def ord_mes(df,column,f = "general", orden = None):
     if f == "general":
         meses = ["Inv","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
     elif f == "f3":
-        meses =['Dic 15', 'Dic 31','Ene 17','Ene 31','Mar 01','Mar 16','Mar 28','Abr 05','Abr 12','Abr 19','Abr 26','May 03','May 10']
+        meses = orden
     elif f == "ant":
         meses = ['Menor a 30 días', 'De 30 a 60 días', 'De 61 a 90 días','De 91 a 120 días', 'De 121 a 180 días', 'Mayor a 181 días','Total'] 
     col_mes = df[column].unique()
@@ -77,6 +77,10 @@ def make_tables(df,rows,column,sum, types = None ):
     elif types == "ant":
         pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
         pt_df = pt_df[["SERVICIO", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', '121 a 180', 'Mayor a 181','Total']]
+    elif types == "ant_f3":
+         pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
+         pt_df = pt_df[["Estado", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', 'Mayor a 121','Total']]
+
     columns = pt_df.columns.to_list()
     listado = []
     for i in columns:
@@ -88,7 +92,7 @@ def make_tables(df,rows,column,sum, types = None ):
     color_fill=  ['rgb(229,236,246)' if x == 'Total' else 'rgb(255,255,255)' for x in listado[0]]
     fig = go.Figure(data=[go.Table(header=dict(values = pt_df.columns.to_list(),font=dict(size=14,color=['rgb(0,0,0)'], family='Arial Black'),line = dict(color='rgb(50,50,50)'),fill=dict(color='rgb(229,236,246)')),
                     cells = dict(values=listado,
-                    format =  [None,'$,.0f'],font = dict(size = 13, color = [font_color]),align='center', height = 30,fill= dict(color=[color_fill]),line = dict(color='rgb(50,50,50)')))
+                    format =  [None,'$,.0f'],font = dict(size = 13, color = [font_color]),align='center', height = 23,fill= dict(color=[color_fill]),line = dict(color='rgb(50,50,50)')))
                         ])
     fig.update_layout( margin = dict(r=1,l=0,t=0,b=0))
     return fig
