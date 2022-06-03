@@ -1,4 +1,3 @@
-
 from f3 import F3
 from f4_classifier import CLASSIFIER_F4
 from f4 import F4
@@ -21,7 +20,7 @@ path_f3 = f3.get_path()
 
 # F4 Clasificador
 f4_classifier = CLASSIFIER_F4(fecha_corte, f4_file)
-f4_clasificada = f4_classifier.get_marca() #[x] pasar a método get_f4_classified() #PRIORITARIO=23MAYO
+f4_clasificada = f4_classifier.get_f4_classifier() #[x] pasar a método get_f4_classified() #PRIORITARIO=23MAYO
 
 # F4
 f4 = F4(f4_clasificada,fecha_corte)
