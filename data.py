@@ -12,6 +12,7 @@ var_f11 = {
     'propietario':'PROPIETARIO',
     'estado':'ESTADO',
     'prop_empresa':'EMPRESA',
+    'prop_cliente':'CLIENTE',
     'fech_creacion':'FECHA_CREACION',
     'estados_abiertos':['Despachado','Espera Retiro Clte.','Ingresado','Entrega parcial'],
     'fecha_inicial':'2021-01-01', 
@@ -20,7 +21,8 @@ var_f11 = {
     'grupo':'GRUPO',
     'fecha_corte':'FECHA_CORTE', 
     'servicio':'SERVICIO',
-    'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ]}
+    'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ], 
+    'dias':'DIAS'}
 
 var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/",

@@ -10,7 +10,7 @@ class F11():
     
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
-    mes = ['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22', 'Feb-22'] # Editar esta lista cada vez 
+    mes = ['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22', 'Feb-22', 'Mar-22'] # Editar esta lista cada vez 
     rango_fechas = []
     f11_tcosto  = None
     f11_tm90_costo  = None
@@ -150,7 +150,6 @@ class F11():
         f11_emp_no_cd = f11_empresa.loc[~f11_empresa[var_f11['grupo']].isin(['CD', 'BODEGA PRODUCTO EN PROCESO'])]
         f11_cl_cd = f11_cliente.loc[f11_cliente[var_f11['grupo']] == 'CD']
         f11_cl_no_cd = f11_cliente.loc[~f11_cliente[var_f11['grupo']].isin(['CD', 'BODEGA PRODUCTO EN PROCESO'])]
-
         self.generate_tables(f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd)
 
     def fig_f11_costo(self, df, gb_annotations, orden_grupo, orden_mes, ta):
@@ -159,7 +158,7 @@ class F11():
         f11_empresa_sede.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
         f11_empresa_sede.update_layout(font=dict(size=14))
 
-        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.83, y1=0.8,line=dict(color="red", width=2,))
+        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.85, y1=1,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0] 
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.9*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.8*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
@@ -177,7 +176,7 @@ class F11():
         f11_es_cantidad.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
         f11_es_cantidad.update_layout(font=dict(size=14))
 
-        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.83, y1=0.8,line=dict(color="red", width=2,))
+        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.85, y1=1,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0]
         f11_es_cantidad.add_annotation(x=mes_ref, y=1200, text= f"Total > 90 días = {gb_annotations.sum()[0]:,.0f} folios", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO igual que en la lina 88
         f11_es_cantidad.add_annotation(x=mes_ref, y=1000,text= f"CD = {gb_annotations.loc['CD'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
@@ -199,14 +198,14 @@ class F11():
         tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
         tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
 
-        tb_emp_gen.write_image(f'{self.path}/{self.dt_string}tb_emp_gral.png',height = 265, width = 1100)
-        tb_cl_gen.write_image(f'{self.path}/{self.dt_string}tb_cl_gral.png',height = 265, width = 1100)
-        tb_emp_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_cd.png',height = 265, width = 1000)
-        tb_emp_no_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_no_cd.png',height = 265, width = 1000)
-        tb_cl_no_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_no_cd.png',height = 265, width = 1000)
-        tb_cl_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_cd.png',height = 265, width = 1000)
-        tb_emp_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_emp_ant.png',height = 265, width = 1000)
-        tb_cl_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_cl_ant.png',height = 265, width = 1000)
+        tb_emp_gen.write_image(f'{self.path}/{self.dt_string}tb_emp_gral.png',height = 265, width = 1100, engine='orca')
+        tb_cl_gen.write_image(f'{self.path}/{self.dt_string}tb_cl_gral.png',height = 265, width = 1100, engine='orca')
+        tb_emp_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_cd.png',height = 265, width = 1000, engine='orca')
+        tb_emp_no_cd.write_image(f'{self.path}/{self.dt_string}tb_emp_no_cd.png',height = 265, width = 1000, engine='orca')
+        tb_cl_no_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_no_cd.png',height = 265, width = 1000, engine='orca')
+        tb_cl_cd.write_image(f'{self.path}/{self.dt_string}tb_cl_cd.png',height = 265, width = 1000, engine='orca')
+        tb_emp_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_emp_ant.png',height = 265, width = 1000, engine='orca')
+        tb_cl_gen_ant.write_image(f'{self.path}/{self.dt_string}tb_cl_ant.png',height = 265, width = 1000, engine='orca')
 
     # ---------------- Trend methods 
     def get_tendencias_costo(self):

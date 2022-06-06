@@ -1,3 +1,5 @@
+from pickletools import read_uint1
+from sys import path_hooks
 from pptx import Presentation
 from pptx.util import Cm,Pt
 from data import  var_global,var_main
@@ -121,4 +123,6 @@ class PPTPY():
         self.f4_panatallas_rotas()
 
     def save_ppt(self):
-        self.seguimiento_fs.save(f"{var_global['path_ppts']}/{self.fecha_corte}_seguimiento_fs.pptx")
+        path_ppt = f"{var_global['path_ppts']}/{self.fecha_corte}_seguimiento_fs.pptx"
+        self.seguimiento_fs.save(path_ppt)
+        return path_ppt
