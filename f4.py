@@ -17,7 +17,7 @@ class F4():
     def __init__(self,f4_clasificada,fc) -> None:
         self.fecha_corte = fc
         self.f4_2022 =  f4_clasificada
-        self.f4_2021 = pd.read_csv('input/f4_2021.csv',sep =';', dtype = object) # TODO leer path desde var_f3
+        self.f4_2021 = pd.read_csv(var_f4["path_f4_2021"],sep =';', dtype = object) # TODO leer path desde var_f3
         self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f4"
         self.f4_21_22()
         self.transform()
@@ -44,7 +44,10 @@ class F4():
                 i = i+1
         col_str = ['desc_local','Marca','descripcion_linea'] # TODO leer desde var_f4
         for col in col_str : self.f4_21_22[col] = self.f4_21_22[col].str.capitalize()
+        for col in col_str : self.f4_2022[col] = self.f4_2022[col].str.capitalize()
+        print(self.f4_21_22[['desc_local','Marca','descripcion_linea']])
         self.f4_21_22.descripcion_linea = self.f4_21_22.linea.str.upper() + ' - ' + self.f4_21_22.descripcion_linea # TODO leer desde var_f4
+
 
     def filters(self):
         self.f4_2022_res = self.f4_2022.loc[(self.f4_2022[var_f4["tipo_redinv"]] == "dado de baja") & (self.f4_2022[var_f4['estado']] =='reservado')]
@@ -290,7 +293,7 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_esp(self):
-        self.marc = 'APPLE'
+        self.marc = 'SAMSUNG'
         marca = self.f4_2022_averia.loc[self.f4_2022_averia.Marca == self.marc]
         top_5_loc = marca.groupby(['desc_local','mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()['desc_local'].unique()[0:5]                                                             
         grup_marca = marca.groupby(['desc_local','mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()
@@ -328,7 +331,7 @@ class F4():
         orden_num = ord_num(gr_anulados_mes, "local_agg", var_f4['costo'])
         orden_mes = ord_mes(gr_anulados_mes, "mes_creacion")
         ord_mes(gr_anulados_mes, "mes_creacion")
-        self.graf_anul_mes = px.bar(gr_anulados_mes, y = var_f4['costo'], x = 'local_agg', color = "mes_creacion" , text=var_f4['costo'], text_auto='.2s', barmode= "group", category_orders = {'local_agg':orden_num, "mes_creacion": orden_mes}, labels = {"total_precio_costo" : "Costo", "local_agg" : "Local"} )
+        self.graf_anul_mes = px.bar(gr_anulados_mes, y = var_f4['costo'], x = 'local_agg', color = "mes_creacion" , text=var_f4['costo'], text_auto='.2s', barmode= "group", category_orders = {'local_agg':orden_num, "mes_creacion": orden_mes}, labels = {"total_precio_costo" : "Costo", "local_agg" : "Local", "mes_creacion":"Mes"} )
         self.graf_anul_mes.update_layout(legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1), font=dict(size=15), margin=dict(r=0,l=0,t = 50, b =0))
 
     def grap_enviados(self, gr_f4_enviados):
@@ -373,7 +376,7 @@ class F4():
         self.tb_anulados.write_image(f'{self.path}/{self.fecha_corte}_tabla_anulados.png',height = 100,  width = 1200, engine = 'orca')
         self.grap_enviado_mes.write_image(f'{self.path}/{self.fecha_corte}_enviados.png',height = 300,  width = 800, engine = 'orca')
         self.grap_reg.write_image(f'{self.path}/{self.fecha_corte}_registrados.png',height = 300,  width = 800, engine = 'orca')
-        self.tb_enviados.write_image(f'{self.path}/{self.fecha_corte}_tabla_enviados.png',height = 150,  width = 1000, engine = 'orca')
+        self.tb_enviados.write_image(f'{self.path}/{self.fecha_corte}_tabla_enviados.png',height = 150,  width = 1000, engine = 'orca') 
         self.tb_registrados.write_image(f'{self.path}/{self.fecha_corte}_tabla_registrados.png',height = 150,  width = 800, engine = 'orca')
         self.tb_reservados.write_image(f'{self.path}/{self.fecha_corte}_tabla_reservados.png',height = 230,  width = 800, engine = 'orca')
         self.tb_materiales.write_image(f'{self.path}/{self.fecha_corte}_tabla_materiales.png',height = 145,  width = 500, engine = 'orca')
