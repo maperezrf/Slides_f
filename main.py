@@ -52,7 +52,7 @@ def f11():
     if f11_file != 'n':
         corte = input('Ingrese fecha corte (AAMMDD): ')
         frizq = datetime.strptime('2022-02-20', '%Y-%m-%d')
-        frder = datetime.strptime(corte, '%y%m%d') + timedelta(days=10)
+        frder = datetime.strptime(corte, '%y%m%d') + timedelta(days=15)
         rango_de_fechas = [frizq, frder]
         f11 = F11(rango_de_fechas, corte, f11_file)
         

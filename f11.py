@@ -10,7 +10,7 @@ class F11():
     
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
-    mes = ['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22', 'Feb-22'] # Editar esta lista cada vez 
+    mes = ['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22', 'Feb-22', 'Mar-22'] # Editar esta lista cada vez 
     rango_fechas = []
     f11_tcosto  = None
     f11_tm90_costo  = None
