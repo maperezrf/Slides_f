@@ -158,7 +158,7 @@ class F11():
         f11_empresa_sede.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
         f11_empresa_sede.update_layout(font=dict(size=14))
 
-        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.83, y1=0.8,line=dict(color="red", width=2,))
+        f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.83, y1=1,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0] 
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.9*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.8*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
@@ -176,7 +176,7 @@ class F11():
         f11_es_cantidad.update_layout(legend=dict(orientation="h", yanchor="top", y=-0.2, xanchor="right", x=0.5))
         f11_es_cantidad.update_layout(font=dict(size=14))
 
-        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.83, y1=0.8,line=dict(color="red", width=2,))
+        f11_es_cantidad.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.83, y1=1,line=dict(color="red", width=2,))
         mes_ref = orden_mes[0]
         f11_es_cantidad.add_annotation(x=mes_ref, y=1200, text= f"Total > 90 días = {gb_annotations.sum()[0]:,.0f} folios", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO igual que en la lina 88
         f11_es_cantidad.add_annotation(x=mes_ref, y=1000,text= f"CD = {gb_annotations.loc['CD'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')

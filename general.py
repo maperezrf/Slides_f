@@ -44,7 +44,7 @@ def unif_colors(df ,column):
 
 def ord_mes(df,column,f = "general", orden = None):
     if f == "general":
-        meses = ["Inv","Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+        meses = ["Inv","Ene","Jan","Feb","Mar","Abr","Apr","May","Jun","Jul","Ago","Aug","Sep","Oct","Nov","Dic","Dec"]
     elif f == "f3":
         meses = orden
     elif f == "ant":
@@ -80,6 +80,11 @@ def make_tables(df,rows,column,sum, types = None ):
     elif types == "ant_f3":
          pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
          pt_df = pt_df[["Estado", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', 'Mayor a 121','Total']]
+    elif types == "local":
+         pt_df.rename(columns={rows:"Local"},inplace=True)
+         pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df["Local"] == 'Total']])
+         pt_df = pt_df[["Local", 'Jan', 'Feb', 'Mar', 'Apr', 'May','Total']]
+
 
     columns = pt_df.columns.to_list()
     listado = []

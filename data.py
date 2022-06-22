@@ -26,6 +26,7 @@ var_f11 = {
 
 var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/",
+    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4_2021.csv',
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'nro_red_inventario',
     'marcas_df':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
@@ -38,6 +39,7 @@ var_f4 = {
     'local' : 'local',
     'costo' : 'total_precio_costo',
     'desc_linea': 'descripcion_linea'
+
 }
 
 var_f3 = { 
@@ -53,7 +55,7 @@ var_f3 = {
     'f3_id':'nro_devolucion',
     'local': 'local',
     'fecha_inicial':'2021-01-01',
-    'abiertos': ['enviado', 'reservado'],
+    'abiertos': ['enviado'],
     'cerrados' : ['anulado', 'confirmado'],
     'tipo_tp' : ['Producto','Market place']
 }

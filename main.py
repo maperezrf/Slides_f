@@ -11,9 +11,6 @@ from ppt import PPTPY
 # Datos a modificar antes de la ejecución del código
 fecha_corte = input("Ingrese la fecha de corte, formato -> AAAA-MM-DD: ") # TODO pasar a formato de fecha 
 
-# Datos a modificar antes de la ejecución del código
-fecha_riesgo_f3 = "2022-04-30" 
-
 generate_structure(fecha_corte)
 
 def menu_f11(f11_df):
@@ -37,7 +34,7 @@ def f4():
     if f4_file != 'n':
         # F4 Clasificador
         f4_classifier = CLASSIFIER_F4(fecha_corte, f4_file)
-        f4_clasificada = f4_classifier.get_marca()
+        f4_clasificada = f4_classifier.get_f4_classifier()
 
         # F4
         f4 = F4(f4_clasificada,fecha_corte)
@@ -74,7 +71,6 @@ def ppt(fc):
     path_f3 = f3()
     path_f4, f4_calcs = f4()
     path_f11 = f11()
-
     # Generación de ppt
     ppt = PPTPY(path_f3, path_f4, f4_calcs, fc)
 
