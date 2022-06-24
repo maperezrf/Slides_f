@@ -45,7 +45,6 @@ class F4():
         col_str = ['desc_local','Marca','descripcion_linea'] # TODO leer desde var_f4
         for col in col_str : self.f4_21_22[col] = self.f4_21_22[col].str.capitalize()
         for col in col_str : self.f4_2022[col] = self.f4_2022[col].str.capitalize()
-        print(self.f4_21_22[['desc_local','Marca','descripcion_linea']])
         self.f4_21_22.descripcion_linea = self.f4_21_22.linea.str.upper() + ' - ' + self.f4_21_22.descripcion_linea # TODO leer desde var_f4
 
 
@@ -367,7 +366,7 @@ class F4():
         self.fig_pant_rotas.write_image(f'{self.path}/{self.fecha_corte}_pantallas_rotas.png', height = 800,  width = 600, engine = 'orca')
         self.f4_mespc_tot.write_image(f'{self.path}/{self.fecha_corte}_mes_f4_motivo_compañia.png', height = 700,  width = 800, engine = 'orca')
         self.tb_averias.write_image(f'{self.path}/{self.fecha_corte}_tabla_averias.png',height = 340,  width = 900, engine = 'orca')
-        self.tb_p_rotas.write_image(f'{self.path}/{self.fecha_corte}_tabla_pantallas_rotas.png',height = 220,  width = 900, engine = 'orca')
+        self.tb_p_rotas.write_image(f'{self.path}/{self.fecha_corte}_tabla_pantallas_rotas.png',height = 250,  width = 900, engine = 'orca')
         self.tb_calidad.write_image(f'{self.path}/{self.fecha_corte}_tabla_calidad.png',height = 370,  width = 900, engine = 'orca')
         self.tb_loc_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_loc_pant.png',height = 520,  width = 400, engine = 'orca')
         self.tb_prod_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_prod_pant.png',height = 340,  width = 600, engine = 'orca')

@@ -33,6 +33,7 @@ class F3():
 
     def transform(self):
         # F3 planilla
+        print('Transformando valores...')
         self.f3[var_f3['costo']] = pd.to_numeric(self.f3[var_f3['costo']])
         fechas = [var_f3['fecha_res'], var_f3['fecha_envio'], var_f3['fecha_anulacion'], var_f3['fecha_confirmacion']]
         self.f3.loc[:, fechas] = self.f3[fechas].apply(lambda x: x.replace(['ene', 'abr', 'ago', 'dic'], ['jan', 'apr', 'aug', 'dec'], regex=True))
@@ -57,6 +58,7 @@ class F3():
         self.f3.loc[self.f3.local_agg.isna(), 'local_agg'] = 'OTROS'
 
     def filters(self):
+        print("Generando filtros...")
         self.f3_2021 = self.f3.loc[self.f3[var_f3['fecha_res']] >= var_f3['fecha_inicial']].reset_index(drop = True)  # [x] leer desde var_f3 = fecha_inicial
         f3_cerrados = self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['cerrados'])].reset_index(drop = True) # [x] leer desde var_f3 = cerrados        
         self.f3_ab_pr_mkp =self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['abiertos'])].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
@@ -113,6 +115,7 @@ class F3():
             return self.grap_cortes(grup_df, var_f3['f3_id'], titulo, etiquetas, orden_x) 
 
     def make_groupby(self):
+        print("Generando agrupaciones...")
         grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['costo']].sum().reset_index()
         grupo_F3_prd_mkp_num = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['f3_id']].nunique().reset_index()
 
@@ -124,6 +127,7 @@ class F3():
         set_columns_nunique(mkp_sede_num, 'local_agg', var_f3['f3_id'])
         set_columns_nunique(mkp_sede_num, 'local_agg', var_f3['f3_id'])
         
+        print("Generando imagenes...")
         self.graf_mkp_sede = self.grap_mkp_x_sede(mkp_sede, var_f3['costo'])
         self.graf_mkp_sede_num = self.grap_mkp_x_sede(mkp_sede_num, var_f3['f3_id'])
 
@@ -255,8 +259,8 @@ class F3():
 
     # Saving graphs 
     def save_graf(self): 
-        pass
         # Graphs x cost
+        print("Guardando imagenes...")
         self.graf_f3_prd_mkp_cost.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva.png' ,width=600, height=400, engine='orca')
         self.graf_mkp_sede.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede.png',width=600, height=400, engine='orca')
         self.graf_tend_mkp.write_image(f'{self.path}/{self.fecha_corte}_f3_tendencia_mkp.png',width=500, height=400, engine='orca')
@@ -270,7 +274,7 @@ class F3():
         self.graf_mkp_sede_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede_cant.png',width=600, height=350, engine='orca')
         self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_prodcuto_cantidad.png',width=500, height=350, engine='orca')
         self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_cantidad.png',width=500, height=350, engine='orca')
-        print('Se guardaron las imgs!')
+        print('Se guardaron las imagenes!')
 
 
 def set_fecha_riesgo():

@@ -22,7 +22,14 @@ var_f11 = {
     'fecha_corte':'FECHA_CORTE', 
     'servicio':'SERVICIO',
     'tipo_f11_x_grafica':['RETIRO F12','S.TECNICO' ], 
-    'dias':'DIAS'}
+    'dias':'DIAS', 
+    'graf_monto' : ['_f11_empresa_abiertos_sede_monto.png','_f11_trend_CD.png','_f11_trend_CD mayores a 90 días.png','_f11_trend_Tiendas & DVD.png','_f11_trend_Tiendas & DVD mayores a 90 días.png'],
+    'graf_cant' : ['_f11_empresa_abiertos_sede_cantidad.png','_f11_tcant_CD.png','_f11_tcant_CD mayores a 90 días.png','_f11_tcant_Tiendas & DVD.png','_f11_tcant_Tiendas & DVD mayores a 90 días.png'],
+    'tab_emp' : ['tb_emp_gral.png','tb_emp_ant.png'],
+    'tab_emp_loc' : ['tb_emp_cd.png','tb_emp_no_cd.png'],
+    'tab_cl' : ['tb_cl_gral.png','tb_cl_ant.png'],
+    'tab_cl_loc' :  ['tb_cl_cd.png','tb_cl_no_cd.png'],
+    }
 
 var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/",

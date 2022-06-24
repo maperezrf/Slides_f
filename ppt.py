@@ -3,31 +3,63 @@ from sys import path_hooks
 from pptx import Presentation
 from pptx.util import Cm,Pt
 from data import  var_global,var_main
+from datetime import datetime
+from pptx.dml.color import RGBColor
+from data import var_f11
+
 class PPTPY():
     path_f3 = ''
     path_f4 = ''
     fecha_corte = ''
     f4_data = []
 
-    def __init__(self, pf3, pf4, f4cals, fc) -> None:
+    def __init__(self, pf3, pf4, pf11, f4cals, fc) -> None:
         self.path_f3 = pf3
         self.path_f4 = pf4
-        self.fecha_corte = fc 
+        self.path_f11 = pf11
+        self.fecha_corte = fc
         self.f4_data = f4cals
-
+        
         self.seguimiento_fs = Presentation(var_main['pah_plantilla'])  # Leer presentacion 
+        self.update_date_ftont()
         for i in  range(2,17):
             self.update_date(i)
-
+    
+    def update_date_ftont(self): 
+        slide = self.seguimiento_fs.slides[0]
+        tb_corte = slide.shapes.add_textbox(Cm(26.48),Cm(12.34),width=Cm(1), height=Cm(0.2))
+        text_corte = tb_corte.text_frame.add_paragraph() 
+        text_corte.text = f"{datetime.strptime(self.fecha_corte, '%y%m%d').strftime('%d - %b - %Y')}"
+        text_corte.font.size = Pt(25)
+        text_corte.font.color.rgb = RGBColor(255, 255, 255)
+        
     def update_date(self, n_slide): 
         slide = self.seguimiento_fs.slides[n_slide]
         tb_corte = slide.shapes.add_textbox(Cm(0),Cm(17.43),width=Cm(1), height=Cm(0.1))
         text_corte = tb_corte.text_frame.add_paragraph() 
-        text_corte.text = f"Corte {self.fecha_corte}"
+        text_corte.text = f"Corte {datetime.strptime(self.fecha_corte, '%y%m%d').strftime('%Y-%m-%d')}"
         text_corte.font.size = Pt(12)    
 
+    def slide_f11_empresa(self, slide, list_graf):
+         f11_empresa = self.seguimiento_fs.slides[slide]
+         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(0.26), Cm(1.6), height = Cm(15.52), width = Cm(15.52)) 
+         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(16.1), Cm(2.75), height = Cm(5.75), width = Cm(8.53)) 
+         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[2]}", Cm(24.89), Cm(2.75), height = Cm(5.75), width = Cm(8.53)) 
+         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[3]}", Cm(16.1), Cm(10.91), height = Cm(5.75), width = Cm(8.53)) 
+         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[4]}", Cm(24.89), Cm(10.91),  height = Cm(5.75), width = Cm(8.53)) 
+        
+    def slide_f11_emp_tab(self, slide, list_graf):
+        f11_emp_tab = self.seguimiento_fs.slides[slide]
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(4.17), Cm(4.63), height = Cm(5.64), width = Cm(23.41)) 
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(4.17), Cm(12.21), height = Cm(5.02), width = Cm(23.41)) 
+
+    def slide_f11_emp_cli(self, slide, list_graf):
+        f11_emp_tab = self.seguimiento_fs.slides[slide]
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(4.17), Cm(4.63),height = Cm(5.5), width = Cm(23.41)) 
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(4.17), Cm(12.21),height = Cm(5.5), width = Cm(23.41)) 
+
     def slide_f3_costo(self):
-        f3 = self.seguimiento_fs.slides[7]
+        f3 = self.seguimiento_fs.slides[12]
         #Producto
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_abiertos_fecha_reserva.png", Cm(0.7), Cm(1.8), height=Cm(7.5)) 
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_tendencia_Producto.png", Cm(13),Cm(1.8), height=Cm(7.5)) 
@@ -37,8 +69,12 @@ class PPTPY():
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_tendencia_mkp.png", Cm(13), Cm(10.2), height=Cm(7.5)) 
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_cerrado_mkp_costo.png", Cm(23), Cm(10.2), height=Cm(7.5))
 
+    def slide_f3_tab(self):
+        f3 = self.seguimiento_fs.slides[13]
+        f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_tabla_res_env.png",  Cm(4.58), Cm(5.69), width = Cm(23.41)) 
+
     def slide_f4(self):
-        f4 = self.seguimiento_fs.slides[8]
+        f4 = self.seguimiento_fs.slides[14]
         f4.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tendencia_creacion_f4_x_años.png", Cm(2.01),Cm(0.58),width = Cm(16.17), height = Cm(9.08)   )
         f4.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_f4_sem.png", Cm(19.55), Cm(0.57), width = Cm(13.29), height = Cm(9.6))
         f4.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_total_por_mes.png", Cm(13.03), Cm(10.07), width = Cm(7.62), height = Cm(7.62)   )
@@ -68,49 +104,82 @@ class PPTPY():
         tx_registrados_m.text = f"Estado Registrado $2M >7 días No han pasado a contabilidad,\nya informados a responsables\nUsuarios de creación:\n  Jair Armando Rocha Vargas"
         tx_registrados_m.font.size= Pt(13)       
 
+    def f4_mot_sede(self):
+        f4_mot_sede = self.seguimiento_fs.slides[15]
+        f4_mot_sede.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_total_por_local.png", Cm(0.5),Cm(1.82),width = Cm(31.75), height = Cm(15.88))
+
+
     def f4_pos_causa(self):
-        f4_pos_causa = self.seguimiento_fs.slides[9]
+        f4_pos_causa = self.seguimiento_fs.slides[16]
         f4_pos_causa.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_clasificacion_posibles_causas_22.png", Cm(1.36),Cm(0.38),width = Cm(31.91), height = Cm(17.32))
         titulo = f4_pos_causa.shapes.add_textbox(Cm(0.4),Cm(-0.79),width=Cm(0.1), height=Cm(0.1))
         tx_titulo = titulo.text_frame.add_paragraph() 
         tx_titulo.text = "F4"
         tx_titulo.font.size= Pt(36)       
 
-    def f4_mot_sede(self):
-        f4_mot_sede = self.seguimiento_fs.slides[10]
-        f4_mot_sede.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_total.png", Cm(0.66),Cm(2.32),width = Cm(17.41), height = Cm(14.81))
-        f4_mot_sede.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_total_por_mes.png", Cm(22.38), Cm(1.01), width = Cm(7.62), height = Cm(7.62))
-        f4_mot_sede.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_total_por_local.png", Cm(18.55), Cm(8.52), width = Cm(14.18), height = Cm(8.94))
-
     def f4_mes_moti(self):
-        f4_mes_moti = self.seguimiento_fs.slides[11]
+        f4_mes_moti = self.seguimiento_fs.slides[17]
 
         f4_mes_moti.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_mes_f4_motivo_compañia.png", Cm(0.34),Cm(2.88),width = Cm(16.03), height = Cm(14.02))
         f4_mes_moti.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_cd_mm.png", Cm(19.5),Cm(0.61),width = Cm(11.59), height = Cm(8.27))
         f4_mes_moti.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tienda_mes_motivo.png", Cm(19.13),Cm(9.19),width = Cm(11.72), height = Cm(8.38))
 
     def f4_linea_año(self):
-        f4_linea_año = self.seguimiento_fs.slides[12]
-        f4_linea_año.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_torta_linea.png", Cm(1.61),Cm(2.26),width = Cm(13.18), height = Cm(15.06))
+        f4_linea_año = self.seguimiento_fs.slides[18]
+        f4_linea_año.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_torta_linea.png", Cm(2.06),Cm(2.4),width = Cm(12.73), height = Cm(14.55))
         f4_linea_año.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_linea_x_mes.png", Cm(14.79),Cm(1.89),width = Cm(17.46), height = Cm(15.27))
 
     def f4_linea_motivo(self):
-        f4_linea_motivo = self.seguimiento_fs.slides[13]
+        f4_linea_motivo = self.seguimiento_fs.slides[19]
         f4_linea_motivo.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_f4_linea_motivo.png", Cm(0.21),Cm(2.39),width = Cm(16.47), height = Cm(13.19))
-        f4_linea_motivo.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_linea_local.png", Cm(15.56),Cm(1.61),width = Cm(17.66), height = Cm(15.41))
+        f4_linea_motivo.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_linea_local.png", Cm(14.79),Cm(3.07),width = Cm(17.66), height = Cm(13.74))
 
     def f4_averias(self):
-        f4_linea_motivo = self.seguimiento_fs.slides[14]
+        f4_linea_motivo = self.seguimiento_fs.slides[20]
         f4_linea_motivo.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_averia_x_mes_y_marca.png", Cm(0),Cm(2.4),width = Cm(16.64), height = Cm(13.82))
+        f4_linea_motivo.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_averias.png", Cm(16.64),Cm(2.39),width = Cm(16.64), height = Cm(6.29))
+        #TODO agregar graficas, marcas x locales
 
     def f4_calidad(self):
-        f4_calidad = self.seguimiento_fs.slides[15]
+        f4_calidad = self.seguimiento_fs.slides[21]
         f4_calidad.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_marca_calidad.png", Cm(0),Cm(2.4),width = Cm(16.64), height = Cm(13.82))
+        f4_calidad.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_calidad.png", Cm(16.64),Cm(6.11),width = Cm(16.64), height = Cm(6.84))
 
     def f4_panatallas_rotas(self):
-        f4_panatallas_rotas = self.seguimiento_fs.slides[16]
-        f4_panatallas_rotas.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_pantallas_rotas.png", Cm(0),Cm(4.1),width = Cm(19.73), height = Cm(12.33))
+        f4_panatallas_rotas = self.seguimiento_fs.slides[22]
+        f4_panatallas_rotas.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_pantallas_rotas.png", Cm(0.55),Cm(2.21),width = Cm(11.68), height = Cm(15.57))
+        f4_panatallas_rotas.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_pantallas_rotas.png", Cm(14.17),Cm(1.2),width = Cm(17.68), height = Cm(4.35))
+        f4_panatallas_rotas.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_prod_pant.png", Cm(20.82),Cm(7.91),width = Cm(12.89), height = Cm(7.3))
+        f4_panatallas_rotas.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_loc_pant.png", Cm(12.48),Cm(6.2),width = Cm(7.87), height = Cm(10.24))
+
+    def f4_anulados(self):
+        f4_anulados = self.seguimiento_fs.slides[23]
+        f4_anulados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_pie_anulados.png", Cm(2.32),Cm(2.16),width = Cm(9), height = Cm(9))
+        f4_anulados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_anulados_mes.png", Cm(11.5),Cm(1.56),width = Cm(17.68), height = Cm(9.26))
+        f4_anulados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_anulados.png", Cm(1.06),Cm(12.67),width = Cm(31.75), height = Cm(2.65))
+
+    def f4_enviados(self):
+        f4_enviados = self.seguimiento_fs.slides[24]
+        f4_enviados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_enviados.png", Cm(3.51),Cm(11.26),width = Cm(26.46), height = Cm(3.97))
+        f4_enviados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_enviados.png", Cm(6.35),Cm(1.77),width = Cm(21.71), height = Cm(7.94))
+
+    def f4_registrados(self):
+        f4_registrados = self.seguimiento_fs.slides[25]
+        f4_registrados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_registrados.png", Cm(6.35),Cm(11.35),width = Cm(21.17), height = Cm(3.97))
+        f4_registrados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_registrados.png", Cm(7.03),Cm(2.24),width = Cm(21.17), height = Cm(7.94))
+
+    def f4_reservados(self):
+        f4_reservados = self.seguimiento_fs.slides[26]
+        f4_reservados.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_reservados.png", Cm(5.54),Cm(11.61),width = Cm(21.17), height = Cm(6.09))
     
+    def f4_detalle(self):
+        f4_detalle = self.seguimiento_fs.slides[27]
+        f4_detalle.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_materiales.png", Cm(1.32),Cm(3.14),width = Cm(13.23), height = Cm(3.84))
+        f4_detalle.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_act_fijo.png", Cm(1.32),Cm(8.73),width = Cm(13.23), height = Cm(3.44))
+        f4_detalle.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_receta.png", Cm(1.32),Cm(13.79),width = Cm(13.23), height = Cm(2.38))
+        f4_detalle.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_gasto_int.png", Cm(18.43),Cm(4.33),width = Cm(13.23), height = Cm(3.84))
+        f4_detalle.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_tabla_bolsa.png", Cm(18.43),Cm(11.02),width = Cm(13.23), height = Cm(3.31))
+
     def get_all_f4_slides(self):
         self.slide_f4()
         self.f4_pos_causa()
@@ -121,6 +190,23 @@ class PPTPY():
         self.f4_averias()
         self.f4_calidad()
         self.f4_panatallas_rotas()
+        self.f4_anulados()
+        self.f4_enviados()
+        self.f4_registrados()
+        self.f4_reservados()
+        self.f4_detalle()
+
+    def get_all_f3_slides(self):
+        self.slide_f3_costo()
+        self.slide_f3_tab()
+
+    def get_all_f11_slides(self):
+        self.slide_f11_empresa(2, var_f11["graf_monto"])
+        self.slide_f11_empresa(3, var_f11["graf_cant"])
+        self.slide_f11_emp_tab(5, var_f11["tab_emp"])
+        self.slide_f11_emp_tab(6, var_f11["tab_emp_loc"])
+        self.slide_f11_emp_cli(7, var_f11["tab_cl"])
+        self.slide_f11_emp_cli(8, var_f11["tab_cl_loc"])
 
     def save_ppt(self):
         path_ppt = f"{var_global['path_ppts']}/{self.fecha_corte}_seguimiento_fs.pptx"

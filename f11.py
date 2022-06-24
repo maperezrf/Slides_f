@@ -38,8 +38,12 @@ class F11():
     def get_f11_m90(self):
         return self.f11_m90
 
+    def get_path(self):
+        return self.path
+
     ## ------ Trasform 
     def transform(self):
+        print('Transformando valores...')
         # Dates 
         self.f11[var_f11['fech_creacion']] = pd.to_datetime(self.f11[var_f11['fech_creacion']], format='%Y-%m-%d')
         self.f11[var_f11['mes']] = self.f11[var_f11['fech_creacion']].dt.strftime('%b-%y')
@@ -50,6 +54,7 @@ class F11():
 
     ## ------ Filters
     def f11_filters(self):
+        print("Generando filtros...")
         f11_initial = fltr_fecha_desde(self.f11)
         f11_empresa = fltr_empresa(f11_initial)
         f11_st_rf12 = fltr_tipo_f11(f11_empresa)
@@ -168,7 +173,7 @@ class F11():
 
         f11_empresa_sede.layout.yaxis.title.text='Total costo promedio'
         f11_empresa_sede.layout.xaxis.title.text='Mes de creación'
-        f11_empresa_sede.write_image(f"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_monto.svg",scale=1, height=800,width=850, engine='orca')
+        f11_empresa_sede.write_image(f"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_monto.png",scale=1, height=800,width=850, engine='orca')
         
     def fig_f11_cantidad(self, df, gb_annotations, orden_grupo, orden_mes, ta):
         f11_es_cantidad = px.bar(df, x=var_f11['mes'], y=var_f11['f11_id'], color=var_f11['grupo'], text=var_f11['f11_id'], text_auto='.0f', category_orders={var_f11['grupo']:orden_grupo, var_f11['mes']:orden_mes})
@@ -186,7 +191,7 @@ class F11():
 
         f11_es_cantidad.layout.yaxis.title.text='Cantidad de folios de F11'
         f11_es_cantidad.layout.xaxis.title.text='Mes de creación'
-        f11_es_cantidad.write_image(F"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.svg",scale=1, height=800,width=850, engine='orca')
+        f11_es_cantidad.write_image(F"{self.path}/{self.dt_string}_f11_empresa_abiertos_sede_cantidad.png",scale=1, height=800,width=850, engine='orca')
 
     def generate_tables(self,f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd):
         tb_emp_gen = make_tables(f11_empresa,'SERVICIO','GRUPO','TOTAL_COSTO')
@@ -240,7 +245,7 @@ class F11():
         fig_f11_cd_trend.update_layout(font=dict(size=14))
         # nuevos 
         fig_f11_cd_trend.update_layout(margin_r=20, margin_t=60)
-        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_trend_{local}.svg",width=550, height=400, engine='orca')
+        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_trend_{local}.png",width=550, height=400, engine='orca')
 
     def get_tendencias_cantidad(self):
         # Cantidad 
@@ -276,7 +281,7 @@ class F11():
         fig_f11_cd_trend.update_xaxes(range=self.rango_fechas, constrain="domain")
         fig_f11_cd_trend.update_layout(margin_r=20, margin_t=60)
         fig_f11_cd_trend.update_layout(font=dict(size=14))
-        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_tcant_{local}.svg",width=550, height=400, engine='orca')
+        fig_f11_cd_trend.write_image(f"{self.path}/{self.dt_string}_f11_tcant_{local}.png",width=550, height=400, engine='orca')
 
 # General methods 
 
