@@ -63,9 +63,9 @@ class F4():
     
     def set_week_f4(self):
         self.f4_sem = self.f4_2022_res.copy()
-        self.f4_sem.loc[self.f4_sem.mes == 'Inventario' ,'mes'] = 'Ene' # TODO leer desde var_f4
+        self.f4_sem.loc[self.f4_sem.mes == 'Inventario' ,'mes'] = 'Jan' # TODO leer desde var_f4
         lista_mes = self.f4_sem.mes.unique() # TODO leer desde var_f4
-        f_inicio  = datetime.strptime('2022/01/01', '%Y/%m/%d') # TODO leer desde var_f4
+        f_inicio  = datetime.strptime('2022/05/01', '%Y/%m/%d') # TODO leer desde var_f4
         f_cortes = f_inicio
         for mes in enumerate(lista_mes):
             sem = 0

@@ -46,7 +46,6 @@ var_f4 = {
     'local' : 'local',
     'costo' : 'total_precio_costo',
     'desc_linea': 'descripcion_linea'
-
 }
 
 var_f3 = { 
