@@ -72,8 +72,8 @@ def make_tables(df,rows,column,sum, types = None ):
         pt_df = pd.concat([pt_df.loc[pt_df['Local']!= 'Total'].sort_values('Total',ascending=False), pt_df.loc[pt_df['Local']=='Total']])
     elif types == "prod":
         pt_df.rename(columns={rows:"Producto",sum:"Total"},inplace=True)
-        pt_df.sort_values('Total',ascending=False)
-        pt_df = pt_df.head(10)
+        pt_df.sort_values('Total',ascending=False, inplace = True)
+        pt_df = pt_df.iloc[1:11]
     elif types == "ant":
         pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
         pt_df = pt_df[["SERVICIO", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', '121 a 180', 'Mayor a 181','Total']]
@@ -81,10 +81,15 @@ def make_tables(df,rows,column,sum, types = None ):
          pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
          pt_df = pt_df[["Estado", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', 'Mayor a 121','Total']]
     elif types == "local":
-         pt_df.rename(columns={rows:"Local"},inplace=True)
-         pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df["Local"] == 'Total']])
-         pt_df = pt_df[["Local", 'Jan', 'Feb', 'Mar', 'Apr', 'May','Total']]
-
+        pt_df.rename(columns={rows:"Local"},inplace=True)
+        pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df["Local"] == 'Total']])
+        meses = ["Inv","Ene","Jan","Feb","Mar","Abr","Apr","May","Jun","Jul","Ago","Aug","Sep","Oct","Nov","Dic","Dec"]
+        list_mes = []
+        for mes in meses:
+            for i in pt_df.columns: 
+                    if mes in i:
+                        list_mes.append(i)
+        pt_df= pt_df[["Local"]+ list_mes +['Total']]
 
     columns = pt_df.columns.to_list()
     listado = []

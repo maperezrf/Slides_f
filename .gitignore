@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 /input
 /output
+/cierres_f11
 
 # C extensions
 *.so

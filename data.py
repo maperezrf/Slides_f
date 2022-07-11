@@ -33,20 +33,26 @@ var_f11 = {
 
 var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/",
-    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4_2021.csv',
+    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4_2021_prueba2.csv',
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
-    'f4_id':'nro_red_inventario',
+    'f4_id':'CTECH_KEY',
     'marcas_df':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
-    'fechas' : ['fecha_creacion', 'fecha_reserva'],
-    'fecha_res' : 'fecha_reserva',
-    'tipo_redinv' : 'tipo_redinv',
-    'estado' : 'estado',
-    'destino' : 'destino',
-    'desccentro_e_costo' : 'desccentro_e_costo',
-    'local' : 'local',
-    'costo' : 'total_precio_costo',
-    'desc_linea': 'descripcion_linea'
-}
+    'fechas' : ['FECHA_REGISTRO', 'FECHA_RESERVA'],
+    'fecha_creacion':'FECHA_REGISTRO',
+    'fecha_res' : 'FECHA_RESERVA',
+    'tipo_redinv' : 'DESCTIPO',
+    'estado' : 'DESCESTADO',
+    'destino' : 'XDESTINO',
+    'upc':'PRD_UPC',
+    'desccentro_e_costo' : 'CCENT_COSTO_F',
+    'local' : 'LOC_ID',
+    'costo' : 'TOTAL_COSTO',
+    'desc_linea': 'PROD_CAT_DESC',
+    'marca_':'PROD_BRAND_ID',
+    'desc_local':'LOC_NAME',
+    'linea':'PROD_CAT_ID',
+    'nombre_prod':'PROD_NAME'
+    }
 
 var_f3 = { 
     'path_df':f'{path_ea}/DATA/F3/',
