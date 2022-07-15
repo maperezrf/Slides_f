@@ -292,7 +292,7 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_esp(self):
-        self.marc = 'SAMSUNG'
+        self.marc = "Samsung"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia[var_f4['marca_']] == self.marc]
         top_5_loc = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()[var_f4['desc_local']].unique()[0:5]                                                             
         grup_marca = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()
@@ -363,10 +363,10 @@ class F4():
         self.fig_f4_marca.write_image(f'{self.path}/{self.fecha_corte}_grafica_averia_x_mes_y_marca.png', height = 900,  width = 900,engine = 'orca')
         self.fig_marca_locales.write_image(f'{self.path}/{self.fecha_corte}_{self.marc}_local.png', height = 600,  width = 500, engine = 'orca')
         self.fig_marcas_calidad.write_image(f'{self.path}/{self.fecha_corte}_marca_calidad.png', height = 700,  width = 800, engine = 'orca')
-        self.fig_pant_rotas.write_image(f'{self.path}/{self.fecha_corte}_pantallas_rotas.png', height = 800,  width = 600, engine = 'orca')
+        self.fig_pant_rotas.write_image(f'{self.path}/{self.fecha_corte}_pantallas_rotas.png', height = 800,  width = 650, engine = 'orca')
         self.f4_mespc_tot.write_image(f'{self.path}/{self.fecha_corte}_mes_f4_motivo_compañia.png', height = 700,  width = 800, engine = 'orca')
         self.tb_averias.write_image(f'{self.path}/{self.fecha_corte}_tabla_averias.png',height = 340,  width = 900, engine = 'orca')
-        self.tb_p_rotas.write_image(f'{self.path}/{self.fecha_corte}_tabla_pantallas_rotas.png',height = 250,  width = 900, engine = 'orca')
+        self.tb_p_rotas.write_image(f'{self.path}/{self.fecha_corte}_tabla_pantallas_rotas.png',height = 300,  width = 900, engine = 'orca')
         self.tb_calidad.write_image(f'{self.path}/{self.fecha_corte}_tabla_calidad.png',height = 370,  width = 900, engine = 'orca')
         self.tb_loc_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_loc_pant.png',height = 520,  width = 400, engine = 'orca')
         self.tb_prod_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_prod_pant.png',height = 340,  width = 600, engine = 'orca')

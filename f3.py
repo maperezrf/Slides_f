@@ -69,7 +69,7 @@ class F3():
 
     def set_cortes(self, f3_cerrado):
         orden_x = []
-        fecha_in = "2022-03-01"
+        fecha_in = "2022-05-01"
         f_in = datetime.strptime(fecha_in,'%Y-%m-%d')
         f_fin = f_in + timedelta(days=7)
         while f_fin <= datetime.now():
@@ -195,7 +195,7 @@ class F3():
         fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1))
         fig.update_layout(font=dict(size = 14))   
         fig.update_layout(margin_r = 20, margin_t = 60)
-        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.85, y1 = 1, line = dict(color = 'red', width = 2))
+        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.9, y1 = 1, line = dict(color = 'red', width = 2))
         fig.add_annotation(x = orden_mes[0], y = (range_y * 60/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 14))
         fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}',showarrow = False, font = dict (color = 'red',size = 14))
         fig.update_annotations(align = 'left')

@@ -71,10 +71,9 @@ class CLASSIFIER_F4():
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & self.f4[var_f4["destino"]].str.contains(r'accidente cliente'), 'Posible Causa'] = 'Accidente cliente'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & self.f4[var_f4["destino"]].str.contains(r'tapabocas|tapaboca|guantes|guante'), 'Posible Causa'] = 'Insumos bioseguridad'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & self.f4[var_f4["destino"]].str.contains(r'[1][1]\d{7,}'), 'Posible Causa'] = 'Cierre de F11 - Tienda sin recupero'
-        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & (self.f4[var_f4["destino"]].str.contains(r'dano|daño') | self.f4[var_f4["destino"]].str.contains('merma') | self.f4[var_f4["destino"]].str.contains('averia')), 'Posible Causa' ] = 'Avería'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & (self.f4[var_f4["destino"]].str.contains(r'dano|daño|merma|averia')), 'Posible Causa' ] = 'Avería'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & (~self.f4[var_f4['desccentro_e_costo']].isin(const.centro_costo_calidad)), 'Posible Causa'] = 'Avería'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & (self.f4[var_f4['destino']].isna()), 'Posible Causa'] = 'Avería'
-        
         
 
         # Locales DVD, ADMIN y VENTA EMPRESA
@@ -86,13 +85,15 @@ class CLASSIFIER_F4():
         # Filtros para CD
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'patalla\w?|rota\w?|pantalla quebrada'), 'Posible Causa'] =  'Pantallas rotas'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'suma'), 'Posible Causa'] = 'Recobro suma'
-        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'recobro suppla'), 'Posible Causa'] = 'Recobro DHL'
-        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='CD') & (self.f4[var_f4["destino"]].str.contains(r'[1][1]\d{7,} sin recupero|[1][2]\d{7,} sin recupero')), 'Posible Causa'] = 'Cierre de F11 - CD sin recupero'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'recobro suppla|cobro suppla'), 'Posible Causa'] = 'Recobro DHL'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='CD') & (self.f4[var_f4["destino"]].str.contains(r'[1][1]\d{7,} sin recupero')), 'Posible Causa'] = 'Cierre de F11 - CD sin recupero'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='CD') & (self.f4[var_f4["destino"]].str.contains(r'[1][2]\d{7,} sin recupero')), 'Posible Causa'] = 'Avería'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'cobro\b.*\d{10}|\d{10}.*cobro\b|recupero'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'recobro\b.*\d{10}|\d{10}.*recobro\b'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'recobrado\b.*\d{10}|\d{10}.*recobrado\b'), 'Posible Causa'] = 'Recobro a transportadora'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & (self.f4[var_f4["destino"]].str.contains(r'oc ')), 'Posible Causa'] = "Avería"
-        self.f4.loc[self.f4['Posible Causa'].isna() & self.f4[var_f4["destino"]].str.contains(r'prestamo\w?'), 'Posible Causa'] = 'Prestamo no devuelto'
+        self.f4.loc[self.f4['Posible Causa'].isna() & self.f4[var_f4["destino"]].str.contains(r'prestamo\w?'), 'Posible Causa'] = 'Prestamo no devuelto' # TODO DE ULTIMO
+        
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='CD') & (self.f4[var_f4["destino"]].str.contains(r"baja por danoaveria en dvl|baja por daño/averia en dvl")), 'Posible Causa'] = 'DVL'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'cambio agil'), 'Posible Causa'] = 'Cambio ágil'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'averias cd dvl'), 'Posible Causa'] = 'Avería'
@@ -108,7 +109,7 @@ class CLASSIFIER_F4():
         reg_sin_clasificar = self.f4.loc[(self.f4["Posible Causa"].isna()) & (self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Reservado')].shape[0]
         reg_clasificados = self.f4.loc[(self.f4["Posible Causa"].notna() & (self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Reservado'))].shape[0]
         reg_sin_marca = self.f4.loc[self.f4[var_f4['marca_']].isna(), var_f4['upc']].nunique()
-        montos_estado = self.f4.groupby([var_f4["estado"]])[[var_f4["costo"]]].sum()/1e6
+        montos_estado = self.f4.loc[self.f4[var_f4['tipo_redinv']] == "Dado de Baja"].groupby([var_f4["estado"]])[[var_f4["costo"]]].sum()/1e6
         montos_estado = montos_estado.reset_index()
         self.registrado = self.f4.loc[self.f4[var_f4["estado"]] == "Registrado"].groupby([var_f4['estado'],var_f4['fecha_creacion']])[[var_f4['costo']]].sum()
         self.print_data(reg_clasificados,reg_sin_clasificar,reg_sin_marca,montos_estado)
@@ -133,7 +134,7 @@ class CLASSIFIER_F4():
         self.f4.to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
         self.f4.loc[(self.f4.local_agg == 'CD') & (self.f4[var_f4["fecha_res"]] < "2022-03-31")].to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado_CD.csv",sep=";" , index=False)
-        self.f4.loc[(self.f4[var_f4['tipo_redinv']] == "dado de baja") & (self.f4[var_f4['estado']] =='registrado')].reset_index(drop=True) .to_excel(f"{self.path}/{self.fecha_corte}_f4_registrados.xlsx", index=False)
+        self.f4.loc[(self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Registrado')].reset_index(drop=True) .to_excel(f"{self.path}/{self.fecha_corte}_f4_registrados.xlsx", index=False)
         print("Se guardo archivo de F4s en estado registrado")
         self.f4.to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado.csv",sep=";" , index=False)
         if reg_sin_marca > 0:
@@ -141,7 +142,7 @@ class CLASSIFIER_F4():
             pd.DataFrame(upc,columns=[var_f4['upc']]).to_excel(f"{self.path}/{self.fecha_corte}_UPCs_nuevos.xlsx", index=False)
             print("Se genero un archivo con los UPCs, a los cuales no se asociaron marcas")
         if reg_sin_clasificar > 0:
-            self.f4.loc[(self.f4["Posible Causa"].isna()) & (self.f4[var_f4['tipo_redinv']] == "dado de baja") & (self.f4[var_f4['estado']] =='reservado') ].to_excel(f"{self.path}/{self.fecha_corte}_f4_sin_clasificar.xlsx", index=False)
+            self.f4.loc[(self.f4["Posible Causa"].isna()) & (self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Reservado') ].to_excel(f"{self.path}/{self.fecha_corte}_f4_sin_clasificar.xlsx", index=False)
             print("Se guardo archivo el cual no se clasifico posible causa")
 
 
