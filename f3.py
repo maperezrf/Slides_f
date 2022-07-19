@@ -13,7 +13,7 @@ class F3():
 
     fecha_corte = datetime.now().strftime('%y%m%d')
     f3_ab_mkp = None
-    f3_ab_pr_mkp = None
+    f3_env_pr_mkp = None
     fecha_corte = None   
 
     def __init__(self, fc, f3_name) -> None:
@@ -61,10 +61,11 @@ class F3():
         print("Generando filtros...")
         self.f3_2021 = self.f3.loc[self.f3[var_f3['fecha_res']] >= var_f3['fecha_inicial']].reset_index(drop = True)  # [x] leer desde var_f3 = fecha_inicial
         f3_cerrados = self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['cerrados'])].reset_index(drop = True) # [x] leer desde var_f3 = cerrados        
+        self.f3_env_pr_mkp =self.f3.loc[self.f3[var_f3['estado']] == 'enviado'].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
         self.f3_ab_pr_mkp =self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['abiertos'])].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
-        self.f3_ab_mkp = self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['tipo_producto']] ==var_f3['tipo_tp'][1]].reset_index(drop = True) # [x] si es variable global entonces debe ir en el init o en inialización 
-        self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[var_f3['fecha_res']] <= set_fecha_riesgo(),'mayor a 30'] = 'y'
-        self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp['mayor a 30'].isna(), 'mayor a 30'] = 'n'
+        self.f3_ab_mkp = self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp[var_f3['tipo_producto']] ==var_f3['tipo_tp'][1]].reset_index(drop = True) # [x] si es variable global entonces debe ir en el init o en inialización 
+        self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp[var_f3['fecha_res']] <= set_fecha_riesgo(),'mayor a 30'] = 'y'
+        self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp['mayor a 30'].isna(), 'mayor a 30'] = 'n'
         self.set_cortes(f3_cerrados)
 
     def set_cortes(self, f3_cerrado):
@@ -116,8 +117,8 @@ class F3():
 
     def make_groupby(self):
         print("Generando agrupaciones...")
-        grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['costo']].sum().reset_index()
-        grupo_F3_prd_mkp_num = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['f3_id']].nunique().reset_index()
+        grupo_F3_prd_mkp = self.f3_env_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['costo']].sum().reset_index()
+        grupo_F3_prd_mkp_num = self.f3_env_pr_mkp.groupby([var_f3['tipo_producto'],'mes','mayor a 30'], sort = False)[var_f3['f3_id']].nunique().reset_index()
 
         mkp_sede = self.f3_ab_mkp.groupby(['local_agg','mes'], sort = False )[var_f3['costo']].sum().reset_index()
         mkp_sede_num = self.f3_ab_mkp.groupby(['local_agg','mes'], sort = False )[var_f3['f3_id']].nunique().reset_index()
@@ -156,7 +157,7 @@ class F3():
         return self.grap_f3_ab(df, orden, column, f3_total_3m, f3_mkp_3m, f3_prd_3m, titulo)
 
     def calc_tend(self):
-        grupo_F3_prd_mkp = self.f3_ab_pr_mkp.groupby([var_f3['tipo_producto'], 'mes', 'mayor a 30'],  sort = False)[var_f3['costo']].sum().reset_index()
+        grupo_F3_prd_mkp = self.f3_env_pr_mkp.groupby([var_f3['tipo_producto'], 'mes', 'mayor a 30'],  sort = False)[var_f3['costo']].sum().reset_index()
         f3_mkp_3m = pd.to_numeric('{:.0f}'.format(grupo_F3_prd_mkp.loc[(grupo_F3_prd_mkp[var_f3['tipo_producto']] == 'Market place'), var_f3['costo']].sum()/1e6))
         f3_prd_3m = pd.to_numeric('{:.0f}'.format(grupo_F3_prd_mkp.loc[(grupo_F3_prd_mkp[var_f3['tipo_producto']] == 'Producto'), var_f3['costo']].sum()/1e6))
         ult_fecha = self.f3_tendencia['fecha ptt'].max()
@@ -190,9 +191,9 @@ class F3():
         range_y = grupo_F3_prd_mkp[axes_y].max()
         orden_mes = grupo_F3_prd_mkp.mes.unique()
         fig = px.bar(grupo_F3_prd_mkp, x = 'mes', y = axes_y, labels = {'mes':'Mes de reserva', var_f3['costo']: 'Costo promedio', var_f3['tipo_producto']:'Tipo producto'}, 
-            text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_sequence = ['rgb(36, 121, 108)','rgb(204, 97, 176)'], title = titulo, 
+            text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_sequence = ['rgb(36, 121, 108)','rgb(204, 97, 176)'],
             category_orders = {var_f3['tipo_producto']:orden, 'mes':orden_mes })
-        fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1))
+        fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1), title = {'text': titulo, 'y' :0.99,'x' : 0, 'yanchor' : 'top'},)
         fig.update_layout(font=dict(size = 14))   
         fig.update_layout(margin_r = 20, margin_t = 60)
         fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.9, y1 = 1, line = dict(color = 'red', width = 2))
@@ -245,17 +246,17 @@ class F3():
         return fig
 
     def generate_table(self):
-        for dia in ["dias_res","dias_env"]:
-            self.f3_ab_pr_mkp[dia] = (self.f3_ab_pr_mkp["fecha_reserva"].max() - self.f3_ab_pr_mkp["fecha_reserva"] )
-            self.f3_ab_pr_mkp[dia] = self.f3_ab_pr_mkp[dia].apply(lambda x :x.days )
-            self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[dia] <30, 'age'] = 'Menor a 30' 
-            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=30) & (self.f3_ab_pr_mkp[dia]<=60), 'age'] ='30 a 60'
-            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=60) & (self.f3_ab_pr_mkp[dia]<=90), 'age'] ='61 a 90'
-            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=90) & (self.f3_ab_pr_mkp[dia]<=120), 'age'] ='91 a 120'
-            self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=120), 'age'] ='Mayor a 121'
-        f3_ab = self.f3_ab_pr_mkp.rename(columns={'descripcion6':'Estado'})
-        f3_ab['Estado'] = f3_ab['Estado'].str.capitalize()  
-        return make_tables(f3_ab,'Estado','age','cant*costoprmd','ant_f3')
+            for dia in ["dias_res","dias_env"]:
+                self.f3_ab_pr_mkp[dia] = (self.f3_ab_pr_mkp["fecha_reserva"].max() - self.f3_ab_pr_mkp["fecha_reserva"] )
+                self.f3_ab_pr_mkp[dia] = self.f3_ab_pr_mkp[dia].apply(lambda x :x.days )
+                self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[dia] <30, 'age'] = 'Menor a 30' 
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=30) & (self.f3_ab_pr_mkp[dia]<=60), 'age'] ='30 a 60'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=60) & (self.f3_ab_pr_mkp[dia]<=90), 'age'] ='61 a 90'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=90) & (self.f3_ab_pr_mkp[dia]<=120), 'age'] ='91 a 120'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=120), 'age'] ='Mayor a 121'
+            f3_ab = self.f3_ab_pr_mkp.rename(columns={'descripcion6':'Estado'})
+            f3_ab['Estado'] = f3_ab['Estado'].str.capitalize()  
+            return make_tables(f3_ab,'Estado','age','cant*costoprmd','ant_f3')
 
     # Saving graphs 
     def save_graf(self): 

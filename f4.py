@@ -131,10 +131,11 @@ class F4():
             f4_receta = self.f4_reservados.loc[self.f4_reservados[var_f4['tipo_redinv']] == "Receta"]
             f4_bolsa = self.f4_reservados.loc[self.f4_reservados[var_f4['tipo_redinv']] == "Bolsa"]
             gr_f4_materiales = f4_materiales.groupby(var_f4['desc_local'])[var_f4['costo']].sum().sort_values(ascending = False).head(5).reset_index()
-    
-            self.tb_averias = make_tables(top_10_marca, var_f4['marca_'], "mes", var_f4['costo'],"meses")
-            self.tb_p_rotas = make_tables(f4_pant_rotas, var_f4['marca_'], "mes", var_f4['costo'],"meses")
-            self.tb_calidad = make_tables(marcas_calidad, var_f4['marca_'], "mes", var_f4['costo'],"meses")
+
+            
+            self.tb_averias = make_tables(top_10_marca.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],"meses")
+            self.tb_p_rotas = make_tables(f4_pant_rotas.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],"meses")
+            self.tb_calidad = make_tables(marcas_calidad.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],"meses")
             self.tb_loc_pant = make_tables(self.f4_2022_pant_rotas, var_f4['desc_local'], None,var_f4['costo'],"loc")
             self.tb_prod_pant = make_tables(self.f4_2022_pant_rotas, var_f4['nombre_prod'], None,var_f4['costo'],"prod")
             self.tb_anulados = make_tables(self.f4_anulados, "local_agg", "mes_creacion", var_f4['costo'], "local")
@@ -292,7 +293,7 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_esp(self):
-        self.marc = "Samsung"
+        self.marc = "Barbie"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia[var_f4['marca_']] == self.marc]
         top_5_loc = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()[var_f4['desc_local']].unique()[0:5]                                                             
         grup_marca = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()

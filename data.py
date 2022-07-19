@@ -67,7 +67,7 @@ var_f3 = {
     'f3_id':'nro_devolucion',
     'local': 'local',
     'fecha_inicial':'2021-01-01',
-    'abiertos': ['enviado'],
+    'abiertos': ['enviado', 'reservado'],
     'cerrados' : ['anulado', 'confirmado'],
     'tipo_tp' : ['Producto','Market place']
 }
