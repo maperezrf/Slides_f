@@ -59,21 +59,20 @@ class F4():
        self.f4_enviados =self.f4_2022.loc[self.f4_2022[var_f4['estado']] == "Enviado"]
        self.f4_registrados = self.f4_2022.loc[(self.f4_2022[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4_2022[var_f4['estado']] == "Registrado")]
        self.f4_reservados =self.f4_2022.loc[self.f4_2022[var_f4['estado']] == "Reservado"]
-
-    
+       
     def set_week_f4(self):
         self.f4_sem = self.f4_2022_res.copy()
         self.f4_sem.loc[self.f4_sem.mes == 'Inventario' ,'mes'] = 'Jan' # TODO leer desde var_f4
         lista_mes = self.f4_sem.mes.unique() # TODO leer desde var_f4
-        f_inicio  = datetime.strptime('2022/05/01', '%Y/%m/%d') # TODO leer desde var_f4
+        f_inicio  = datetime.strptime('2022/05/01 23:59', '%Y/%m/%d %H:%M') # TODO leer desde var_f4
         f_cortes = f_inicio
         for mes in enumerate(lista_mes):
-            sem = 0
-            while f_cortes < self.f4_sem.loc[self.f4_sem.mes == mes[1], var_f4['fecha_res']].max(): # TODO leer desde var_f4
+            sem = 0            
+            while f_cortes <= self.f4_sem.loc[self.f4_sem.mes == mes[1], var_f4['fecha_res']].max(): # TODO leer desde var_f4
                 sem = sem + 1
                 f_cortes = f_inicio + timedelta(days = 7)
                 if sem == 4:
-                    dias = monthrange(2011,mes[0]+1)[1]
+                    dias = monthrange(2021,mes[0]+1)[1]
                     if dias == 28:
                         f_cortes = f_cortes - timedelta(days = 4)
                     elif dias == 30:
@@ -81,7 +80,9 @@ class F4():
                     elif dias == 31:
                         f_cortes = f_cortes - timedelta(days = 1)
                 self.f4_sem.loc[(self.f4_sem[var_f4['fecha_res']] >= f_inicio) & (self.f4_sem[var_f4['fecha_res']] <= f_cortes), 'Semana (fecha de reserva)'] = f"S{sem}{f_cortes.strftime('%b')}"
+                print(f'{f_inicio} - {f_cortes} {sem}')
                 f_inicio = f_cortes + timedelta(days = 1)
+
 
     def make_groupby(self):
             f4_x_semanas =  self.f4_sem.groupby(['local_agg', 'Semana (fecha de reserva)'], sort = False)[var_f4['costo']].sum().reset_index()# TODO leer desde var_f4
@@ -293,7 +294,7 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_esp(self):
-        self.marc = "Barbie"
+        self.marc = "Apple"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia[var_f4['marca_']] == self.marc]
         top_5_loc = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()[var_f4['desc_local']].unique()[0:5]                                                             
         grup_marca = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()

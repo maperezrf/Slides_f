@@ -132,7 +132,7 @@ class CLASSIFIER_F4():
         self.f4.to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado.csv",sep=";" , index=False)
         print("Se guardo archivo de F4s clasificado")
         self.f4.loc[(self.f4.local_agg == 'CD') & (self.f4[var_f4["fecha_res"]] < "2022-03-31")].to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado_CD.csv",sep=";" , index=False)
-        self.f4.loc[(self.f4[var_f4['tipo_redinv']] == "dado de baja") & (self.f4[var_f4['estado']] =='registrado')].reset_index(drop=True) .to_excel(f"{self.path}/{self.fecha_corte}_f4_registrados.xlsx", index=False)
+        self.f4.loc[(self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Registrado')].reset_index(drop=True) .to_excel(f"{self.path}/{self.fecha_corte}_f4_registrados.xlsx", index=False)
         print("Se guardo archivo de F4s en estado registrado")
         self.f4.to_csv(f"{self.path}/{self.fecha_corte}_f4_clasificado.csv",sep=";" , index=False)
         if reg_sin_marca > 0:
@@ -140,5 +140,5 @@ class CLASSIFIER_F4():
             pd.DataFrame(upc,columns=[var_f4['upc']]).to_excel(f"{self.path}/{self.fecha_corte}_UPCs_nuevos.xlsx", index=False)
             print("Se genero un archivo con los UPCs, a los cuales no se asociaron marcas")
         if reg_sin_clasificar > 0:
-            self.f4.loc[(self.f4["Posible Causa"].isna()) & (self.f4[var_f4['tipo_redinv']] == "dado de baja") & (self.f4[var_f4['estado']] =='reservado') ].to_excel(f"{self.path}/{self.fecha_corte}_f4_sin_clasificar.xlsx", index=False)
+            self.f4.loc[(self.f4["Posible Causa"].isna()) & (self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Reservado') ].to_excel(f"{self.path}/{self.fecha_corte}_f4_sin_clasificar.xlsx", index=False)
             print("Se guardo archivo el cual no se clasifico posible causa")
