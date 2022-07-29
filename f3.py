@@ -22,6 +22,7 @@ class F3():
        self.f3 = pd.read_csv(var_f3['path_df'] + f3_name + '.csv', sep = ';', dtype = object)
        self.f3_tendencia = pd.read_excel(var_f3['trend_path'], dtype = str)
        self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f3"
+       self.set_f3_sin_sop() # Agrega categoria Producto sin soporte
        self.transform()
        self.set_local_agg()
        self.filters()
@@ -30,6 +31,11 @@ class F3():
 
     def get_path(self):
         return self.path
+
+    def set_f3_sin_sop (self):
+        f3_ss = pd.read_excel('input/220727_f3_producto_sin_soporte.xlsx', sheet_name = 'Sheet1', dtype=str)
+        list_f3_ss = f3_ss['nro_devolucion'].tolist()
+        self.f3.loc[self.f3['nro_devolucion'].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
 
     def transform(self):
         # F3 planilla
@@ -180,7 +186,7 @@ class F3():
         orden_y = ord_mes(df, 'Cortes_cerra', "f3", orden_c)
         orden_x = ord_num(df, var_f3['estado'],column)
         graf_F3_cerr_prd = px.bar(df, x='Cortes_cerra', y=column, labels = etiquetas, text = column, text_auto='.2s',  category_orders={var_f3['estado']:orden_x,
-            "Cortes_cerra":orden_y}, color = 'descripcion6', color_discrete_sequence=['rgb(118, 78, 159)','rgb(218, 165, 27)'], title = titulo)
+            "Cortes_cerra":orden_y}, color = 'descripcion6', color_discrete_sequence=['rgb(255, 255, 255)','rgb(218, 165, 27)'], title = titulo)
         graf_F3_cerr_prd.update_layout(legend = dict(yanchor = "bottom", xanchor = "left", orientation = "h", y = 1))
         graf_F3_cerr_prd.update_yaxes(range = [0, df[column].max() + (df[column].max() * 0.25)], constrain ='domain')
         graf_F3_cerr_prd.update_layout(font=dict(size = 14))   
@@ -188,10 +194,11 @@ class F3():
         return graf_F3_cerr_prd
 
     def grap_f3_ab(self, grupo_F3_prd_mkp, orden, axes_y, f3_total_3m, f3_mkp_3m, f3_prd_3m, titulo):
+        colores = unif_colors(grupo_F3_prd_mkp, var_f3['tipo_producto'])
         range_y = grupo_F3_prd_mkp[axes_y].max()
         orden_mes = grupo_F3_prd_mkp.mes.unique()
         fig = px.bar(grupo_F3_prd_mkp, x = 'mes', y = axes_y, labels = {'mes':'Mes de reserva', var_f3['costo']: 'Costo promedio', var_f3['tipo_producto']:'Tipo producto'}, 
-            text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_sequence = ['rgb(36, 121, 108)','rgb(204, 97, 176)'],
+            text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_map = colores,
             category_orders = {var_f3['tipo_producto']:orden, 'mes':orden_mes })
         fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1), title = {'text': titulo, 'y' :0.99,'x' : 0, 'yanchor' : 'top'},)
         fig.update_layout(font=dict(size = 14))   
