@@ -40,7 +40,8 @@ def f4():
         f4 = F4(f4_clasificada,fecha_corte)
         path_f4 = f4.get_path()
         f4_calcs = f4_classifier.calculos() 
-        return path_f4, f4_calcs
+        f4_calcs_2 = f4.calculos()
+        return path_f4, f4_calcs, f4_calcs_2
     else:
         return '', []
 
@@ -68,10 +69,10 @@ def f11():
 def ppt(fc):
     
     path_f3 = f3()
-    path_f4, f4_calcs = f4()
+    path_f4, f4_calcs, f4_calcs_2 = f4()
     path_f11 = f11()
     # Generación de ppt
-    ppt = PPTPY(path_f3, path_f4, path_f11, f4_calcs, fc)
+    ppt = PPTPY(path_f3, path_f4, path_f11, f4_calcs, fc, f4_calcs_2)
 
     sel = input('Desea generar slides de F11: (y/n)')
     if sel=='y': ppt.get_all_f11_slides() 

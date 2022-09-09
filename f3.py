@@ -33,9 +33,10 @@ class F3():
         return self.path
 
     def set_f3_sin_sop (self):
-        f3_ss = pd.read_excel('input/220727_f3_producto_sin_soporte.xlsx', sheet_name = 'Sheet1', dtype=str)
+        f3_ss = pd.read_excel('input/220808_f3_producto_sin_soporte.xlsx', sheet_name = 'Base', dtype=str)
         list_f3_ss = f3_ss['nro_devolucion'].tolist()
         self.f3.loc[self.f3['nro_devolucion'].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
+
 
     def transform(self):
         # F3 planilla
@@ -76,7 +77,7 @@ class F3():
 
     def set_cortes(self, f3_cerrado):
         orden_x = []
-        fecha_in = "2022-05-01"
+        fecha_in = "2022-07-01"
         f_in = datetime.strptime(fecha_in,'%Y-%m-%d')
         f_fin = f_in + timedelta(days=7)
         while f_fin <= datetime.now():
@@ -186,7 +187,7 @@ class F3():
         orden_y = ord_mes(df, 'Cortes_cerra', "f3", orden_c)
         orden_x = ord_num(df, var_f3['estado'],column)
         graf_F3_cerr_prd = px.bar(df, x='Cortes_cerra', y=column, labels = etiquetas, text = column, text_auto='.2s',  category_orders={var_f3['estado']:orden_x,
-            "Cortes_cerra":orden_y}, color = 'descripcion6', color_discrete_sequence=['rgb(255, 255, 255)','rgb(218, 165, 27)'], title = titulo)
+            "Cortes_cerra":orden_y}, color = 'descripcion6', color_discrete_sequence=['rgb(118, 78, 159)','rgb(218, 165, 27)'], title = titulo)
         graf_F3_cerr_prd.update_layout(legend = dict(yanchor = "bottom", xanchor = "left", orientation = "h", y = 1))
         graf_F3_cerr_prd.update_yaxes(range = [0, df[column].max() + (df[column].max() * 0.25)], constrain ='domain')
         graf_F3_cerr_prd.update_layout(font=dict(size = 14))   
@@ -203,11 +204,11 @@ class F3():
         fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1), title = {'text': titulo, 'y' :0.99,'x' : 0, 'yanchor' : 'top'},)
         fig.update_layout(font=dict(size = 14))   
         fig.update_layout(margin_r = 20, margin_t = 60)
-        fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.9, y1 = 1, line = dict(color = 'red', width = 2))
+        # fig.add_shape(type = 'rect', xref = 'paper', yref = 'paper', x0 = 0, y0 = 0, x1 = 0.9, y1 = 1, line = dict(color = 'red', width = 2))
         fig.add_annotation(x = orden_mes[0], y = (range_y * 60/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 14))
         fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}',showarrow = False, font = dict (color = 'red',size = 14))
         fig.update_annotations(align = 'left')
-        fig.update_yaxes(range = [0,grupo_F3_prd_mkp[axes_y].max() + (grupo_F3_prd_mkp[axes_y].max() * 0.7)], constrain = 'domain')
+        fig.update_yaxes(range = [0,grupo_F3_prd_mkp[axes_y].max() + (grupo_F3_prd_mkp[axes_y].max() * 0.8)], constrain = 'domain')
         return fig
     
     def grap_mkp_x_sede(self, mkp_sede, column):
@@ -217,7 +218,7 @@ class F3():
             fig = px.bar(mkp_sede, x = 'mes', y = column, color = 'local_agg', title = f'F3 Marketplace abiertos - Total costo ${total:,.0f}M', 
                 labels = { column:'Costo promedio', 'mes':'Mes de reserva', 'local_agg':'Local'}, text = column,text_auto = '.2s', color_discrete_map = color )  
             fig.update_layout(legend = dict(yanchor ='top', y=0.9, xanchor = 'left', x = 0.1))
-            fig.update_yaxes(range = [0,6*1e8], constrain='domain')
+            fig.update_yaxes(range = [0,5*1e8], constrain='domain')
             fig.update_layout(margin_r=20, margin_t=60)
         elif column == var_f3['f3_id']:
             color = unif_colors(mkp_sede, 'local_agg')
@@ -231,7 +232,7 @@ class F3():
         return fig
 
     def grap_tend(self, tipo_producto = 'producto'): 
-        trend = self.f3_tendencia.loc[self.f3_tendencia['fecha ptt'] >= '2022-03-01']
+        trend = self.f3_tendencia.loc[self.f3_tendencia['fecha ptt'] >= '2022-07-01']
         tend_prod = trend.loc[trend['tipo producto'] == 'producto']
         tend_mkp = trend.loc[trend['tipo producto'] == 'mkp']
         if tipo_producto == 'mkp':
@@ -257,10 +258,10 @@ class F3():
                 self.f3_ab_pr_mkp[dia] = (self.f3_ab_pr_mkp["fecha_reserva"].max() - self.f3_ab_pr_mkp["fecha_reserva"] )
                 self.f3_ab_pr_mkp[dia] = self.f3_ab_pr_mkp[dia].apply(lambda x :x.days )
                 self.f3_ab_pr_mkp.loc[self.f3_ab_pr_mkp[dia] <30, 'age'] = 'Menor a 30' 
-                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=30) & (self.f3_ab_pr_mkp[dia]<=60), 'age'] ='30 a 60'
-                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=60) & (self.f3_ab_pr_mkp[dia]<=90), 'age'] ='61 a 90'
-                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=90) & (self.f3_ab_pr_mkp[dia]<=120), 'age'] ='91 a 120'
-                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia]>=120), 'age'] ='Mayor a 121'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia] >= 30) & (self.f3_ab_pr_mkp[dia]<=60), 'age'] ='30 a 60'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia] >= 60) & (self.f3_ab_pr_mkp[dia]<=90), 'age'] ='61 a 90'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia] >= 90) & (self.f3_ab_pr_mkp[dia]<=120), 'age'] ='91 a 120'
+                self.f3_ab_pr_mkp.loc[(self.f3_ab_pr_mkp[dia] >= 120), 'age'] ='Mayor a 121'
             f3_ab = self.f3_ab_pr_mkp.rename(columns={'descripcion6':'Estado'})
             f3_ab['Estado'] = f3_ab['Estado'].str.capitalize()  
             return make_tables(f3_ab,'Estado','age','cant*costoprmd','ant_f3')
@@ -277,16 +278,17 @@ class F3():
         self.fig_mkp_costo.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_costo.png',width=500, height=400, engine='orca')
         self.generate_table().write_image(f'{self.path}/{self.fecha_corte}_f3_tabla_res_env.png',width=800, height=100, engine='orca')
 
-        # Graphs x cant
-        self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=350, engine='orca')
-        self.graf_mkp_sede_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede_cant.png',width=600, height=350, engine='orca')
-        self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_prodcuto_cantidad.png',width=500, height=350, engine='orca')
-        self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_cantidad.png',width=500, height=350, engine='orca')
-        print('Se guardaron las imagenes!')
+        # # Graphs x cant
+        # self.graf_f3_prd_mkp_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abiertos_fecha_reserva_cant.png' ,width=600, height=350, engine='orca')
+        # self.graf_mkp_sede_num.write_image(f'{self.path}/{self.fecha_corte}_f3_abierto_sede_cant.png',width=600, height=350, engine='orca')
+        # self.fig_prd_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_prodcuto_cantidad.png',width=500, height=350, engine='orca')
+        # self.fig_mkp_cantidad.write_image(f'{self.path}/{self.fecha_corte}_f3_cerrado_mkp_cantidad.png',width=500, height=350, engine='orca')
+        # print('Se guardaron las imagenes!')
 
 
 def set_fecha_riesgo():
     year = (datetime.now() - dateutil.relativedelta.relativedelta(months=1)).strftime("%Y")
     month = (datetime.now() - dateutil.relativedelta.relativedelta(months=1)).strftime("%m")
     day = calendar.monthrange(int(year), int(month))[1]
+    print(year, month, day)
     return  f'{year}-{month}-{day}'

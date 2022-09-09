@@ -6,6 +6,8 @@ from data import  var_global,var_main
 from datetime import datetime
 from pptx.dml.color import RGBColor
 from data import var_f11
+import calendar
+from pptx.enum.shapes import MSO_SHAPE
 
 class PPTPY():
     path_f3 = ''
@@ -13,12 +15,13 @@ class PPTPY():
     fecha_corte = ''
     f4_data = []
 
-    def __init__(self, pf3, pf4, pf11, f4cals, fc) -> None:
+    def __init__(self, pf3, pf4, pf11, f4cals, fc, años) -> None:
         self.path_f3 = pf3
         self.path_f4 = pf4
         self.path_f11 = pf11
         self.fecha_corte = fc
         self.f4_data = f4cals
+        self.años = años
         
         self.seguimiento_fs = Presentation(var_main['pah_plantilla'])  # Leer presentacion 
         self.update_date_ftont()
@@ -41,12 +44,19 @@ class PPTPY():
         text_corte.font.size = Pt(12)    
 
     def slide_f11_empresa(self, slide, list_graf):
-         f11_empresa = self.seguimiento_fs.slides[slide]
-         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(0.26), Cm(1.6), height = Cm(15.52), width = Cm(15.52)) 
-         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(16.1), Cm(2.75), height = Cm(5.75), width = Cm(8.53)) 
-         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[2]}", Cm(24.89), Cm(2.75), height = Cm(5.75), width = Cm(8.53)) 
-         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[3]}", Cm(16.1), Cm(10.91), height = Cm(5.75), width = Cm(8.53)) 
-         f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[4]}", Cm(24.89), Cm(10.91),  height = Cm(5.75), width = Cm(8.53)) 
+        f11_empresa = self.seguimiento_fs.slides[slide]
+        f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(0.26), Cm(1.6), height = Cm(15.52), width = Cm(15.52)) 
+        f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(16.1), Cm(2.75), height = Cm(5.75), width = Cm(8.53)) 
+        f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[2]}", Cm(24.89), Cm(2.75), height = Cm(5.75), width = Cm(8.53)) 
+        f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[3]}", Cm(16.1), Cm(10.91), height = Cm(5.75), width = Cm(8.53)) 
+        f11_empresa.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[4]}", Cm(24.89), Cm(10.91),  height = Cm(5.75), width = Cm(8.53)) 
+        shapes = f11_empresa.shapes
+        shape = shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, Cm(2.15), Cm(2.75), Cm(10.22), Cm(10.23)
+        )
+        shape.fill.background()
+        line = shape.line
+        line.color.rgb = RGBColor(255, 0, 0)
         
     def slide_f11_emp_tab(self, slide, list_graf):
         f11_emp_tab = self.seguimiento_fs.slides[slide]
@@ -69,6 +79,16 @@ class PPTPY():
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_tendencia_mkp.png", Cm(13), Cm(10.2), height=Cm(7.5)) 
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_cerrado_mkp_costo.png", Cm(23), Cm(10.2), height=Cm(7.5))
 
+        shapes = f3.shapes
+        shape = shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, Cm(2.23), Cm(2.98), Cm(7.76), Cm(4.49)
+        )
+        shape.fill.background()
+        line = shape.line
+        line.color.rgb = RGBColor(255, 0, 0)
+
+
+
     def slide_f3_tab(self):
         f3 = self.seguimiento_fs.slides[13]
         f3.shapes.add_picture(f"{self.path_f3}/{self.fecha_corte}_f3_tabla_res_env.png",  Cm(4.58), Cm(5.69), width = Cm(23.41)) 
@@ -79,7 +99,7 @@ class PPTPY():
         f4.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_f4_sem.png", Cm(19.55), Cm(0.57), width = Cm(13.29), height = Cm(9.6))
         f4.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_grafica_total_por_mes.png", Cm(13.03), Cm(10.07), width = Cm(7.62), height = Cm(7.62)   )
         f4.shapes.add_picture(f"{self.path_f4}/{self.fecha_corte}_torta.png", Cm(22.84), Cm(10.23), width = Cm(10), height = Cm(7.13))
-        tb_reserva = f4.shapes.add_textbox(Cm(1.21),Cm(15.28),width=Cm(1), height=Cm(0.1))
+        tb_reserva = f4.shapes.add_textbox(Cm(0.74),Cm(15.31),width=Cm(1), height=Cm(0.1))
         tx_text_reserva = tb_reserva.text_frame.add_paragraph() 
         tx_text_reserva.text = f"Reservado {self.f4_data[4]}"
         tx_text_reserva.font.size= Pt(14)
@@ -103,6 +123,42 @@ class PPTPY():
         tx_registrados_m = registrados_m.text_frame.add_paragraph() 
         tx_registrados_m.text = f"Estado Registrado $2M >7 días No han pasado a contabilidad,\nya informados a responsables\nUsuarios de creación:\n  Jair Armando Rocha Vargas"
         tx_registrados_m.font.size= Pt(13)       
+
+        shapes = f4.shapes
+        left = top = width = height = Cm(1.0)
+        shape = shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, Cm(14.15), Cm(2.65), Cm(2.76), Cm(1.58)
+        )
+        fill = shape.fill
+        fill.solid()
+        fill.fore_color.rgb = RGBColor(255, 255, 255)
+        line = shape.line
+        line.color.rgb = RGBColor(255, 255, 255)
+
+
+        mes = f4.shapes.add_textbox(Cm(14.04),Cm(1.82),width=Cm(2.07), height=Cm(0.68))
+        txt_mes = mes.text_frame.add_paragraph() 
+        txt_mes.text = f"Mes Corte: {calendar.month_abbr[self.años[3]]}"
+        txt_mes.font.size = Pt(10)
+        txt_mes.font.color.rgb = RGBColor(119, 125, 135)
+
+        m_2021 = f4.shapes.add_textbox(Cm(14.04),Cm(2.15),width=Cm(2.07), height=Cm(0.68))
+        txt_m_2021 = m_2021.text_frame.add_paragraph() 
+        txt_m_2021.text = f"2021: {self.años[0]}"
+        txt_m_2021.font.size = Pt(10)
+        txt_m_2021.font.color.rgb = RGBColor(0, 0, 0)
+
+        m_2022 = f4.shapes.add_textbox(Cm(14.04),Cm(2.48),width=Cm(2.07), height=Cm(0.68))
+        txt_m_2022 = m_2022.text_frame.add_paragraph() 
+        txt_m_2022.text = f"2022: {self.años[1]}"
+        txt_m_2022.font.size = Pt(10)
+        txt_m_2022.font.color.rgb = RGBColor(237, 173, 8)
+
+        dif = f4.shapes.add_textbox(Cm(14.04),Cm(2.81),width=Cm(2.07), height=Cm(0.68))
+        txt_dif = dif.text_frame.add_paragraph() 
+        txt_dif.text = f"Dif: {self.años[2]}"
+        txt_dif.font.size = Pt(10)
+        txt_dif.font.color.rgb = RGBColor(0, 179, 80)
 
     def f4_mot_sede(self):
         f4_mot_sede = self.seguimiento_fs.slides[15]
