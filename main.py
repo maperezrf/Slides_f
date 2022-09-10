@@ -43,7 +43,7 @@ def f4():
         f4_calcs_2 = f4.calculos()
         return path_f4, f4_calcs, f4_calcs_2
     else:
-        return '', []
+        return '', [] , []
 
 def f11():
     f11_file = input('Ingrese nombre de archivo de f11 abiertos .csv (n, de lo contrario): ')

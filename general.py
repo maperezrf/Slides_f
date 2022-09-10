@@ -76,7 +76,7 @@ def make_tables(df,rows,column,sum, types = None ):
         pt_df = pt_df.iloc[1:11]
     elif types == "ant":
         pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
-        pt_df = pt_df[["Estado", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', '121 a 180', 'Mayor a 181','Total']]
+        pt_df = pt_df[["SERVICIO", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', '121 a 180', 'Mayor a 181','Total']]
     elif types == "ant_f3":
          pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
          pt_df = pt_df[["Estado", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', 'Mayor a 121','Total']]
