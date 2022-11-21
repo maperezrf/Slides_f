@@ -235,7 +235,6 @@ fig_torta_local = px.pie(gb_local, values='total_precio_costo', names='Local', t
 fig_torta_local.update_traces( textposition='inside', textinfo='percent+label')
 
 
-
 ## ------ Output 
 # TODO guardar figuras en una carpeta para cada corte
 fig_torta_local.write_image(f"images/{dt_string}_f4_torta.svg", engine='orca') 

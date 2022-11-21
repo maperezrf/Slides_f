@@ -11,7 +11,7 @@ class F3():
     f3_ab_mkp = None
     f3_env_pr_mkp = None
     fecha_corte = None   
-
+    
     def __init__(self, fc, f3_name) -> None:
        self.fecha_corte = fc
        

@@ -436,7 +436,6 @@ class F4():
         self.tb_receta.write_image(f'{self.path}/tabla_receta.png',height = 90,  width = 500, engine = 'orca')
         self.tb_bolsa.write_image(f'{self.path}/tabla_bolsa.png',height = 500,  width = 500, engine = 'orca')
         self.fig_linea_mes_mot.write_image(f'{self.path}/fig_linea_mes_mot.png', height = 700,  width = 700, engine = 'orca')
-
     
 def f4_figs(df, pc_order, titulo):
     orden = ord_mes(df,'mes') # TODO leer desde var_f4

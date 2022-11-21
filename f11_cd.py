@@ -199,7 +199,7 @@ class F11():
 
         tm90_cd = self.f11_tm90_cant.loc[self.f11_tm90_cant[dtagco['grupo']]=='CD']
         tm90_tienda = self.f11_tm90_cant.loc[(self.f11_tm90_cant[dtagco['grupo']]=='TIENDAS')|(self.f11_tm90_cant[dtagco['grupo']]=='DVD ADMINISTRATIVO')]
-
+        
         gb_tm90_cd = tm90_cd.groupby([dtagco['fecha_corte']])[dtagco['f11_id']].sum().reset_index()
         gb_tm90_tienda = tm90_tienda.groupby([dtagco['fecha_corte']])[dtagco['f11_id']].sum().reset_index()
 

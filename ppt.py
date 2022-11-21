@@ -272,3 +272,4 @@ class PPTPY():
         path_ppt = f"{var_global['path_ppts']}/seguimiento_fs.pptx"
         self.seguimiento_fs.save(path_ppt)
         return path_ppt
+    

@@ -58,7 +58,7 @@ def ord_mes(df,column,f = "general", orden = None):
             if mes in i:
                 list_mes.append(i)
     return list_mes
-
+    
 def ord_num(df,column,colum_num):
     return df.groupby(column)[colum_num].sum().sort_values(ascending=False).reset_index()[column].unique()
 

@@ -13,7 +13,7 @@ pd.options.display.float_format = '${:,.0f}'.format
 # TODO 3. cuando vayan "," que queden pegadas a la palabra anterior y con un espacio después 
 
 class CLASSIFIER_F4():
-
+    
     dt_string = datetime.now().strftime('%y%m%d')
     f4_db_res = None
     f4_db_reg = None

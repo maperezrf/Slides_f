@@ -53,7 +53,7 @@ var_f4 = {
     'linea':'PROD_CAT_ID',
     'nombre_prod':'PROD_NAME'
     }
-
+    
 var_f3 = { 
     'path_df':f'{path_ea}/DATA/F3/',
     'trend_path':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/tendencias_f3.xlsx' ,

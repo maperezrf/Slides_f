@@ -21,7 +21,7 @@ class F12():
         self.make_table()
         # self.group_by()
         self.save_images()
-
+        
     def transform(self):
         print("Transformando datos...")
         self.f12['Fecha Estado'] = pd.to_datetime(self.f12['Fecha Estado'])

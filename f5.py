@@ -70,3 +70,4 @@ class F5():
         self.tabla_gral.write_image(f'{self.path}/antiguedad_f5.jpg', width=1000, height=100, engine='orca')
         self.tb_res.write_image(f'{self.path}/antiguedad_res.jpg', width= 2000, height=700, engine='orca')
         self.tb_env.write_image(f'{self.path}/antiguedad_env.jpg', width= 2000, height=700, engine='orca')
+    
