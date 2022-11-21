@@ -63,6 +63,7 @@ class CLASSIFIER_F4():
     def set_posible_causa(self):
         # Filtros para tienda 
         self.f4.loc[((self.f4['Posible Causa'].isna())) & (self.f4[var_f4['f4_id']].isin(const.f4_dup)),'Posible Causa']= 'F4 duplicado generado por CI' 
+        self.f4.loc[((self.f4['Posible Causa'].isna())) & (self.f4[var_f4['f4_id']].isin(const.f4_merma)),'Posible Causa']= 'Avería'
         self.f4.loc[((self.f4['Posible Causa'].isna())) & (self.f4[var_f4['local']]==3000),'Posible Causa']='Conciliación NC 2021 - Local 3000'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & self.f4[var_f4["destino"]].str.contains(r'pantalla\w? rota\w?|pantalla quebrada| pantalla\w? |pantalla rota', na= False), 'Posible Causa'] = 'Pantallas rotas'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & (self.f4[var_f4["destino"]].str.contains(r'calidad|cambio|politica|devolucion cliente|danocalida', na= False) | self.f4[var_f4['desccentro_e_costo']].isin(const.centro_costo_calidad)), 'Posible Causa'] = 'Calidad'
@@ -94,8 +95,9 @@ class CLASSIFIER_F4():
         self.f4.loc[self.f4['Posible Causa'].isna() & self.f4[var_f4["destino"]].str.contains(r'prestamo\w?'), 'Posible Causa'] = 'Prestamo no devuelto'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='CD') & (self.f4[var_f4["destino"]].str.contains(r"baja por danoaveria en dvl|baja por daño/averia en dvl", na= False)), 'Posible Causa'] = 'DVL'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'cambio agil', na= False), 'Posible Causa'] = 'Cambio ágil'
-        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'averias cd dvl', na= False), 'Posible Causa'] = 'Avería'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'averias cd dvl|averias|evento|o002004', na= False), 'Posible Causa'] = 'Avería'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'calidad', na= False), 'Posible Causa'] = 'Avería'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'premios|obsequios', na= False), 'Posible Causa'] = 'Premios clientes'
 
         # revisar 
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'importacion', na= False), 'Posible Causa'] = "Avería"

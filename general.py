@@ -30,6 +30,8 @@ def generate_structure(dt_string):
         mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f4")
         mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f11")
         mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/classifier")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f5")
+        mkdir(f"{var_global['path_cortes']}/{dt_string}_corte/images/f12")
     else:
         pass
     
@@ -48,7 +50,7 @@ def ord_mes(df,column,f = "general", orden = None):
     elif f == "f3":
         meses = orden
     elif f == "ant":
-        meses = ['Menor a 30 días', 'De 30 a 60 días', 'De 61 a 90 días','De 91 a 120 días', 'De 121 a 180 días', 'Mayor a 181 días','Total'] 
+        meses = ['Menor a 30', '31 a 60', '61 a 90','91 a 120', '121 a 180','Mayor a 121', 'Mayor a 181','Total'] 
     col_mes = df[column].unique()
     list_mes = []
     for mes in meses:
@@ -75,11 +77,11 @@ def make_tables(df,rows,column,sum, types = None ):
         pt_df.sort_values('Total',ascending=False, inplace = True)
         pt_df = pt_df.iloc[1:11]
     elif types == "ant":
+        ord_antiguedad = ord_mes(df, column, 'ant')
         pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
-        pt_df = pt_df[["SERVICIO", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', '121 a 180', 'Mayor a 181','Total']]
-    elif types == "ant_f3":
-         pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
-         pt_df = pt_df[["Estado", 'Menor a 30', '30 a 60', '61 a 90','91 a 120', 'Mayor a 121','Total']]
+        ord_antiguedad.insert(0, rows)
+        ord_antiguedad.append('Total')
+        pt_df = pt_df[ord_antiguedad]
     elif types == "local":
         pt_df.rename(columns={rows:"Local"},inplace=True)
         pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df["Local"] == 'Total']])
@@ -106,3 +108,26 @@ def make_tables(df,rows,column,sum, types = None ):
                         ])
     fig.update_layout( margin = dict(r=1,l=1,t=0,b=0))
     return fig
+
+def set_antiguedad(df, fecha_column, tipo):
+    if tipo == 'f11':
+        df = set_age(df,'DIAS','age')
+    elif tipo == 'f3':
+        for i in fecha_column:
+            df[f'DIAS_{i}'] = df[i].max() - df[i]
+            df[f'DIAS_{i}'] = df[f'DIAS_{i}'].apply(lambda x :x.days )
+            df = set_age(df,f'DIAS_{i}', f'age_{i}')
+        df.loc[df['descripcion6'] == 'enviado', 'age'] = df.loc[df['descripcion6'] == 'enviado', 'age_fecha_envio' ] 
+        df.loc[df['age'].isna() , 'age'] = df.loc[df['age'].isna(), 'age_fecha_reserva']    
+    if 'Mayor a 181' not in df[f'age'].unique():
+        df[f'age'].replace('121 a 180' , 'Mayor a 121', inplace=True)
+    return df
+
+def set_age(df, column, age):
+    df.loc[df[column] <30, age] = 'Menor a 30' 
+    df.loc[(df[column] >= 30) & (df[column]<=60), age] ='31 a 60'
+    df.loc[(df[column] > 60) & (df[column]<=90), age] ='61 a 90'
+    df.loc[(df[column] > 90) & (df[column]<=120), age] ='91 a 120'
+    df.loc[(df[column] > 120)&(df[column]<=180), age]='121 a 180'
+    df.loc[(df[column] > 180), age] ='Mayor a 181'
+    return df

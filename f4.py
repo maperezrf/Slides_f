@@ -19,7 +19,7 @@ class F4():
         self.f4_2022 =  f4_clasificada
         self.f4_2021 = pd.read_csv(var_f4["path_f4_2021"],sep =';', dtype = object) # TODO leer path desde var_f3
         self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f4"
-        self.date_filter = '2022-05-01'
+        self.date_filter = '2022-06-01'
         self.concat_f4_21_22()
         self.transform()
         self.filters()
@@ -145,7 +145,7 @@ class F4():
         gb_f4mes_tot = gb_f4_mes_tot_aux.groupby(['mes','Posible Causa'])[var_f4['costo']].sum().reset_index() # TODO leer desde var_f4
         gb_f4mes_tot = gb_f4mes_tot.loc[gb_f4mes_tot['Posible Causa'].isin(orden_pc_tot)] # TODO leer desde var_f4
 
-        gr_anulados_mes = self.f4_anulados.groupby(["local_agg","mes_creacion"])[var_f4['costo']].sum().reset_index()
+        gr_anulados_mes = self.f4_anulados.groupby(["local_agg","mes"])[var_f4['costo']].sum().reset_index()
         gr_f4_enviados = self.f4_enviados.groupby([var_f4['desc_local'],var_f4['tipo_redinv'],"mes"])[var_f4['costo']].sum().reset_index()
         gr_f4_regis = self.f4_registrados.groupby(["local_agg","mes_creacion"])[var_f4['costo']].sum().reset_index()
         gr_anulados = self.f4_anulados.groupby("local_agg")[var_f4['costo']].sum().reset_index()
@@ -157,6 +157,16 @@ class F4():
         f4_bolsa = self.f4_reservados.loc[self.f4_reservados[var_f4['tipo_redinv']] == "Bolsa"]
         gr_f4_materiales = f4_materiales.groupby(var_f4['desc_local'])[var_f4['costo']].sum().sort_values(ascending = False).head(5).reset_index()
 
+        mes = int(datetime.now().strftime('%m'))
+        # print('Cambiar mes de grafica, linea mes')
+        top_5_lin = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2022-10-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2022-11-01')].groupby([var_f4['desc_linea']])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)['PROD_CAT_DESC'].unique()
+        lista_f = []
+        for i in top_5_lin:
+            lista = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2022-10-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2022-11-01') & (self.f4_2022_res[var_f4['desc_linea']] == i)].groupby([var_f4['desc_linea'],'Posible Causa'])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)
+            lista_f.append(lista)
+            linea_mt_mes = pd.concat(lista_f).reset_index(drop=True)
+
+
         
         self.tb_averias = make_tables(top_10_marca.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],"meses")
         self.tb_p_rotas = make_tables(f4_pant_rotas.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],"meses")
@@ -165,7 +175,8 @@ class F4():
         self.tb_prod_pant = make_tables(self.f4_2022_pant_rotas, var_f4['nombre_prod'], None,var_f4['costo'],"prod")
         self.tb_anulados = make_tables(self.f4_anulados, "local_agg", "mes_creacion", var_f4['costo'], "local")
         self.tb_enviados = make_tables(self.f4_enviados,var_f4['tipo_redinv'], "mes", var_f4['costo'], "local")
-        self.tb_registrados = make_tables(self.f4_registrados, "local_agg", "mes_creacion", var_f4['costo'])
+        if self.f4_registrados.shape[0] > 0:
+            self.tb_registrados = make_tables(self.f4_registrados, "local_agg", "mes_creacion", var_f4['costo'])
         self.tb_reservados = make_tables(self.f4_reservados, var_f4['tipo_redinv'], "mes_creacion", var_f4['costo'],"local")
         self.tb_materiales = make_tables(gr_f4_materiales, var_f4['desc_local'], None ,var_f4['costo'], "loc" )
         self.tb_act_fijo = make_tables(f4_act_fijo, var_f4['desc_local'], None ,var_f4['costo'], "loc" )
@@ -202,6 +213,7 @@ class F4():
         set_columns_sum(gb_f4mes_tot, 'Posible Causa',var_f4['costo'])
         set_columns_sum(gr_anulados_mes,"local_agg",var_f4['costo'])
         set_columns_sum(gr_f4_enviados, var_f4['tipo_redinv'], var_f4['costo'])
+        set_columns_sum(linea_mt_mes, var_f4['desc_linea'], var_f4['costo'])
         
         self.grap_bar_sem(f4_x_semanas)
         self.grap_bar(f4_x_años)
@@ -225,6 +237,7 @@ class F4():
         self.grap_anulados_mes(gr_anulados_mes)
         self.grap_enviados(gr_f4_enviados)
         self.graph_registradosdos(gr_f4_regis)
+        self.graf_linea_mes_mot(linea_mt_mes, mes)
 
     def grap_bar_sem(self,f4_x_semanas):
         colores = unif_colors(f4_x_semanas, 'local_agg') # TODO leer desde var_f4
@@ -243,13 +256,15 @@ class F4():
         self.ten_creac_x_año.update_layout(legend = dict(yanchor = 'top', y = 0.95, xanchor = 'left', x = 0.1),font =dict(size = 15), margin=dict(l=0,r=10,b=0) )
         
     def grap_pos_causa(self,gb_f4g_graf_21): 
+        total = f'{gb_f4g_graf_21[var_f4["costo"]].sum():,.0f}'
+        gb_f4g_graf_21 = gb_f4g_graf_21.loc[~gb_f4g_graf_21['mes'].isin(['Inventario', 'Jan'])]
         colores = unif_colors(gb_f4g_graf_21,'local_agg') # TODO leer desde var_f4
         orden = gb_f4g_graf_21.sort_values(var_f4['costo'], ascending = False)['Posible Causa'].unique() # TODO leer desde var_f4
         gb_f4g_graf_21[var_f4['costo']] = gb_f4g_graf_21[var_f4['costo']]/1e6
         self.graf_f4_pos_causa = px.bar(gb_f4g_graf_21, y = 'Posible Causa', x = var_f4['costo'] , color = 'local_agg',text = var_f4['costo'],text_auto = '.2s', # TODO leer desde var_f4
-        title = f'Posibles causas de F4 2022 dados de baja por locales - Total costo $ {gb_f4g_graf_21[var_f4["costo"]].sum():,.0f} M ', 
+        title = f'Posibles causas de F4 2022 dados de baja por locales - Total costo $ {total} M ', 
         labels = {'Posible Causa':'Posibles causas',var_f4['costo']:'Costo total (Millones)', 'local_agg':'Local', 'mes':'Mes de reserva'}, 
-        facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['Inventario','Jan', 'Feb', 'Mar','Apr', 'May', 'Jun','Jul' , 'Aug']}, color_discrete_map = colores) # TODO leer desde var_f4
+        facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['Feb', 'Mar','Apr', 'May', 'Jun','Jul' , 'Aug','Sep','Oct']}, color_discrete_map = colores) # TODO leer desde var_f4
         self.graf_f4_pos_causa.update_layout(legend = dict(yanchor = 'bottom', y = 0.05, xanchor = 'right', x = 1))
 
     def grap_pie(self, gb_local):
@@ -259,6 +274,7 @@ class F4():
         self.fig_torta_local.update_layout(font = dict(size = 15),  margin =dict(l=0, r=0, t=40,b=0))
     
     def grap_pie_lineas(self, f4_linea):
+
         self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea en 2022')
         self.fig_torta_linea.update_traces( textposition='inside', textinfo = 'percent')
         self.fig_torta_linea.update_layout(font_size=16,legend=dict(yanchor = 'top',xanchor='right', orientation = 'h',y = 0,x = 0.8),font=dict(size=15), margin= dict(l=0,r=0) )
@@ -318,18 +334,18 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_esp(self):
-        self.marc = "Apple"
+        self.marc = "Samsung"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia[var_f4['marca_']] == self.marc]
         top_5_loc = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()[var_f4['desc_local']].unique()[0:5]                                                             
         grup_marca = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()
         grup_marca = grup_marca.loc[grup_marca[var_f4['desc_local']].isin(top_5_loc)]
         set_columns_sum(grup_marca,'mes',var_f4['costo'])
         set_columns_sum(grup_marca,var_f4['desc_local'],var_f4['costo'])
+        orden = ord_mes(grup_marca, 'mes')
         color = unif_colors(grup_marca,'mes')
-        self.fig_marca_locales = px.bar(grup_marca, x = var_f4['desc_local'],y = var_f4['costo'],text = var_f4['costo'],color = 'mes',text_auto = '.2s',labels = {var_f4['costo']:'Costo total',var_f4['desc_local']:'Local','mes':'Mes'}, color_discrete_map = color)
-        self.fig_marca_locales.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 10,uniformtext_mode ='show',legend= dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1),font=dict(size=15),title={'text':f'{self.marc} por local','y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
-        self.fig_marca_locales.update_yaxes(range = [0, 35000000 ], constrain ='domain')
-        print(grup_marca[var_f4['costo']].max())
+        self.fig_marca_locales = px.bar(grup_marca, x = var_f4['desc_local'],y = var_f4['costo'],text = var_f4['costo'],color = 'mes',text_auto = '.2s',labels = {var_f4['costo']:'Costo total',var_f4['desc_local']:'Local','mes':'Mes'}, color_discrete_map = color, category_orders = {'mes':orden})
+        self.fig_marca_locales.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 10,uniformtext_mode ='show',legend= dict(yanchor = 'auto',xanchor = 'left', orientation = 'v',y = 1),font=dict(size=15),title={'text':f'{self.marc} por local','y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
+        self.fig_marca_locales.update_yaxes(range = [0, 70000000 ], constrain ='domain')
         self.fig_marca_locales.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_averia(self, marcas_calidad):
@@ -355,10 +371,11 @@ class F4():
         
     def grap_anulados_mes(self, gr_anulados_mes):
         orden_num = ord_num(gr_anulados_mes, "local_agg", var_f4['costo'])
-        orden_mes = ord_mes(gr_anulados_mes, "mes_creacion")
-        ord_mes(gr_anulados_mes, "mes_creacion")
-        self.graf_anul_mes = px.bar(gr_anulados_mes, y = var_f4['costo'], x = 'local_agg', color = "mes_creacion" , text=var_f4['costo'], text_auto='.2s', barmode= "group", category_orders = {'local_agg':orden_num, "mes_creacion": orden_mes}, labels = {var_f4['costo'] : "Costo", "local_agg" : "Local", "mes_creacion":"Mes"} )
-        self.graf_anul_mes.update_layout(legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1), font=dict(size=15), margin=dict(r=0,l=0,t = 50, b =0))
+        orden_mes = ord_mes(gr_anulados_mes, "mes")
+        gr_anulados_mes = gr_anulados_mes.loc[~gr_anulados_mes['mes'].isin(['Inventario', 'Jan','Feb','Mar','Apr','May'])]
+        ord_mes(gr_anulados_mes, "mes")
+        self.graf_anul_mes = px.bar(gr_anulados_mes, y = var_f4['costo'], x = 'local_agg', color = "mes" , text=var_f4['costo'], text_auto='.2s', barmode= "group", category_orders = {'local_agg':orden_num, "mes": orden_mes}, labels = {var_f4['costo'] : "Costo", "local_agg" : "Local", "mes":"Mes"} )
+        self.graf_anul_mes.update_layout(legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1), font=dict(size=10), margin=dict(r=0,l=0,t = 50, b =0))
 
     def grap_enviados(self, gr_f4_enviados):
         orden_num = ord_num(gr_f4_enviados, var_f4['tipo_redinv'], var_f4['costo'])
@@ -372,44 +389,54 @@ class F4():
         self.grap_reg = px.bar(gr_f4_regis, y = var_f4['costo'], x = 'local_agg', text=var_f4['costo'],color = "mes_creacion" , text_auto='.2s', barmode= "group", category_orders = {'tipo_redinv':orden_num, "mes": orden_mes}, labels = {var_f4['costo'] : "Costo", "local_agg" : "Local", "mes_creacion": "Mes"} )
         self.grap_reg.update_layout(legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1),font=dict(size=15), margin=dict(r=0,l=0,t=50))
 
+    def graf_linea_mes_mot(self ,linea_mt_mes, mes):
+        print('Cambiar mes')
+        self.fig_linea_mes_mot = px.bar(linea_mt_mes, x = var_f4['desc_linea'],y = var_f4['costo'], text = var_f4['costo'],color = 'Posible Causa', text_auto ='.2s', barmode = 'group', labels = {var_f4['costo']:'Costo total', var_f4['desc_linea']:'Línea'}) # TODO leer desde var_f4
+        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: octubre'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
+        self.fig_linea_mes_mot.update_yaxes(range = [0, linea_mt_mes[var_f4['costo']].max() + (linea_mt_mes[var_f4['costo']].max() * 0.25)], constrain = 'domain')
+        self.fig_linea_mes_mot.update_traces(textangle = 90, textposition = 'outside')
+
     def save_grap(self):  
         print("Guardando graficas f4's....")
-        self.fig_torta_local.write_image(f'{self.path}/{self.fecha_corte}_torta.png', engine = 'orca') 
-        self.ten_creac_x_año.write_image(f'{self.path}/{self.fecha_corte}_tendencia_creacion_f4_x_años.png', width = 800, height = 450, engine = 'orca')
-        self.grafica_f4_sem.write_image(f'{self.path}/{self.fecha_corte}_grafica_f4_sem.png', width = 700, height = 500, engine = 'orca')
-        self.graf_f4_pos_causa.write_image(f'{self.path}/{self.fecha_corte}_clasificacion_posibles_causas_22.png', width = 1800, height = 900, engine = 'orca') 
-        self.fig_clasificado.write_image(f'{self.path}/{self.fecha_corte}_grafica_total.png', height = 600,  width = 700, engine='orca')
-        self.fig_clasificado_local.write_image(f'{self.path}/{self.fecha_corte}_grafica_total_por_local.png', height = 600,  width = 1200,engine = 'orca')
-        self.fig_clas_mes_local.write_image(f'{self.path}/{self.fecha_corte}_grafica_total_por_mes.png', height = 550,  width = 500,engine = 'orca')
-        self.f4_mespc.write_image(f'{self.path}/{self.fecha_corte}_tienda_mes_motivo.png', height = 500,  width =900,engine = 'orca')
-        self.f4_mespc_cd.write_image(f'{self.path}/{self.fecha_corte}_cd_mm.png', engine = 'orca',height = 500,  width = 900)
-        self.fig_torta_linea.write_image(f'{self.path}/{self.fecha_corte}_torta_linea.png', height = 800,  width = 700,engine = 'orca')
-        self.fig_f4_linea_mes.write_image(f'{self.path}/{self.fecha_corte}_grafica_linea_x_mes.png', height = 700,  width = 900,engine = 'orca')
-        self.fig_f4_linea_motivo.write_image(f'{self.path}/{self.fecha_corte}_f4_linea_motivo.png', height = 800,  width = 1000,engine = 'orca')
-        self.fig_lin_local.write_image(f'{self.path}/{self.fecha_corte}_linea_local.png', height = 700,  width = 800, engine = 'orca')
-        self.fig_f4_marca.write_image(f'{self.path}/{self.fecha_corte}_grafica_averia_x_mes_y_marca.png', height = 900,  width = 900,engine = 'orca')
-        self.fig_marca_locales.write_image(f'{self.path}/{self.fecha_corte}_{self.marc}_local.png', height = 600,  width = 500, engine = 'orca')
-        self.fig_marcas_calidad.write_image(f'{self.path}/{self.fecha_corte}_marca_calidad.png', height = 700,  width = 800, engine = 'orca')
-        self.fig_pant_rotas.write_image(f'{self.path}/{self.fecha_corte}_pantallas_rotas.png', height = 800,  width = 650, engine = 'orca')
-        self.f4_mespc_tot.write_image(f'{self.path}/{self.fecha_corte}_mes_f4_motivo_compañia.png', height = 700,  width = 800, engine = 'orca')
-        self.tb_averias.write_image(f'{self.path}/{self.fecha_corte}_tabla_averias.png',height = 340,  width = 1100, engine = 'orca')
-        self.tb_p_rotas.write_image(f'{self.path}/{self.fecha_corte}_tabla_pantallas_rotas.png',height = 300,  width = 900, engine = 'orca')
-        self.tb_calidad.write_image(f'{self.path}/{self.fecha_corte}_tabla_calidad.png',height = 370,  width = 900, engine = 'orca')
-        self.tb_loc_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_loc_pant.png',height = 520,  width = 400, engine = 'orca')
-        self.tb_prod_pant.write_image(f'{self.path}/{self.fecha_corte}_tabla_prod_pant.png',height = 340,  width = 600, engine = 'orca')
-        self.fig_torta_anu.write_image(f'{self.path}/{self.fecha_corte}_pie_anulados.png',height = 400,  width = 400, engine = 'orca')
-        self.graf_anul_mes.write_image(f'{self.path}/{self.fecha_corte}_anulados_mes.png',height = 350,  width = 800, engine = 'orca')
-        self.tb_anulados.write_image(f'{self.path}/{self.fecha_corte}_tabla_anulados.png',height = 100,  width = 1200, engine = 'orca')
-        self.grap_enviado_mes.write_image(f'{self.path}/{self.fecha_corte}_enviados.png',height = 300,  width = 800, engine = 'orca')
-        self.grap_reg.write_image(f'{self.path}/{self.fecha_corte}_registrados.png',height = 300,  width = 800, engine = 'orca')
-        self.tb_enviados.write_image(f'{self.path}/{self.fecha_corte}_tabla_enviados.png',height = 150,  width = 1000, engine = 'orca') 
-        self.tb_registrados.write_image(f'{self.path}/{self.fecha_corte}_tabla_registrados.png',height = 150,  width = 800, engine = 'orca')
-        self.tb_reservados.write_image(f'{self.path}/{self.fecha_corte}_tabla_reservados.png',height = 250,  width = 1100, engine = 'orca')
-        self.tb_materiales.write_image(f'{self.path}/{self.fecha_corte}_tabla_materiales.png',height = 145,  width = 500, engine = 'orca')
-        self.tb_act_fijo.write_image(f'{self.path}/{self.fecha_corte}_tabla_act_fijo.png',height = 150,  width = 500, engine = 'orca')
-        self.tb_gasto_int.write_image(f'{self.path}/{self.fecha_corte}_tabla_gasto_int.png',height = 145,  width = 500, engine = 'orca')
-        self.tb_receta.write_image(f'{self.path}/{self.fecha_corte}_tabla_receta.png',height = 90,  width = 500, engine = 'orca')
-        self.tb_bolsa.write_image(f'{self.path}/{self.fecha_corte}_tabla_bolsa.png',height = 1150,  width = 500, engine = 'orca')
+        self.fig_torta_local.write_image(f'{self.path}/torta.png', engine = 'orca') 
+        self.ten_creac_x_año.write_image(f'{self.path}/tendencia_creacion_f4_x_años.png', width = 800, height = 450, engine = 'orca')
+        self.grafica_f4_sem.write_image(f'{self.path}/grafica_f4_sem.png', width = 700, height = 500, engine = 'orca')
+        self.graf_f4_pos_causa.write_image(f'{self.path}/clasificacion_posibles_causas_22.png', width = 1800, height = 900, engine = 'orca') 
+        self.fig_clasificado.write_image(f'{self.path}/grafica_total.png', height = 600,  width = 700, engine='orca')
+        self.fig_clasificado_local.write_image(f'{self.path}/grafica_total_por_local.png', height = 600,  width = 1200,engine = 'orca')
+        self.fig_clas_mes_local.write_image(f'{self.path}/grafica_total_por_mes.png', height = 550,  width = 500,engine = 'orca')
+        self.f4_mespc.write_image(f'{self.path}/tienda_mes_motivo.png', height = 500,  width =900,engine = 'orca')
+        self.f4_mespc_cd.write_image(f'{self.path}/cd_mm.png', engine = 'orca',height = 500,  width = 900)
+        self.fig_torta_linea.write_image(f'{self.path}/torta_linea.png', height = 800,  width = 700,engine = 'orca')
+        self.fig_f4_linea_mes.write_image(f'{self.path}/grafica_linea_x_mes.png', height = 700,  width = 900,engine = 'orca')
+        self.fig_f4_linea_motivo.write_image(f'{self.path}/f4_linea_motivo.png', height = 800,  width = 1000,engine = 'orca')
+        self.fig_lin_local.write_image(f'{self.path}/linea_local.png', height = 700,  width = 800, engine = 'orca')
+        self.fig_f4_marca.write_image(f'{self.path}/grafica_averia_x_mes_y_marca.png', height = 900,  width = 900,engine = 'orca')
+        self.fig_marca_locales.write_image(f'{self.path}/{self.marc}_local.png', height = 700,  width = 500, engine = 'orca')
+        self.fig_marcas_calidad.write_image(f'{self.path}/marca_calidad.png', height = 700,  width = 800, engine = 'orca')
+        self.fig_pant_rotas.write_image(f'{self.path}/pantallas_rotas.png', height = 800,  width = 650, engine = 'orca')
+        self.f4_mespc_tot.write_image(f'{self.path}/mes_f4_motivo_compañia.png', height = 700,  width = 800, engine = 'orca')
+        self.tb_averias.write_image(f'{self.path}/tabla_averias.png',height = 400,  width = 1100, engine = 'orca')
+        self.tb_p_rotas.write_image(f'{self.path}/tabla_pantallas_rotas.png',height = 400,  width = 1100, engine = 'orca')
+        self.tb_calidad.write_image(f'{self.path}/tabla_calidad.png',height = 370,  width = 900, engine = 'orca')
+        self.tb_loc_pant.write_image(f'{self.path}/tabla_loc_pant.png',height = 600,  width = 400, engine = 'orca')
+        self.tb_prod_pant.write_image(f'{self.path}/tabla_prod_pant.png',height = 340,  width = 600, engine = 'orca')
+        self.fig_torta_anu.write_image(f'{self.path}/pie_anulados.png',height = 400,  width = 400, engine = 'orca')
+        self.graf_anul_mes.write_image(f'{self.path}/anulados_mes.png',height = 350,  width = 800, engine = 'orca')
+        self.tb_anulados.write_image(f'{self.path}/tabla_anulados.png',height = 400,  width = 1200, engine = 'orca')
+        self.grap_enviado_mes.write_image(f'{self.path}/enviados.png',height = 300,  width = 800, engine = 'orca')
+        self.grap_reg.write_image(f'{self.path}/registrados.png',height = 300,  width = 800, engine = 'orca')
+        self.tb_enviados.write_image(f'{self.path}/tabla_enviados.png',height = 150,  width = 1000, engine = 'orca') 
+        if self.f4_registrados.shape[0] > 0:
+            self.tb_registrados.write_image(f'{self.path}/tabla_registrados.png',height = 150,  width = 800, engine = 'orca')
+        self.tb_reservados.write_image(f'{self.path}/tabla_reservados.png',height = 400,  width = 1300, engine = 'orca')
+        self.tb_materiales.write_image(f'{self.path}/tabla_materiales.png',height = 145,  width = 500, engine = 'orca')
+        self.tb_act_fijo.write_image(f'{self.path}/tabla_act_fijo.png',height = 200,  width = 500, engine = 'orca')
+        self.tb_gasto_int.write_image(f'{self.path}/tabla_gasto_int.png',height = 145,  width = 500, engine = 'orca')
+        self.tb_receta.write_image(f'{self.path}/tabla_receta.png',height = 90,  width = 500, engine = 'orca')
+        self.tb_bolsa.write_image(f'{self.path}/tabla_bolsa.png',height = 500,  width = 500, engine = 'orca')
+        self.fig_linea_mes_mot.write_image(f'{self.path}/fig_linea_mes_mot.png', height = 700,  width = 700, engine = 'orca')
+
     
 def f4_figs(df, pc_order, titulo):
     orden = ord_mes(df,'mes') # TODO leer desde var_f4

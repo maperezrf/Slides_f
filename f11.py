@@ -1,16 +1,14 @@
-# Libraries
 import pandas as pd
 import plotly.express as px
-from   datetime import datetime
+from   datetime import datetime, timedelta
 from data import var_f11, var_global
-from general import set_columns_nunique, set_columns_sum, make_tables
-import plotly.graph_objects as go
+from general import set_columns_nunique, set_columns_sum, make_tables, set_antiguedad
 
 class F11():
     
     # Constants
     dt_string = datetime.now().strftime('%y%m%d')
-    mes = ['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22', 'Feb-22', 'Mar-22', 'Apr-22', 'May-22'] # Editar esta lista cada vez 
+    mes = ['Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21', 'Jan-22', 'Feb-22', 'Mar-22', 'Apr-22', 'May-22','Jun-22','Jul-22'] # Editar esta lista cada vez 
     rango_fechas = []
     f11_tcosto  = None
     f11_tm90_costo  = None
@@ -20,11 +18,11 @@ class F11():
     def __init__(self, frango, fcorte, f11_name) -> None:
         self.fcorte = fcorte
         self.rango_fechas = frango
-        self.f11 = pd.read_csv(var_f11['path_df'] + f11_name + '.csv', dtype='object', sep=';')
+        self.f11 = pd.read_csv(var_f11['path_df'] + f11_name + '.csv', dtype='object', sep=';', encoding= 'latin-1')
         self.path = f"{var_global['path_cortes']}/{fcorte}_corte/images/f11"
         self.transform()
         self.f11 = self.f11.sort_values(var_f11['fech_creacion'])
-        self.set_antiguedad()
+        self.f11  = set_antiguedad(self.f11, 'DIAS', 'f11')
         self.f11_rf = self.f11_filters() # F11 con todos los filtros iniciales
         self.f11_m90 = self.fltr_riesgo(self.f11_rf) # F11 empresa abiertos mayores a 90 días de creados
         self.print_numbers()
@@ -62,16 +60,8 @@ class F11():
         f11_emp_abiertos = fltr_abiertos(f11_st_rf12)
         return f11_emp_abiertos
 
-    def set_antiguedad(self):
-        self.f11.loc[self.f11['DIAS'] <30, 'age'] = 'Menor a 30' 
-        self.f11.loc[(self.f11['DIAS']>=30)&(self.f11['DIAS']<=60), 'age'] ='30 a 60'
-        self.f11.loc[(self.f11['DIAS']>=60)&(self.f11['DIAS']<=90), 'age'] ='61 a 90'
-        self.f11.loc[(self.f11['DIAS']>=90)&(self.f11['DIAS']<=120), 'age'] ='91 a 120'
-        self.f11.loc[(self.f11['DIAS']>=120)&(self.f11['DIAS']<=180), 'age'] ='121 a 180'
-        self.f11.loc[(self.f11['DIAS']>=181), 'age'] = 'Mayor a 181'
-
     def fltr_riesgo(self, df):
-        return df.loc[df[var_f11['mes']].isin(self.mes)].reset_index(drop=True) # TODO mejorar estructura
+        return df.loc[df['DIAS'] >90]
 
     def load_trend_files(self):
         self.f11_tcosto = pd.read_excel(var_f11['trend_path'], sheet_name='f11_abiertos_costo')
@@ -195,14 +185,14 @@ class F11():
         f11_es_cantidad.write_image(F"{self.path}/{self.fcorte}_f11_empresa_abiertos_sede_cantidad.png",scale=1, height=800,width=850, engine='orca')
 
     def generate_tables(self,f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd):
-        tb_emp_gen = make_tables(f11_empresa,'SERVICIO','GRUPO','TOTAL_COSTO')
-        tb_cl_gen = make_tables(f11_cliente,'SERVICIO','GRUPO','TOTAL_COSTO')
-        tb_emp_gen_ant = make_tables(f11_empresa,'SERVICIO','age','TOTAL_COSTO','ant')
-        tb_cl_gen_ant = make_tables(f11_cliente,'SERVICIO','age','TOTAL_COSTO','ant')
-        tb_emp_cd = make_tables(f11_emp_cd,'SERVICIO','age','TOTAL_COSTO','ant')
-        tb_emp_no_cd = make_tables(f11_emp_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
-        tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
-        tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age','TOTAL_COSTO','ant')
+        tb_emp_gen = make_tables(f11_empresa,'SERVICIO','GRUPO',var_f11['costo'])
+        tb_cl_gen = make_tables(f11_cliente,'SERVICIO','GRUPO',var_f11['costo'])
+        tb_emp_gen_ant = make_tables(f11_empresa,'SERVICIO','age',var_f11['costo'],'ant')
+        tb_cl_gen_ant = make_tables(f11_cliente,'SERVICIO','age',var_f11['costo'],'ant')
+        tb_emp_cd = make_tables(f11_emp_cd,'SERVICIO','age',var_f11['costo'],'ant')
+        tb_emp_no_cd = make_tables(f11_emp_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'ant')
+        tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'ant')
+        tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'ant')
 
         tb_emp_gen.write_image(f'{self.path}/{self.fcorte}tb_emp_gral.png',height = 265, width = 1100, engine='orca')
         tb_cl_gen.write_image(f'{self.path}/{self.fcorte}tb_cl_gral.png',height = 265, width = 1100, engine='orca')

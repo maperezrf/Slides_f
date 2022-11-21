@@ -3,7 +3,7 @@ from config.user_path import  path_ea, path_ea
 var_global ={'path_cortes':f'{path_ea}/SEGUIMIENTO-FS/cortes',
 'path_ppts':f'{path_ea}/SEGUIMIENTO-FS/presentaciones/'}
 
-var_main = {'pah_plantilla': f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/plantilla_seg_fs.pptx'}
+var_main = {'pah_plantilla': f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/plantilla.pptx'}
 
 var_f11 = {
     'path_df': f'{path_ea}/DATA/F11/',
@@ -17,7 +17,7 @@ var_f11 = {
     'estados_abiertos':['Despachado','Espera Retiro Clte.','Ingresado','Entrega parcial'],
     'fecha_inicial':'2021-01-01', 
     'mes':'MES', 
-    'costo':'TOTAL_COSTO',
+    'costo':'COSTO_PROMEDIO',
     'grupo':'GRUPO',
     'fecha_corte':'FECHA_CORTE', 
     'servicio':'SERVICIO',
@@ -70,4 +70,12 @@ var_f3 = {
     'abiertos': ['enviado', 'reservado'],
     'cerrados' : ['anulado', 'confirmado'],
     'tipo_tp' : ['Producto','Market place']
+}
+
+var_f5 = {
+     'path_df':f'{path_ea}/DATA/F5/',
+}
+
+var_f12 = {
+     'path_df':f'{path_ea}/DATA/F12/',
 }
