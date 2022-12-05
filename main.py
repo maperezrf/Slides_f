@@ -48,7 +48,7 @@ def f4():
 def f11():
     f11_file = input('Ingrese nombre de archivo de f11 abiertos .csv (n, de lo contrario): ')
     if f11_file != 'n':
-        frizq = datetime.strptime('2022-02-20', '%Y-%m-%d')
+        frizq = datetime.strptime('2022-07-01', '%Y-%m-%d')
         frder = datetime.strptime(fecha_corte, '%y%m%d') + timedelta(days=30)
         rango_de_fechas = [frizq, frder]
         f11 = F11(rango_de_fechas, fecha_corte, f11_file)
