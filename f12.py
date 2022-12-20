@@ -24,7 +24,7 @@ class F12():
         
     def transform(self):
         print("Transformando datos...")
-        self.f12['Fecha Estado'] = pd.to_datetime(self.f12['Fecha Estado'])
+        self.f12['Fecha Estado'] = pd.to_datetime(self.f12['Fecha Estado'], format='%d/%m/%Y')
         self.f12['Importe Total'] = pd.to_numeric(self.f12['Importe Total'])
         self.f12 = self.f12.loc[self.f12['Fecha Estado'] >= '2022-01-01'].reset_index()
         self.f12.loc[self.f12['Fecha Estado'].notna(), 'mes_creacion'] = self.f12.loc[self.f12['Fecha Estado'].notna(), 'Fecha Estado'].apply(lambda  x : x.strftime('%b'))
@@ -35,6 +35,7 @@ class F12():
         self.f12['DIAS'] = self.f12['DIAS'].apply(lambda x :x.days)
         self.f12 = set_antiguedad(self.f12, 'DIAS', 'f11')
         self.f12.rename(columns={'Estado Actual':'Estado'}, inplace=True)
+        self.f12.to_excel('f12.xlsx')
 
     def make_table(self):
         print('Generando tabla...')

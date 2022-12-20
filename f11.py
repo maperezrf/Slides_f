@@ -137,7 +137,7 @@ class F11():
         gb_f11_3m_cant_grupo = self.f11_m90.groupby(var_f11['grupo'])[var_f11['f11_id']].nunique().reset_index().set_index(var_f11['grupo']) # Calcula los totales de costo por grupo 
         self.fig_f11_cantidad(gb_f11_gm_cant, gb_f11_3m_cant_grupo, orden_grupo_cant, orden_mes_cant, total_abierto_cant)
         
-        #Generación tablas 
+        #Generación tablas
         f11_initial = fltr_fecha_desde(self.f11)
         f11_abiertos = fltr_abiertos(f11_initial)
         f11_empresa = fltr_empresa(f11_abiertos)
@@ -155,6 +155,7 @@ class F11():
         f11_empresa_sede.update_layout(font=dict(size=14))
 
         # f11_empresa_sede.add_shape(type="rect",xref="paper", yref="paper",x0=0, y0=0,x1=0.62, y1=1,line=dict(color="red", width=2,))
+        print(f'{orden_mes[0]}-----------------------------')
         mes_ref = orden_mes[0] 
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.9*1e9, text= f"Total > 90 días = {gb_annotations.sum()[0]/1e6:,.0f}M", showarrow=False, font = dict (color = "red",size = 17), xanchor='left') # TODO Estas líneas pueden agrupar, en un solo add_annotation, utilizando <br>, y se alinea mejor utilizando fig.update_annotations(align="left") 
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.8*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
