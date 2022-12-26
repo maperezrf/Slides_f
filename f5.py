@@ -23,8 +23,9 @@ class F5():
 
     def transform(self):
         print("Transformando datos...")
-        self.f5['TRF_ENTRY_DATE'] = pd.to_datetime(self.f5['TRF_ENTRY_DATE'])
-        self.f5['TRF_SHIP_DATE'] = pd.to_datetime(self.f5['TRF_SHIP_DATE'] )
+        print(self.f5['TRF_ENTRY_DATE'])
+        self.f5['TRF_ENTRY_DATE'] = pd.to_datetime(self.f5['TRF_ENTRY_DATE'], format='%Y/%m/%d')
+        self.f5['TRF_SHIP_DATE'] = pd.to_datetime(self.f5['TRF_SHIP_DATE'], format='%Y/%m/%d')
         self.f5['TOTAL_COST'] = pd.to_numeric(self.f5['TOTAL_COST'])
         self.f5 = self.f5.loc[self.f5['TRF_ENTRY_DATE'] >= '2022-01-01'].reset_index()
         
