@@ -70,6 +70,5 @@ class F12():
         self.tabla_estado.write_image(f'{self.path}/tb_estados.png',width=1800, height=400, engine='orca')
         self.tabla_ruta.write_image(f'{self.path}/tb_ruta.png',width = 1800, height=1500, engine='orca')
         self.tabla_dgitado.write_image(f'{self.path}/tb_digitado.png',width= 1800, height=1500, engine='orca'       )
-        self.tabla_riesgo.write_image(f'{self.path}/tb_riesgo.png',width= 1800, height=1500, engine='orca')
         # self.make_pie().write_image(f'{self.path}/pie.png',width=400, height=400, engine='orca')
         # self.make_bar().write_image(f'{self.path}/meses.png',width=800, height=400, engine='orca')
