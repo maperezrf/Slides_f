@@ -62,9 +62,9 @@ class F5():
         self.f5_res = self.f5.loc[(self.f5['Estado'] == 'Reservados') & (self.f5['NAME_SHIP'].isin(f5_list))]
         self.f5_res.rename(columns={'NAME_SHIP' : 'Local que envia'}, inplace=True)
 
-        self.tb_env = make_tables(self.f5_env, 'Local que recibe', 'age', 'TOTAL_COST' , 'ant')
-        self.tb_res = make_tables(self.f5_res, 'Local que envia', 'age', 'TOTAL_COST' , 'ant')
-        self.tabla_gral = make_tables(f5_2,'Estado', 'age', 'TOTAL_COST', 'ant')
+        self.tb_env = make_tables(self.f5_env, 'Local que recibe', 'age', 'TOTAL_COST' , types = 'ant')
+        self.tb_res = make_tables(self.f5_res, 'Local que envia', 'age', 'TOTAL_COST' , types = 'ant')
+        self.tabla_gral = make_tables(f5_2,'Estado', 'age', 'TOTAL_COST', types = 'ant')
     
     def save_images(self):
         print('Guardando tablas...')

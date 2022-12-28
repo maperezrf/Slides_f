@@ -62,36 +62,40 @@ def ord_mes(df,column,f = "general", orden = None):
 def ord_num(df,column,colum_num):
     return df.groupby(column)[colum_num].sum().sort_values(ascending=False).reset_index()[column].unique()
 
-def make_tables(df,rows,column,sum, types = None ):
-    pt_df = df.pivot_table(index = rows, columns = column, values = sum, aggfunc = "sum", margins = True,  margins_name = 'Total', fill_value = 0).reset_index()
+def make_tables(df,rows,column,sum, f = None ,types = None):
+    pt_df = df.pivot_table(index = rows, columns = column, values = sum, aggfunc = "sum", margins = True,  margins_name = 'Total General', fill_value = 0).reset_index()
     if types == None:
-        pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']]) 
+        pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total General'].sort_values('Total General',ascending = False), pt_df.loc[pt_df[rows] == 'Total General']]) 
     if types == "meses":
-        pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']]) 
-        pt_df = pt_df[[rows] + ord_mes(df,column) + ['Total'] ]
+        pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total General'].sort_values('Total General',ascending = False), pt_df.loc[pt_df[rows] == 'Total General']]) 
+        pt_df = pt_df[[rows] + ord_mes(df,column) + ['Total General'] ]
     elif types == "loc":
-        pt_df.rename(columns={rows:'Local',sum:'Total'},inplace=True)
-        pt_df = pd.concat([pt_df.loc[pt_df['Local']!= 'Total'].sort_values('Total',ascending=False), pt_df.loc[pt_df['Local']=='Total']])
+        pt_df.rename(columns={rows:'Local',sum:'Total General'},inplace=True)
+        pt_df = pd.concat([pt_df.loc[pt_df['Local']!= 'Total General'].sort_values('Total General',ascending=False), pt_df.loc[pt_df['Local']=='Total General']])
     elif types == "prod":
         pt_df.rename(columns={rows:"Producto",sum:"Total"},inplace=True)
         pt_df.sort_values('Total',ascending=False, inplace = True)
         pt_df = pt_df.iloc[1:11]
     elif types == "ant":
-        ord_antiguedad = ord_mes(df, column, 'ant')
-        pt_df = pd.concat([pt_df.loc[pt_df[rows] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df[rows] == 'Total']])
+        ord_antiguedad = ord_mes(df, 'age', 'ant')
         ord_antiguedad.insert(0, rows)
-        ord_antiguedad.append('Total')
+        ord_antiguedad.append('Total General')
+        pt_df = pt_df[ord_antiguedad]
+        set_col_riesgo(pt_df, f, rows)
+        ord_antiguedad = ord_mes(df, 'age', 'ant')
+        ord_antiguedad.insert(0, rows)
+        ord_antiguedad.extend(['Total Riesgo', 'Total General'])
         pt_df = pt_df[ord_antiguedad]
     elif types == "local":
         pt_df.rename(columns={rows:"Local"},inplace=True)
-        pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total'].sort_values('Total',ascending = False), pt_df.loc[pt_df["Local"] == 'Total']])
+        pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total General'].sort_values('Total General',ascending = False), pt_df.loc[pt_df["Local"] == 'Total General']])
         meses = ["Inv","Ene","Jan","Feb","Mar","Abr","Apr","May","Jun","Jul","Ago","Aug","Sep","Oct","Nov","Dic","Dec"]
         list_mes = []
         for mes in meses:
             for i in pt_df.columns: 
                     if mes in i:
                         list_mes.append(i)
-        pt_df= pt_df[["Local"]+ list_mes +['Total']]
+        pt_df= pt_df[["Local"]+ list_mes +['Total General']]
 
     columns = pt_df.columns.to_list()
     listado = []
@@ -131,3 +135,13 @@ def set_age(df, column, age):
     df.loc[(df[column] > 120)&(df[column]<=180), age]='121 a 180'
     df.loc[(df[column] > 180), age] ='Mayor a 181'
     return df
+
+def set_col_riesgo(df,f,rows):
+    if f == 'f11':
+        col = 4
+    else:
+        col = 2
+    lista_col = df.loc[df[rows]!= 'Total'].iloc[:,col:-1].columns
+    df['Total Riesgo'] = 0
+    for i in range(len(lista_col)):
+        df['Total Riesgo'] = df['Total Riesgo'] + df[lista_col[i]]

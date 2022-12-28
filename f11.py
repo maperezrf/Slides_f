@@ -161,7 +161,7 @@ class F11():
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.8*1e9, text= f"CD = {gb_annotations.loc['CD'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.7*1e9, text= f"TIENDAS = {gb_annotations.loc['TIENDAS'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
         f11_empresa_sede.add_annotation(x=mes_ref, y=0.6*1e9, text= f"BODEGA PRODUCTO EN PROCESO = {gb_annotations.loc['BODEGA PRODUCTO EN PROCESO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
-        f11_empresa_sede.add_annotation(x=mes_ref, y=0.5*1e9, text= f"DVD ADMINISTRATIVO = {gb_annotations.loc['DVD ADMINISTRATIVO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
+        # f11_empresa_sede.add_annotation(x=mes_ref, y=0.5*1e9, text= f"DVD ADMINISTRATIVO = {gb_annotations.loc['DVD ADMINISTRATIVO'][0]/1e6:,.0f}M",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
 
         f11_empresa_sede.layout.yaxis.title.text='Total costo promedio'
         f11_empresa_sede.layout.xaxis.title.text='Mes de creación'
@@ -179,7 +179,7 @@ class F11():
         f11_es_cantidad.add_annotation(x=mes_ref, y=1000,text= f"CD = {gb_annotations.loc['CD'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
         f11_es_cantidad.add_annotation(x=mes_ref, y=900,text= f"TIENDAS = {gb_annotations.loc['TIENDAS'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
         f11_es_cantidad.add_annotation(x=mes_ref, y=800,text= f"BODEGA PRODUCTO EN PROCESO = {gb_annotations.loc['BODEGA PRODUCTO EN PROCESO'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
-        f11_es_cantidad.add_annotation(x=mes_ref, y=700,text= f"DVD ADMINISTRATIVO = {gb_annotations.loc['DVD ADMINISTRATIVO'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
+        # f11_es_cantidad.add_annotation(x=mes_ref, y=700,text= f"DVD ADMINISTRATIVO = {gb_annotations.loc['DVD ADMINISTRATIVO'][0]:,.0f} folios",showarrow=False,font = dict (color = "red",size = 14), xanchor='left')
 
         f11_es_cantidad.layout.yaxis.title.text='Cantidad de folios de F11'
         f11_es_cantidad.layout.xaxis.title.text='Mes de creación'
@@ -188,21 +188,21 @@ class F11():
     def generate_tables(self,f11_empresa,f11_cliente,f11_emp_cd,f11_emp_no_cd,f11_cl_no_cd,f11_cl_cd):
         tb_emp_gen = make_tables(f11_empresa,'SERVICIO','GRUPO',var_f11['costo'])
         tb_cl_gen = make_tables(f11_cliente,'SERVICIO','GRUPO',var_f11['costo'])
-        tb_emp_gen_ant = make_tables(f11_empresa,'SERVICIO','age',var_f11['costo'],'ant')
-        tb_cl_gen_ant = make_tables(f11_cliente,'SERVICIO','age',var_f11['costo'],'ant')
-        tb_emp_cd = make_tables(f11_emp_cd,'SERVICIO','age',var_f11['costo'],'ant')
-        tb_emp_no_cd = make_tables(f11_emp_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'ant')
-        tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'ant')
-        tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'ant')
+        tb_emp_gen_ant = make_tables(f11_empresa,'SERVICIO','age',var_f11['costo'], 'f11','ant')
+        tb_cl_gen_ant = make_tables(f11_cliente,'SERVICIO','age',var_f11['costo'],'f11', 'ant')
+        tb_emp_cd = make_tables(f11_emp_cd,'SERVICIO','age',var_f11['costo'],'f11','ant')
+        tb_emp_no_cd = make_tables(f11_emp_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'f11','ant')
+        tb_cl_no_cd = make_tables(f11_cl_no_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'f11','ant')
+        tb_cl_cd = make_tables(f11_cl_cd.sort_values('DIAS',ascending=True),'SERVICIO','age',var_f11['costo'],'f11','ant')
 
-        tb_emp_gen.write_image(f'{self.path}/{self.fcorte}tb_emp_gral.png',height = 265, width = 1100, engine='orca')
-        tb_cl_gen.write_image(f'{self.path}/{self.fcorte}tb_cl_gral.png',height = 265, width = 1100, engine='orca')
-        tb_emp_cd.write_image(f'{self.path}/{self.fcorte}tb_emp_cd.png',height = 265, width = 1000, engine='orca')
-        tb_emp_no_cd.write_image(f'{self.path}/{self.fcorte}tb_emp_no_cd.png',height = 265, width = 1000, engine='orca')
-        tb_cl_no_cd.write_image(f'{self.path}/{self.fcorte}tb_cl_no_cd.png',height = 265, width = 1000, engine='orca')
-        tb_cl_cd.write_image(f'{self.path}/{self.fcorte}tb_cl_cd.png',height = 265, width = 1000, engine='orca')
-        tb_emp_gen_ant.write_image(f'{self.path}/{self.fcorte}tb_emp_ant.png',height = 265, width = 1000, engine='orca')
-        tb_cl_gen_ant.write_image(f'{self.path}/{self.fcorte}tb_cl_ant.png',height = 265, width = 1000, engine='orca')
+        tb_emp_gen.write_image(f'{self.path}/{self.fcorte}tb_emp_gral.png',height = 265, width = 1500, engine='orca')
+        tb_cl_gen.write_image(f'{self.path}/{self.fcorte}tb_cl_gral.png',height = 265, width = 1500, engine='orca')
+        tb_emp_cd.write_image(f'{self.path}/{self.fcorte}tb_emp_cd.png',height = 265, width = 1500, engine='orca')
+        tb_emp_no_cd.write_image(f'{self.path}/{self.fcorte}tb_emp_no_cd.png',height = 265, width = 1500, engine='orca')
+        tb_cl_no_cd.write_image(f'{self.path}/{self.fcorte}tb_cl_no_cd.png',height = 265, width = 1500, engine='orca')
+        tb_cl_cd.write_image(f'{self.path}/{self.fcorte}tb_cl_cd.png',height = 265, width = 1500, engine='orca')
+        tb_emp_gen_ant.write_image(f'{self.path}/{self.fcorte}tb_emp_ant.png',height = 265, width = 1500, engine='orca')
+        tb_cl_gen_ant.write_image(f'{self.path}/{self.fcorte}tb_cl_ant.png',height = 265, width = 1500, engine='orca')
 
     # ---------------- Trend methods 
     def get_tendencias_costo(self):

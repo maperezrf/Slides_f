@@ -43,9 +43,9 @@ class F12():
         f12_ab.rename(columns={'Local Abastecedor': 'Local abastecimiento'}, inplace= True)
         f12_digitado = f12_ab.loc[f12_ab['Estado'] == 'DIGITADO']
         f12_ruta = f12_ab.loc[f12_ab['Estado'] == 'EN RUTA']
-        self.tabla_estado = make_tables(f12_ab, 'Estado', 'age', 'Importe Total', 'ant' )
-        self.tabla_ruta = make_tables(f12_ruta, 'Local abastecimiento', 'age', 'Importe Total', 'ant' )
-        self.tabla_dgitado = make_tables(f12_digitado, 'Local abastecimiento', 'age', 'Importe Total', 'ant' )
+        self.tabla_estado = make_tables(f12_ab, 'Estado', 'age', 'Importe Total', types = 'ant' )
+        self.tabla_ruta = make_tables(f12_ruta, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
+        self.tabla_dgitado = make_tables(f12_digitado, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
         
 
     def make_pie(self):

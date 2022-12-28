@@ -30,7 +30,7 @@ class F3():
 
     def set_f3_sin_sop (self):
         f3_ss = pd.read_csv('input/221024-1728-pendientes partes 1 de F3 sin soportes-output.csv',sep=';', dtype=str)
-        print(f'{f3_ss} total del archivo que ingresa')
+        print(f'{f3_ss.shape[0]} total del archivo que ingresa')
         list_f3_ss = f3_ss['NRO_DEVOLUCION'].tolist()
         self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
         print(f"{self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss)][var_f3['f3_id']].nunique()} cruzaron con planilla de f3" )
@@ -71,7 +71,6 @@ class F3():
         self.f3_ab_pr_mkp =self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['abiertos'])].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
         self.f3_ab_mkp = self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp[var_f3['tipo_producto']] ==var_f3['tipo_tp'][1]].reset_index(drop = True) # [x] si es variable global entonces debe ir en el init o en inialización
         self.f3_env_pr_mkp['mes_env'] = self.f3_env_pr_mkp[var_f3['fecha_envio']].apply(lambda x : x.strftime('%b')) 
-        print(self.f3_env_pr_mkp['age'])
         self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp['age'] == 'Menor a 30' ,'mayor a 30'] = 'n'
         self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp['age'] != 'Menor a 30' ,'mayor a 30'] = 'y'
         self.set_cortes(f3_cerrados)
@@ -256,7 +255,7 @@ class F3():
     def generate_table(self):
         self.f3_ab_pr_mkp = self.f3_ab_pr_mkp.rename(columns={'descripcion6':'Estado'})
         self.f3_ab_pr_mkp['Estado'] = self.f3_ab_pr_mkp['Estado'].str.capitalize()  
-        return make_tables(self.f3_ab_pr_mkp,'Estado','age','cant*costoprmd','ant')
+        return make_tables(self.f3_ab_pr_mkp,'Estado','age','cant*costoprmd', types = 'ant')
 
     # Saving graphs 
     def save_graf(self): 
@@ -268,7 +267,7 @@ class F3():
         self.graf_tend_prod.write_image(f'{self.path}/f3_tendencia_Producto.png',width=500, height=400, engine='orca')
         self.fig_prd_costo.write_image(f'{self.path}/f3_cerrado_producto_costo.png',width=500, height=400, engine='orca')
         self.fig_mkp_costo.write_image(f'{self.path}/f3_cerrado_mkp_costo.png',width=500, height=400, engine='orca')
-        self.generate_table().write_image(f'{self.path}/f3_tabla_res_env.png',width=1000, height=120, engine='orca')
+        self.generate_table().write_image(f'{self.path}/f3_tabla_res_env.png',width=1300, height=120, engine='orca')
 
         # # Graphs x cant
         # self.graf_f3_prd_mkp_num.write_image(f'{self.path}/f3_abiertos_fecha_reserva_cant.png' ,width=600, height=350, engine='orca')
