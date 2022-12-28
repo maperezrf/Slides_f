@@ -29,7 +29,7 @@ class F3():
         return self.path
 
     def set_f3_sin_sop (self):
-        f3_ss = pd.read_csv('input/221024-1728-pendientes partes 1 de F3 sin soportes-output.csv',sep=';', dtype=str)
+        f3_ss = pd.read_csv('input/221219_f3_sin_soporte.csv',sep=';', dtype=str)
         print(f'{f3_ss} total del archivo que ingresa')
         list_f3_ss = f3_ss['NRO_DEVOLUCION'].tolist()
         self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
@@ -78,7 +78,7 @@ class F3():
 
     def set_cortes(self, f3_cerrado):
         orden_x = []
-        fecha_in = "2022-07-01"
+        fecha_in = "2022-09-01"
         f_in = datetime.strptime(fecha_in,'%Y-%m-%d')
         f_fin = f_in + timedelta(days=7)
         while f_fin <= datetime.now():

@@ -43,6 +43,8 @@ class F12():
         f12_ab.rename(columns={'Local Abastecedor': 'Local abastecimiento'}, inplace= True)
         f12_digitado = f12_ab.loc[f12_ab['Estado'] == 'DIGITADO']
         f12_ruta = f12_ab.loc[f12_ab['Estado'] == 'EN RUTA']
+        f12_riesgo = f12_ab.loc[f12_ab['age'] != 'Menor a 30']
+        self.tabla_riesgo = make_tables(f12_riesgo, 'Estado', 'Importe Total' , None)
         self.tabla_estado = make_tables(f12_ab, 'Estado', 'age', 'Importe Total', 'ant' )
         self.tabla_ruta = make_tables(f12_ruta, 'Local abastecimiento', 'age', 'Importe Total', 'ant' )
         self.tabla_dgitado = make_tables(f12_digitado, 'Local abastecimiento', 'age', 'Importe Total', 'ant' )
@@ -67,9 +69,9 @@ class F12():
 
     def save_images(self):
         print('Guardando imagenes')
-        self.tabla_estado.write_image(f'{self.path}/tb_estados.png',width=1800, height=400, engine='orca')
-        self.tabla_ruta.write_image(f'{self.path}/tb_ruta.png',width = 1800, height=1500, engine='orca')
-        self.tabla_dgitado.write_image(f'{self.path}/tb_digitado.png',width= 1800, height=1500, engine='orca')
-
+        # self.tabla_estado.write_image(f'{self.path}/tb_estados.png',width=1800, height=400, engine='orca')
+        # self.tabla_ruta.write_image(f'{self.path}/tb_ruta.png',width = 1800, height=1500, engine='orca')
+        # self.tabla_dgitado.write_image(f'{self.path}/tb_digitado.png',width= 1800, height=1500, engine='orca'       )
+        self.tabla_riesgo.write_image(f'{self.path}/tb_riesgo.png',width= 1800, height=1500, engine='orca')
         # self.make_pie().write_image(f'{self.path}/pie.png',width=400, height=400, engine='orca')
         # self.make_bar().write_image(f'{self.path}/meses.png',width=800, height=400, engine='orca')
