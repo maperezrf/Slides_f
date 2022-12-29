@@ -34,7 +34,6 @@ class F3():
         list_f3_ss = f3_ss['NRO_DEVOLUCION'].tolist()
         self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
         print(f"{self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss)][var_f3['f3_id']].nunique()} cruzaron con planilla de f3" )
-        self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss)].to_excel('soporte_f3.xlsx')
 
     def transform(self):
         # F3 planilla
