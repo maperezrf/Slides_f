@@ -31,7 +31,7 @@ class F4():
         return self.path
 
     def concat_f4_21_22(self):
-        self.f4_2022['año'] = '2022' # TODO leer desde var_f4
+        self.f4_2022['año'] = '2023' # TODO leer desde var_f4
         self.f4_21_22 = pd.concat([self.f4_2021,self.f4_2022]) # Esta variable se llama igual que el método, esto puede hacer que python se confunda 
     
     def transform(self):
@@ -90,7 +90,7 @@ class F4():
         m_2021 = f'2021-{month}-01'
         mes = int(month)-1
         from data import  var_global, var_f4
-        t_2022 = self.f4_21_22.loc[(self.f4_21_22[var_f4['tipo_redinv']].str.contains(r"Dado de Baja|dado de baja")) & (self.f4_21_22[var_f4['estado']].str.contains(r'Reservado|reservado')) & (self.f4_21_22[var_f4['fecha_res']] < m_2022) & (self.f4_21_22[var_f4['fecha_res']] >= '2022-01-01')  ][var_f4['costo']].sum()
+        t_2022 = self.f4_21_22.loc[(self.f4_21_22[var_f4['tipo_redinv']].str.contains(r"Dado de Baja|dado de baja")) & (self.f4_21_22[var_f4['estado']].str.contains(r'Reservado|reservado')) & (self.f4_21_22[var_f4['fecha_res']] < m_2022) & (self.f4_21_22[var_f4['fecha_res']] >= '2023-01-01')  ][var_f4['costo']].sum()
         t_2021 = self.f4_21_22.loc[(self.f4_21_22[var_f4['tipo_redinv']].str.contains(r"Dado de Baja|dado de baja")) & (self.f4_21_22[var_f4['estado']].str.contains(r'Reservado|reservado')) & (self.f4_21_22[var_f4['fecha_res']] < m_2021)][var_f4['costo']].sum()
         return [f'{round(t_2021/1e6):,.0f} M', f'{round(t_2022/1e6):,.0f} M',  f'{round((t_2021/1e6) - (t_2022/1e6)):,.0f} M', mes]
 
@@ -159,10 +159,10 @@ class F4():
 
         mes = int(datetime.now().strftime('%m'))
         # print('Cambiar mes de grafica, linea mes')
-        top_5_lin = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2022-12-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-01-01')].groupby([var_f4['desc_linea']])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)['PROD_CAT_DESC'].unique()
+        top_5_lin = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2023-01-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-02-01')].groupby([var_f4['desc_linea']])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)['PROD_CAT_DESC'].unique()
         lista_f = []
         for i in top_5_lin:
-            lista = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2022-12-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-01-01') & (self.f4_2022_res[var_f4['desc_linea']] == i)].groupby([var_f4['desc_linea'],'Posible Causa'])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)
+            lista = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2023-01-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-02-01') & (self.f4_2022_res[var_f4['desc_linea']] == i)].groupby([var_f4['desc_linea'],'Posible Causa'])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)
             lista_f.append(lista)
             linea_mt_mes = pd.concat(lista_f).reset_index(drop=True)
 
@@ -177,7 +177,7 @@ class F4():
         self.tb_enviados = make_tables(self.f4_enviados,var_f4['tipo_redinv'], "mes", var_f4['costo'], types="local")
         if self.f4_registrados.shape[0] > 0:
             self.tb_registrados = make_tables(self.f4_registrados, "local_agg", "mes_creacion", var_f4['costo'])
-        self.tb_reservados = make_tables(self.f4_reservados, var_f4['tipo_redinv'], "mes_creacion", var_f4['costo'],types="local")
+        self.tb_reservados = make_tables(self.f4_reservados, var_f4['tipo_redinv'], "mes", var_f4['costo'],types="local")
         self.tb_materiales = make_tables(gr_f4_materiales, var_f4['desc_local'], None ,var_f4['costo'], types="loc" )
         self.tb_act_fijo = make_tables(f4_act_fijo, var_f4['desc_local'], None ,var_f4['costo'], types="loc" )
         self.tb_gasto_int = make_tables(f4_gasto_int, var_f4['desc_local'], None ,var_f4['costo'], types="loc" )
@@ -275,7 +275,7 @@ class F4():
     
     def grap_pie_lineas(self, f4_linea):
 
-        self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea en 2022')
+        self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea en 2023')
         self.fig_torta_linea.update_traces( textposition='inside', textinfo = 'percent')
         self.fig_torta_linea.update_layout(font_size=16,legend=dict(yanchor = 'top',xanchor='right', orientation = 'h',y = 0,x = 0.8),font=dict(size=15), margin= dict(l=0,r=0) )
     
@@ -334,7 +334,7 @@ class F4():
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_esp(self):
-        self.marc = "Apple"
+        self.marc = "Benefit"
         marca = self.f4_2022_averia.loc[self.f4_2022_averia[var_f4['marca_']] == self.marc]
         top_5_loc = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()[var_f4['desc_local']].unique()[0:5]                                                             
         grup_marca = marca.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()
@@ -345,7 +345,7 @@ class F4():
         color = unif_colors(grup_marca,'mes')
         self.fig_marca_locales = px.bar(grup_marca, x = var_f4['desc_local'],y = var_f4['costo'],text = var_f4['costo'],color = 'mes',text_auto = '.2s',labels = {var_f4['costo']:'Costo total',var_f4['desc_local']:'Local','mes':'Mes'}, color_discrete_map = color, category_orders = {'mes':orden})
         self.fig_marca_locales.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 10,uniformtext_mode ='show',legend= dict(yanchor = 'auto',xanchor = 'left', orientation = 'v',y = 1),font=dict(size=15),title={'text':f'{self.marc} por local','y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
-        self.fig_marca_locales.update_yaxes(range = [0, 70000000 ], constrain ='domain')
+        self.fig_marca_locales.update_yaxes(range = [0, 50000000 ], constrain ='domain')
         self.fig_marca_locales.update_traces(textangle = 90, textposition = 'outside')
     
     def grap_marca_averia(self, marcas_calidad):
@@ -372,7 +372,7 @@ class F4():
     def grap_anulados_mes(self, gr_anulados_mes):
         orden_num = ord_num(gr_anulados_mes, "local_agg", var_f4['costo'])
         orden_mes = ord_mes(gr_anulados_mes, "mes")
-        gr_anulados_mes = gr_anulados_mes.loc[~gr_anulados_mes['mes'].isin(['Inventario', 'Jan','Feb','Mar','Apr','May'])]
+        #gr_anulados_mes = gr_anulados_mes.loc[~gr_anulados_mes['mes'].isin(['Inventario', 'Jan','Feb','Mar','Apr','May'])]
         ord_mes(gr_anulados_mes, "mes")
         self.graf_anul_mes = px.bar(gr_anulados_mes, y = var_f4['costo'], x = 'local_agg', color = "mes" , text=var_f4['costo'], text_auto='.2s', barmode= "group", category_orders = {'local_agg':orden_num, "mes": orden_mes}, labels = {var_f4['costo'] : "Costo", "local_agg" : "Local", "mes":"Mes"} )
         self.graf_anul_mes.update_layout(legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1), font=dict(size=10), margin=dict(r=0,l=0,t = 50, b =0))
@@ -392,7 +392,7 @@ class F4():
     def graf_linea_mes_mot(self ,linea_mt_mes, mes):
         print('Cambiar mes')
         self.fig_linea_mes_mot = px.bar(linea_mt_mes, x = var_f4['desc_linea'],y = var_f4['costo'], text = var_f4['costo'],color = 'Posible Causa', text_auto ='.2s', barmode = 'group', labels = {var_f4['costo']:'Costo total', var_f4['desc_linea']:'Línea'}) # TODO leer desde var_f4
-        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: Diciembre'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
+        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: Enero'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
         self.fig_linea_mes_mot.update_yaxes(range = [0, linea_mt_mes[var_f4['costo']].max() + (linea_mt_mes[var_f4['costo']].max() * 0.25)], constrain = 'domain')
         self.fig_linea_mes_mot.update_traces(textangle = 90, textposition = 'outside')
 

@@ -33,7 +33,7 @@ var_f11 = {
 
 var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/",
-    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4_2021_prueba2.csv',
+    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4_2022_prueba31.csv',
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'CTECH_KEY',
     'marcas_df':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
@@ -70,7 +70,7 @@ var_f3 = {
     'abiertos': ['enviado', 'reservado'],
     'cerrados' : ['anulado', 'confirmado'],
     'tipo_tp' : ['Producto','Market place']
-}
+} 
 
 var_f5 = {
      'path_df':f'{path_ea}/DATA/F5/',
