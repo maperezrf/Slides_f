@@ -47,8 +47,8 @@ class CLASSIFIER_F4():
     def set_local_agg(self):
         self.f4.loc[self.f4[var_f4["local"]].isin(const.tienda), 'local_agg'] = 'TIENDA'
         self.f4.loc[self.f4[var_f4["local"]].isin(const.cd), 'local_agg'] = 'CD'
-        #self.f4.loc[self.f4[var_f4["local"]] == 3001, 'local_agg'] = 'DVD ADMINISTRATIVO'
-        #self.f4.loc[self.f4[var_f4["local"]] == 11, 'local_agg'] = 'VENTA EMPRESA'
+        self.f4.loc[self.f4[var_f4["local"]] == 3001, 'local_agg'] = 'DVD ADMINISTRATIVO'
+        self.f4.loc[self.f4[var_f4["local"]] == 11, 'local_agg'] = 'VENTA EMPRESA'
         self.f4.loc[self.f4[var_f4["local"]] == 99, 'local_agg'] = 'ADMINISTRATIVO'
         self.f4.loc[self.f4[var_f4["local"]] == 9910, 'local_agg'] = 'BODEGA MAVESA'
         self.f4.loc[self.f4[var_f4["local"]].isna(), 'local_agg'] = 'OTROS'
@@ -77,10 +77,10 @@ class CLASSIFIER_F4():
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='TIENDA') & (self.f4[var_f4['destino']].isna()), 'Posible Causa'] = 'Avería'
         
         # Locales DVD, ADMIN y VENTA EMPRESA
-        #self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='DVD ADMINISTRATIVO') & (self.f4[var_f4["destino"]].str.contains(r'[1][1]\d{7,}', na= False)), 'Posible Causa'] = 'Cierre de F11 - DVD sin recupero'
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='DVD ADMINISTRATIVO') & (self.f4[var_f4["destino"]].str.contains(r'[1][1]\d{7,}', na= False)), 'Posible Causa'] = 'Cierre de F11 - DVD sin recupero'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='ADMINISTRATIVO') & (self.f4[var_f4["destino"]].str.contains(r"cobro a deprisa", na= False)), 'Posible Causa'] = 'Recobro a transportadora (Administrativo)'
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='ADMINISTRATIVO'), 'Posible Causa'] = 'Avería'
-        #self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='VENTA EMPRESA'), 'Posible Causa'] = 'Venta empresa' 
+        self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg =='VENTA EMPRESA'), 'Posible Causa'] = 'Venta empresa' 
 
         # Filtros para CD
         self.f4.loc[self.f4['Posible Causa'].isna() & (self.f4.local_agg == "CD") & self.f4[var_f4["destino"]].str.contains(r'patalla\w?|rota\w?|pantalla quebrada', na= False), 'Posible Causa'] =  'Pantallas rotas'
@@ -118,8 +118,8 @@ class CLASSIFIER_F4():
         reservado = self.f4.loc[(self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Reservado')].reset_index(drop=True).groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum().reset_index()
         cd = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "CD", var_f4['costo']].item() /1e6)
         tienda = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "TIENDA", var_f4['costo']].item() /1e6)
-        #dvd = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "DVD ADMINISTRATIVO", var_f4['costo']].item() /1e6)
-        #vent_emp = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "VENTA EMPRESA", var_f4['costo']].item() /1e6)
+        dvd = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "DVD ADMINISTRATIVO", var_f4['costo']].item() /1e6)
+        vent_emp = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "VENTA EMPRESA", var_f4['costo']].item() /1e6)
         total = '${:,.0f} M '.format(reservado[var_f4['costo']].sum() /1e6)
         return [cd,tienda,total]
 

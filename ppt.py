@@ -101,7 +101,7 @@ class PPTPY():
         f4.shapes.add_picture(f"{self.path_f4}/torta.png", Cm(1.34), Cm(10.17), height = Cm(7.13))
         tb_reserva = f4.shapes.add_textbox(Cm(22.59),Cm(14.66),width=Cm(1), height=Cm(0.1))
         tx_text_reserva = tb_reserva.text_frame.add_paragraph() 
-        tx_text_reserva.text = f"Reservado {self.f4_data[2]}"
+        tx_text_reserva.text = f"Reservado {self.f4_data[4]}"
         tx_text_reserva.font.size= Pt(14)
         
         corchete = f4.shapes.add_textbox(Cm(27.21),Cm(13.4),width=Cm(1), height=Cm(0.1))
@@ -111,7 +111,7 @@ class PPTPY():
 
         estados = f4.shapes.add_textbox(Cm(27.89), Cm(13.91), width=Cm(1), height=Cm(0.1))
         tx_estados = estados.text_frame.add_paragraph() 
-        tx_estados.text = f"Tienda {self.f4_data[1]}\nCD {self.f4_data[0]}"
+        tx_estados.text = f"Tienda {self.f4_data[1]}\nCD {self.f4_data[0]}\nDVD {self.f4_data[2]}\nVenta empresa {self.f4_data[3]}"
         tx_estados.font.size= Pt(12)
 
         registrados = f4.shapes.add_textbox(Cm(20.44),Cm(9.97),width=Cm(0.1), height=Cm(0.1))

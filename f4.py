@@ -86,8 +86,8 @@ class F4():
 
     def calculos(self):
         month = datetime.now().strftime("%m")
-        m_2022 = f'2022-{month}-01'
-        m_2021 = f'2021-{month}-01'
+        m_2022 = f'2023-{month}-01'
+        m_2021 = f'2022-{month}-01'
         mes = int(month)-1
         from data import  var_global, var_f4
         t_2022 = self.f4_21_22.loc[(self.f4_21_22[var_f4['tipo_redinv']].str.contains(r"Dado de Baja|dado de baja")) & (self.f4_21_22[var_f4['estado']].str.contains(r'Reservado|reservado')) & (self.f4_21_22[var_f4['fecha_res']] < m_2022) & (self.f4_21_22[var_f4['fecha_res']] >= '2023-01-01')  ][var_f4['costo']].sum()
