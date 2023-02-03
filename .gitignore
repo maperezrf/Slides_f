@@ -15,6 +15,7 @@ input/
 images/
 config/
 jupyters/
+JUPYTER/
 
 # Distribution / packaging
 .Python

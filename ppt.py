@@ -144,13 +144,13 @@ class PPTPY():
 
         m_2021 = f4.shapes.add_textbox(Cm(14.04),Cm(2.15),width=Cm(2.07), height=Cm(0.68))
         txt_m_2021 = m_2021.text_frame.add_paragraph() 
-        txt_m_2021.text = f"2021: {self.años[0]}"
+        txt_m_2021.text = f"2022: {self.años[0]}"
         txt_m_2021.font.size = Pt(10)
         txt_m_2021.font.color.rgb = RGBColor(0, 0, 0)
 
         m_2022 = f4.shapes.add_textbox(Cm(14.04),Cm(2.48),width=Cm(2.07), height=Cm(0.68))
         txt_m_2022 = m_2022.text_frame.add_paragraph() 
-        txt_m_2022.text = f"2022: {self.años[1]}"
+        txt_m_2022.text = f"2023: {self.años[1]}"
         txt_m_2022.font.size = Pt(10)
         txt_m_2022.font.color.rgb = RGBColor(237, 173, 8)
 

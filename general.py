@@ -48,7 +48,7 @@ def ord_mes(df,column,f = "general", orden = None):
     if f == "general":
         meses = ["Inv","Ene","Jan","Feb","Mar","Abr","Apr","May","Jun","Jul","Ago","Aug","Sep","Oct","Nov","Dic","Dec"]
     elif f == "f3":
-        meses = orden
+        meses = ["2022-Jan","2022-Feb","2022-Mar","2022-Apr","2022-May","2022-Jun","2022-Jul","2022-Aug","2022-Sep","2022-Oct","2022-Nov","2022-Dec","2023-Jan","2023-Feb","2023-Mar","2023-Apr","2023-May","2023-Jun","2023-Jul","2023-Aug","2023-Sep","2023-Oct","2023-Nov","2023-Dec"]
     elif f == "ant":
         meses = ['Menor a 30', '31 a 60', '61 a 90','91 a 120', '121 a 180','Mayor a 121', 'Mayor a 181','Total'] 
     col_mes = df[column].unique()

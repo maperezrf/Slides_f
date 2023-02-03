@@ -29,8 +29,8 @@ class F3():
         return self.path
 
     def set_f3_sin_sop (self):
-        f3_ss = pd.read_csv('input/230124-1628-221130_cf11_cd-output.csv',sep=';', dtype=str)
-        print(f'{f3_ss.shape[0]} total del archivo que ingresa')
+        f3_ss = pd.read_csv('input/221219_f3_sin_soporte.csv',sep=';', dtype=str)
+        print(f'{f3_ss} total del archivo que ingresa')
         list_f3_ss = f3_ss['NRO_DEVOLUCION'].tolist()
         self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
         print(f"{self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss)][var_f3['f3_id']].nunique()} cruzaron con planilla de f3" )
@@ -69,14 +69,14 @@ class F3():
         self.f3_env_pr_mkp = self.f3.loc[self.f3[var_f3['estado']] == 'enviado'].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
         self.f3_ab_pr_mkp =self.f3.loc[self.f3[var_f3['estado']].isin(var_f3['abiertos'])].reset_index(drop = True)  # [x] leer desde var_f3 = filtro_tp # [x] si es variable global entonces debe ir en el init o en inialización 
         self.f3_ab_mkp = self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp[var_f3['tipo_producto']] ==var_f3['tipo_tp'][1]].reset_index(drop = True) # [x] si es variable global entonces debe ir en el init o en inialización
-        self.f3_env_pr_mkp['mes_env'] = self.f3_env_pr_mkp[var_f3['fecha_envio']].apply(lambda x : x.strftime('%b')) 
+        self.f3_env_pr_mkp['mes_env'] = self.f3_env_pr_mkp[var_f3['fecha_envio']].apply(lambda x : x.strftime('%Y-%b')) 
         self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp['age'] == 'Menor a 30' ,'mayor a 30'] = 'n'
         self.f3_env_pr_mkp.loc[self.f3_env_pr_mkp['age'] != 'Menor a 30' ,'mayor a 30'] = 'y'
         self.set_cortes(f3_cerrados)
 
     def set_cortes(self, f3_cerrado):
         orden_x = []
-        fecha_in = "2022-07-01"
+        fecha_in = "2022-09-01"
         f_in = datetime.strptime(fecha_in,'%Y-%m-%d')
         f_fin = f_in + timedelta(days=7)
         while f_fin <= datetime.now():
@@ -197,7 +197,7 @@ class F3():
     def grap_f3_ab(self, grupo_F3_prd_mkp, orden, axes_y, f3_total_3m, f3_mkp_3m, f3_prd_3m, titulo):
         colores = unif_colors(grupo_F3_prd_mkp, var_f3['tipo_producto'])
         range_y = grupo_F3_prd_mkp[axes_y].max()
-        orden_mes = ord_mes(grupo_F3_prd_mkp, 'mes_env')
+        orden_mes = ord_mes(grupo_F3_prd_mkp, 'mes_env',"f3")
         fig = px.bar(grupo_F3_prd_mkp, x = 'mes_env', y = axes_y, labels = {'mes_env':'Mes de envio', var_f3['costo']: 'Costo promedio', var_f3['tipo_producto']:'Tipo producto'}, text = axes_y, text_auto = '.2s', color = var_f3['tipo_producto'], color_discrete_map = colores, category_orders = {'mes_env' : orden_mes ,var_f3['tipo_producto']:orden})
         fig.update_layout(legend = dict(orientation = "h", yanchor = "bottom", xanchor = "right",x = 1,y = 1), title = {'text': titulo, 'y' :0.99,'x' : 0, 'yanchor' : 'top'},)
         fig.update_layout(font=dict(size = 14))   
@@ -206,7 +206,7 @@ class F3():
         fig.add_annotation(x = orden_mes[0], y = (range_y * 60/100) + range_y, text = f'Total > 30 días = {f3_total_3m}', showarrow = False, font = dict (color = 'red',size = 14))
         fig.add_annotation(x = orden_mes[0], y = range_y + (range_y * 35/100), text = f'Producto > 30 días = {f3_prd_3m} <br>Market place > 30 días = {f3_mkp_3m}',showarrow = False, font = dict (color = 'red',size = 14))
         fig.update_annotations(align = 'left')
-        fig.update_yaxes(range = [0,grupo_F3_prd_mkp[axes_y].max() + (grupo_F3_prd_mkp[axes_y].max() * 0.8)], constrain = 'domain')
+        fig.update_yaxes(range = [0,grupo_F3_prd_mkp[axes_y].max() + (grupo_F3_prd_mkp[axes_y].max() * 0.9)], constrain = 'domain')
         return fig
     
     def grap_mkp_x_sede(self, mkp_sede, column):
