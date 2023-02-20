@@ -244,7 +244,7 @@ class F4():
         orden = ord_num(f4_x_semanas,'local_agg',var_f4['costo']) # TODO leer desde var_f4
         self.grafica_f4_sem = px.bar(f4_x_semanas, x = 'Semana (fecha de reserva)', y = var_f4['costo'], labels = {var_f4['costo']: 'Total costo','local_agg':'Local'}, text = var_f4['costo'], # TODO leer desde var_f4
         text_auto = '.2s', color = 'local_agg', color_discrete_map = colores, category_orders = {'local_agg' :orden}) # TODO leer desde var_f4
-        self.grafica_f4_sem.update_layout(legend = dict(orientation = 'h', yanchor = 'bottom', xanchor = 'left',x = 0,y = 1), font = dict(size = 14), margin=dict(l=0,r=10,t=100), title={'text':'Creación F4 dados de baja por semana - 2022','y':0.99,'x':0.5,'yanchor': 'top'})
+        self.grafica_f4_sem.update_layout(legend = dict(orientation = 'h', yanchor = 'bottom', xanchor = 'left',x = 0,y = 1), font = dict(size = 14), margin=dict(l=0,r=10,t=100), title={'text':'Creación F4 dados de baja por semana','y':0.99,'x':0.5,'yanchor': 'top'})
 
     def grap_bar(self, f4_x_años):
         colores = unif_colors(f4_x_años,'año') # TODO leer desde var_f4
@@ -257,14 +257,15 @@ class F4():
         
     def grap_pos_causa(self,gb_f4g_graf_21): 
         total = f'{gb_f4g_graf_21[var_f4["costo"]].sum():,.0f}'
-        gb_f4g_graf_21 = gb_f4g_graf_21.loc[~gb_f4g_graf_21['mes'].isin(['Inventario', 'Jan', 'Feb', 'Mar','Apr'])]
+        # gb_f4g_graf_21 = gb_f4g_graf_21.loc[~gb_f4g_graf_21['mes'].isin(['Inventario', 'Jan', 'Feb'])]
+        print(gb_f4g_graf_21['mes'].unique())
         colores = unif_colors(gb_f4g_graf_21,'local_agg') # TODO leer desde var_f4
         orden = gb_f4g_graf_21.sort_values(var_f4['costo'], ascending = False)['Posible Causa'].unique() # TODO leer desde var_f4
         gb_f4g_graf_21[var_f4['costo']] = gb_f4g_graf_21[var_f4['costo']]/1e6
         self.graf_f4_pos_causa = px.bar(gb_f4g_graf_21, y = 'Posible Causa', x = var_f4['costo'] , color = 'local_agg',text = var_f4['costo'],text_auto = '.2s', # TODO leer desde var_f4
-        title = f'Posibles causas de F4 2022 dados de baja por locales - Total costo $ {total} M ', 
+        title = f'Posibles causas de F4 dados de baja por locales - Total costo $ {total} M ', 
         labels = {'Posible Causa':'Posibles causas',var_f4['costo']:'Costo total (Millones)', 'local_agg':'Local', 'mes':'Mes de reserva'}, 
-        facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['May', 'Jun','Jul' , 'Aug','Sep','Oct', 'Nov', 'Dec']}, color_discrete_map = colores) # TODO leer desde var_f4
+        facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['Inventario', 'Jan', 'Feb']}, color_discrete_map = colores) # TODO leer desde var_f4
         self.graf_f4_pos_causa.update_layout(legend = dict(yanchor = 'bottom', y = 0.05, xanchor = 'right', x = 1))
 
     def grap_pie(self, gb_local):
@@ -275,7 +276,7 @@ class F4():
     
     def grap_pie_lineas(self, f4_linea):
 
-        self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea en 2023')
+        self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea')
         self.fig_torta_linea.update_traces( textposition='inside', textinfo = 'percent')
         self.fig_torta_linea.update_layout(font_size=16,legend=dict(yanchor = 'top',xanchor='right', orientation = 'h',y = 0,x = 0.8),font=dict(size=15), margin= dict(l=0,r=0) )
     
@@ -283,7 +284,7 @@ class F4():
         total = self.f4_2022[var_f4['costo']].sum()
         total_graf = '${:,.0f} M '.format(total/1e6)
         self.fig_clasificado = px.bar(group_total, x=var_f4['costo'], y='Posible Causa',text=var_f4['costo'] ,text_auto='.2s',labels={var_f4['costo']: 'Costo total','Posible Causa':'Posible causa'})
-        self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f'F4 acumulados - Total acumulado 2022 {total_graf}')
+        self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f'F4 acumulados - Total acumulado {total_graf}')
     
     def grap_f4_local(self,group_local):
         orden = ord_num(group_local,'local_agg',var_f4['costo']) # TODO leer desde var_f4
@@ -392,7 +393,7 @@ class F4():
     def graf_linea_mes_mot(self ,linea_mt_mes, mes):
         print('Cambiar mes')
         self.fig_linea_mes_mot = px.bar(linea_mt_mes, x = var_f4['desc_linea'],y = var_f4['costo'], text = var_f4['costo'],color = 'Posible Causa', text_auto ='.2s', barmode = 'group', labels = {var_f4['costo']:'Costo total', var_f4['desc_linea']:'Línea'}) # TODO leer desde var_f4
-        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: Enero'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
+        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: Febrero'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
         self.fig_linea_mes_mot.update_yaxes(range = [0, linea_mt_mes[var_f4['costo']].max() + (linea_mt_mes[var_f4['costo']].max() * 0.25)], constrain = 'domain')
         self.fig_linea_mes_mot.update_traces(textangle = 90, textposition = 'outside')
 
