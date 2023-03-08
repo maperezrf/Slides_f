@@ -54,12 +54,12 @@ class F5():
     def group_by(self):
         print('Generando tablas...')
         f5_2 = self.f5.groupby(['age','Estado'])['TOTAL_COST'].sum().reset_index()
-        f5_list = self.f5.loc[self.f5['Estado'] == 'Enviados'].groupby(['NAME_REC'])['TOTAL_COST'].sum().sort_values(ascending = False).reset_index()['NAME_REC'][0:10]
-        self.f5_env = self.f5.loc[(self.f5['Estado'] == 'Enviados') & (self.f5['NAME_REC'].isin(f5_list))]
+        f5_list = self.f5.loc[self.f5['Estado'] == 'Enviado'].groupby(['NAME_REC'])['TOTAL_COST'].sum().sort_values(ascending = False).reset_index()['NAME_REC'][0:10]
+        self.f5_env = self.f5.loc[(self.f5['Estado'] == 'Enviado') & (self.f5['NAME_REC'].isin(f5_list))]
         self.f5_env.rename(columns={'NAME_REC' : 'Local que recibe'}, inplace=True)
 
-        f5_list = self.f5.loc[self.f5['Estado'] == 'Reservados'].groupby(['NAME_SHIP'])['TOTAL_COST'].sum().sort_values(ascending = False).reset_index()['NAME_SHIP'][0:10]
-        self.f5_res = self.f5.loc[(self.f5['Estado'] == 'Reservados') & (self.f5['NAME_SHIP'].isin(f5_list))]
+        f5_list = self.f5.loc[self.f5['Estado'] == 'Reservado'].groupby(['NAME_SHIP'])['TOTAL_COST'].sum().sort_values(ascending = False).reset_index()['NAME_SHIP'][0:10]
+        self.f5_res = self.f5.loc[(self.f5['Estado'] == 'Reservado') & (self.f5['NAME_SHIP'].isin(f5_list))]
         self.f5_res.rename(columns={'NAME_SHIP' : 'Local que envia'}, inplace=True)
 
         self.tb_env = make_tables(self.f5_env, 'Local que recibe', 'age', 'TOTAL_COST' , types = 'ant')

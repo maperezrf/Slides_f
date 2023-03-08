@@ -41,7 +41,7 @@ class F12():
         self.f12['DIAS'] = self.f12['DIAS'].apply(lambda x :x.days)
         self.f12 = set_antiguedad(self.f12, 'DIAS', 'f11')
         self.f12.rename(columns={'Estado Actual':'Estado'}, inplace=True)
-        self.f12.to_excel('f12.xlsx')
+        #self.f12.to_excel('f12.xlsx')
 
     def make_table(self):
         print('Generando tabla...')
@@ -57,8 +57,8 @@ class F12():
         f12_rutaSS = f12_ab.loc[(f12_ab['Estado'] == 'EN RUTA') & (f12_ab['Metodo'] == 'SITE TO STORE')]
 
         self.tabla_estado = make_tables(f12_ab,'Estado', 'age', 'Importe Total', types = 'ant' )
-        self.tabla_estadoER = make_tables(f12_digitado,'Metodo', 'age', 'Importe Total', types = 'ant' )
-        self.tabla_estadoDG = make_tables(f12_ruta,'Metodo', 'age', 'Importe Total', types = 'ant' )
+        self.tabla_estadoER = make_tables(f12_ruta,'Metodo', 'age', 'Importe Total', types = 'ant' )
+        self.tabla_estadoDG = make_tables(f12_digitado,'Metodo', 'age', 'Importe Total', types = 'ant' )
 
         self.tabla_digitadoHD = make_tables(f12_digitadoHD, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
         self.tabla_digitadoPS = make_tables(f12_digitadoPS, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
