@@ -18,7 +18,7 @@ class F3():
        self.f3 = pd.read_csv(var_f3['path_df'] + f3_name + '.csv', sep = ';', dtype = object)
        self.f3_tendencia = pd.read_excel(var_f3['trend_path'], dtype = str)
        self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f3"
-       self.set_f3_sin_sop() # Agrega categoria Producto sin soporte
+    #    self.set_f3_sin_sop() # Agrega categoria Producto sin soporte
        self.transform()
        self.set_local_agg()
        self.filters()

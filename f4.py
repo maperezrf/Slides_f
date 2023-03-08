@@ -262,7 +262,7 @@ class F4():
         orden = gb_f4g_graf_21.sort_values(var_f4['costo'], ascending = False)['Posible Causa'].unique() # TODO leer desde var_f4
         gb_f4g_graf_21[var_f4['costo']] = gb_f4g_graf_21[var_f4['costo']]/1e6
         self.graf_f4_pos_causa = px.bar(gb_f4g_graf_21, y = 'Posible Causa', x = var_f4['costo'] , color = 'local_agg',text = var_f4['costo'],text_auto = '.2s', # TODO leer desde var_f4
-        title = f'Posibles causas de F4 2022 dados de baja por locales - Total costo $ {total} M ', 
+        title = f'Posibles causas de F4 dados de baja por locales - Total costo $ {total} M ', 
         labels = {'Posible Causa':'Posibles causas',var_f4['costo']:'Costo total (Millones)', 'local_agg':'Local', 'mes':'Mes de reserva'}, 
         facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['Inventario', 'Jan','Feb']}, color_discrete_map = colores) # TODO leer desde var_f4
         self.graf_f4_pos_causa.update_layout(legend = dict(yanchor = 'bottom', y = 0.05, xanchor = 'right', x = 1))
@@ -275,7 +275,7 @@ class F4():
     
     def grap_pie_lineas(self, f4_linea):
 
-        self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea en 2023')
+        self.fig_torta_linea = px.pie(f4_linea, values = var_f4['costo'], names = var_f4['desc_linea'],color_discrete_sequence = px.colors.qualitative.Vivid , title='F4s Por línea')
         self.fig_torta_linea.update_traces( textposition='inside', textinfo = 'percent')
         self.fig_torta_linea.update_layout(font_size=16,legend=dict(yanchor = 'top',xanchor='right', orientation = 'h',y = 0,x = 0.8),font=dict(size=15), margin= dict(l=0,r=0) )
     
@@ -283,7 +283,7 @@ class F4():
         total = self.f4_2022[var_f4['costo']].sum()
         total_graf = '${:,.0f} M '.format(total/1e6)
         self.fig_clasificado = px.bar(group_total, x=var_f4['costo'], y='Posible Causa',text=var_f4['costo'] ,text_auto='.2s',labels={var_f4['costo']: 'Costo total','Posible Causa':'Posible causa'})
-        self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f'F4 acumulados - Total acumulado 2022 {total_graf}')
+        self.fig_clasificado.update_layout(yaxis_categoryorder = 'total ascending', title = f'F4 acumulados - Total acumulado {total_graf}')
     
     def grap_f4_local(self,group_local):
         orden = ord_num(group_local,'local_agg',var_f4['costo']) # TODO leer desde var_f4

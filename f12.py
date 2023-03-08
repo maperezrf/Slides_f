@@ -16,8 +16,7 @@ class F12():
         self.fecha_corte = fc
         self.f12 = pd.read_csv(var_f12['path_df'] + f12_name + '.csv', sep = ';', dtype = object)
         self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f12"
-        self.NS=pd.read_csv('input\Sabana_NS.csv', sep = ';', dtype = object)
-        self.NS1=self.NS[['NFOLIO', 'METODO_DE_DESPACHO']]
+        self.NS1 = pd.read_csv('input\Sabana_NS.csv', sep = ';', dtype = object, usecols=['NFOLIO', 'METODO_DE_DESPACHO'])
         self.transform()
         self.set_age_f12()
         self.make_table()
