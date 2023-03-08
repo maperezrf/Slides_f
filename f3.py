@@ -29,7 +29,7 @@ class F3():
         return self.path
 
     def set_f3_sin_sop (self):
-        f3_ss = pd.read_csv('input/221219_f3_sin_soporte.csv',sep=';', dtype=str)
+        f3_ss = pd.read_csv('input/230217_f3_sin_soporte.csv',sep=';', dtype=str)
         print(f'{f3_ss} total del archivo que ingresa')
         list_f3_ss = f3_ss['NRO_DEVOLUCION'].tolist()
         self.f3.loc[self.f3[var_f3['f3_id']].isin(list_f3_ss) ,'tipo_producto'] = 'Producto, sin soporte'
@@ -76,7 +76,7 @@ class F3():
 
     def set_cortes(self, f3_cerrado):
         orden_x = []
-        fecha_in = "2022-09-01"
+        fecha_in = "2023-01-01"
         f_in = datetime.strptime(fecha_in,'%Y-%m-%d')
         f_fin = f_in + timedelta(days=7)
         while f_fin <= datetime.now():
@@ -184,11 +184,11 @@ class F3():
 
     # Gráficas 
     def grap_cortes(self, df, column, titulo, etiquetas, orden_c):
-        orden_y = ord_mes(df, 'Cortes_cerra', "f3", orden_c)
+        orden_y = ord_mes(df, 'Cortes_cerra', "f3_semanas", orden_c)
         orden_x = ord_num(df, var_f3['estado'],column)
         graf_F3_cerr_prd = px.bar(df, x='Cortes_cerra', y=column, labels = etiquetas, text = column, text_auto='.2s',  category_orders={var_f3['estado']:orden_x,
             "Cortes_cerra":orden_y}, color = 'descripcion6', color_discrete_sequence=['rgb(118, 78, 159)','rgb(218, 165, 27)'], title = titulo)
-        graf_F3_cerr_prd.update_layout(legend = dict(yanchor = "bottom", xanchor = "left", orientation = "h", y = 1))
+        graf_F3_cerr_prd.update_layout(legend = dict(yanchor = "bottom", xanchor = "left", orientation = "h",y=1))
         graf_F3_cerr_prd.update_yaxes(range = [0, df[column].max() + (df[column].max() * 0.25)], constrain ='domain')
         graf_F3_cerr_prd.update_layout(font=dict(size = 14))   
         graf_F3_cerr_prd.update_layout(margin_r=20, margin_t=60)
@@ -264,7 +264,7 @@ class F3():
         self.graf_mkp_sede.write_image(f'{self.path}/f3_abierto_sede.png',width=600, height=400, engine='orca')
         self.graf_tend_mkp.write_image(f'{self.path}/f3_tendencia_mkp.png',width=500, height=400, engine='orca')
         self.graf_tend_prod.write_image(f'{self.path}/f3_tendencia_Producto.png',width=500, height=400, engine='orca')
-        self.fig_prd_costo.write_image(f'{self.path}/f3_cerrado_producto_costo.png',width=500, height=400, engine='orca')
+        self.fig_prd_costo.write_image(f'{self.path}/f3_cerrado_producto_costo.png',width=700, height=400, engine='orca')
         self.fig_mkp_costo.write_image(f'{self.path}/f3_cerrado_mkp_costo.png',width=500, height=400, engine='orca')
         self.generate_table().write_image(f'{self.path}/f3_tabla_res_env.png',width=1300, height=120, engine='orca')
 

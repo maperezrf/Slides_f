@@ -1,5 +1,7 @@
 import pandas as pd
+import plotly
 import plotly.express as px
+plotly.io.orca.config.save()
 from   datetime import timedelta, datetime
 from calendar import monthrange
 from data import  var_global, var_f4
@@ -19,13 +21,14 @@ class F4():
         self.f4_2022 =  f4_clasificada
         self.f4_2021 = pd.read_csv(var_f4["path_f4_2021"],sep =';', dtype = str) # TODO leer path desde var_f3
         self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f4"
+        self.date_filter = '2023-01-01'
         self.concat_f4_21_22()
         self.date_filter = '2022-06-01'
         self.transform()
         self.filters()
         self.set_week_f4()
-        # self.make_groupby()
-        # self.save_grap()
+        self.make_groupby()
+        self.save_grap()
 
     def get_path(self):
         return self.path
@@ -67,25 +70,7 @@ class F4():
     def set_week_f4(self):
         self.f4_sem = self.f4_2022_res.copy()
         self.f4_sem.loc[self.f4_sem.mes == 'Inventario' ,'mes'] = 'Jan' # TODO leer desde var_f4
-        lista_mes = self.f4_sem.mes.unique() # TODO leer desde var_f4
-        f_inicio  = datetime.strptime('2022/05/01 23:59', '%Y/%m/%d %H:%M') # TODO leer desde var_f4
-        f_cortes = f_inicio
-        for mes in enumerate(lista_mes):
-            sem = 0            
-            while f_cortes <= self.f4_sem.loc[self.f4_sem.mes == mes[1], var_f4['fecha_res']].max(): # TODO leer desde var_f4
-                sem = sem + 1
-                f_cortes = f_inicio + timedelta(days = 7)
-                if sem == 4:
-                    dias = monthrange(2021,mes[0]+1)[1]
-                    if dias == 28:
-                        f_cortes = f_cortes - timedelta(days = 4)
-                    elif dias == 30:
-                        f_cortes = f_cortes - timedelta(days = 2) 
-                    elif dias == 31:
-                        f_cortes = f_cortes - timedelta(days = 1)
-                self.f4_sem.loc[(self.f4_sem[var_f4['fecha_res']] >= f_inicio) & (self.f4_sem[var_f4['fecha_res']] <= f_cortes), 'Semana (fecha de reserva)'] = f"S{sem}{f_cortes.strftime('%b')}"
-                f_inicio = f_cortes + timedelta(days = 1)
-
+        self.f4_sem["Semana (fecha de reserva)"] = self.f4_sem[var_f4['fecha_res']].apply(lambda x : f"Sem {x.isocalendar().week}")
 
     def calculos(self):
         month = datetime.now().strftime("%m")
@@ -162,10 +147,10 @@ class F4():
 
         mes = int(datetime.now().strftime('%m'))
         # print('Cambiar mes de grafica, linea mes')
-        top_5_lin = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2023-01-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-02-01')].groupby([var_f4['desc_linea']])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)['PROD_CAT_DESC'].unique()
+        top_5_lin = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2023-03-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-04-01')].groupby([var_f4['desc_linea']])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)['PROD_CAT_DESC'].unique()
         lista_f = []
         for i in top_5_lin:
-            lista = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2023-01-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-02-01') & (self.f4_2022_res[var_f4['desc_linea']] == i)].groupby([var_f4['desc_linea'],'Posible Causa'])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)
+            lista = self.f4_2022_res.loc[(self.f4_2022_res['FECHA_RESERVA'] >= f'2023-03-01') & (self.f4_2022_res['FECHA_RESERVA'] < f'2023-04-01') & (self.f4_2022_res[var_f4['desc_linea']] == i)].groupby([var_f4['desc_linea'],'Posible Causa'])[var_f4['costo']].sum().reset_index().sort_values(var_f4['costo'],ascending = False).head(5)
             lista_f.append(lista)
             linea_mt_mes = pd.concat(lista_f).reset_index(drop=True)
 
@@ -187,67 +172,67 @@ class F4():
         self.tb_receta = make_tables(f4_receta, var_f4['desc_local'], None ,var_f4['costo'], types="loc" )
         self.tb_bolsa = make_tables(f4_bolsa, var_f4['desc_local'], None ,var_f4['costo'],types= "loc" )
         
-        # set_columns_sum(f4_x_semanas,'Semana (fecha de reserva)',var_f4['costo'])
-        # set_columns_sum(f4_x_semanas,'local_agg',var_f4['costo'])
-        # set_columns_sum(f4_x_años,'año',var_f4['costo'])
-        # set_columns_sum(gb_local,'local_agg',var_f4['costo'])
-        # set_columns_sum(gb_f4g_graf_21, 'Posible Causa',var_f4['costo'])
-        # set_columns_sum(gb_f4g_graf_21, 'local_agg',var_f4['costo'])
-        # set_columns_sum(group_local, 'local_agg',var_f4['costo'])
-        # set_columns_sum(group_mes, 'mes',var_f4['costo'])
-        # set_columns_sum(group_mes, 'local_agg',var_f4['costo'])
-        # set_columns_sum(gb_f4mespc, 'mes',var_f4['costo'])
-        # set_columns_sum(gb_f4mespc, 'Posible Causa',var_f4['costo'])
-        # set_columns_sum(gb_f4mespc_cd, 'mes',var_f4['costo'])
-        # set_columns_sum(gb_f4mespc_cd, 'Posible Causa',var_f4['costo'])
-        # set_columns_sum(f4_linea_mes, 'mes',var_f4['costo'])
-        # set_columns_sum(f4_linea_mes, var_f4['desc_linea'],var_f4['costo'])
-        # set_columns_sum(linea_motivo,'Posible Causa',var_f4['costo'])
-        # set_columns_sum(linea_motivo, var_f4['desc_linea'],var_f4['costo'])
-        # set_columns_sum(linea_local, var_f4['desc_linea'],var_f4['costo'])
-        # set_columns_sum(linea_local, 'local_agg',var_f4['costo'])
-        # set_columns_sum(top_10_marca, var_f4['marca_'],var_f4['costo'])
-        # set_columns_sum(top_10_marca, 'mes',var_f4['costo'])
-        # set_columns_sum(marcas_calidad, 'mes',var_f4['costo'])
-        # set_columns_sum(marcas_calidad, var_f4['marca_'],var_f4['costo'])
-        # set_columns_sum(f4_pant_rotas, var_f4['marca_'],var_f4['costo'])
-        # set_columns_sum(f4_pant_rotas, 'mes',var_f4['costo'])
-        # set_columns_sum(gb_f4mes_tot, 'mes',var_f4['costo'])
-        # set_columns_sum(gb_f4mes_tot, 'Posible Causa',var_f4['costo'])
-        # set_columns_sum(gr_anulados_mes,"local_agg",var_f4['costo'])
-        # set_columns_sum(gr_f4_enviados, var_f4['tipo_redinv'], var_f4['costo'])
-        # set_columns_sum(linea_mt_mes, var_f4['desc_linea'], var_f4['costo'])
+        set_columns_sum(f4_x_semanas,'Semana (fecha de reserva)',var_f4['costo'])
+        set_columns_sum(f4_x_semanas,'local_agg',var_f4['costo'])
+        set_columns_sum(f4_x_años,'año',var_f4['costo'])
+        set_columns_sum(gb_local,'local_agg',var_f4['costo'])
+        set_columns_sum(gb_f4g_graf_21, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(gb_f4g_graf_21, 'local_agg',var_f4['costo'])
+        set_columns_sum(group_local, 'local_agg',var_f4['costo'])
+        set_columns_sum(group_mes, 'mes',var_f4['costo'])
+        set_columns_sum(group_mes, 'local_agg',var_f4['costo'])
+        set_columns_sum(gb_f4mespc, 'mes',var_f4['costo'])
+        set_columns_sum(gb_f4mespc, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(gb_f4mespc_cd, 'mes',var_f4['costo'])
+        set_columns_sum(gb_f4mespc_cd, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(f4_linea_mes, 'mes',var_f4['costo'])
+        set_columns_sum(f4_linea_mes, var_f4['desc_linea'],var_f4['costo'])
+        set_columns_sum(linea_motivo,'Posible Causa',var_f4['costo'])
+        set_columns_sum(linea_motivo, var_f4['desc_linea'],var_f4['costo'])
+        set_columns_sum(linea_local, var_f4['desc_linea'],var_f4['costo'])
+        set_columns_sum(linea_local, 'local_agg',var_f4['costo'])
+        set_columns_sum(top_10_marca, var_f4['marca_'],var_f4['costo'])
+        set_columns_sum(top_10_marca, 'mes',var_f4['costo'])
+        set_columns_sum(marcas_calidad, 'mes',var_f4['costo'])
+        set_columns_sum(marcas_calidad, var_f4['marca_'],var_f4['costo'])
+        set_columns_sum(f4_pant_rotas, var_f4['marca_'],var_f4['costo'])
+        set_columns_sum(f4_pant_rotas, 'mes',var_f4['costo'])
+        set_columns_sum(gb_f4mes_tot, 'mes',var_f4['costo'])
+        set_columns_sum(gb_f4mes_tot, 'Posible Causa',var_f4['costo'])
+        set_columns_sum(gr_anulados_mes,"local_agg",var_f4['costo'])
+        set_columns_sum(gr_f4_enviados, var_f4['tipo_redinv'], var_f4['costo'])
+        set_columns_sum(linea_mt_mes, var_f4['desc_linea'], var_f4['costo'])
         
-        # self.grap_bar_sem(f4_x_semanas)
-        # self.grap_bar(f4_x_años)
-        # self.grap_pie(gb_local)
-        # self.grap_pos_causa(gb_f4g_graf_21)
-        # self.grap_total(group_total)
-        # self.grap_f4_local(group_local)
-        # self.grap_f4_mes_local(group_mes)
-        # self.f4_mespc = f4_figs(gb_f4mespc, orden_pc, 'F4s Tienda mes/motivo')
-        # self.f4_mespc_cd = f4_figs(gb_f4mespc_cd, orden_pc_cd, 'F4s CD mes/motivo')
-        # self.f4_mespc_tot = f4_figs(gb_f4mes_tot, orden_pc_tot, 'F4s por mes y motivo total compañía')
-        # self.grap_pie_lineas(f4_linea)
-        # self.grap_f4_lina_mes(f4_linea_mes)
-        # self.grap_f4_linea_motivo(linea_motivo)
-        # self.grap_f4_linea_local(linea_local)
-        # self.grap_f4_top_10_marcas(top_10_marca)
-        # self.grap_marca_esp()
-        # self.grap_marca_averia(marcas_calidad)
-        # self.grap_pant_rotas(f4_pant_rotas)
-        # self.pie_anulados(gr_anulados)
-        # self.grap_anulados_mes(gr_anulados_mes)
-        # self.grap_enviados(gr_f4_enviados)
-        # self.graph_registradosdos(gr_f4_regis)
-        # self.graf_linea_mes_mot(linea_mt_mes, mes)
+        self.grap_bar_sem(f4_x_semanas)
+        self.grap_bar(f4_x_años)
+        self.grap_pie(gb_local)
+        self.grap_pos_causa(gb_f4g_graf_21)
+        self.grap_total(group_total)
+        self.grap_f4_local(group_local)
+        self.grap_f4_mes_local(group_mes)
+        self.f4_mespc = f4_figs(gb_f4mespc, orden_pc, 'F4s Tienda mes/motivo')
+        self.f4_mespc_cd = f4_figs(gb_f4mespc_cd, orden_pc_cd, 'F4s CD mes/motivo')
+        self.f4_mespc_tot = f4_figs(gb_f4mes_tot, orden_pc_tot, 'F4s por mes y motivo total compañía')
+        self.grap_pie_lineas(f4_linea)
+        self.grap_f4_lina_mes(f4_linea_mes)
+        self.grap_f4_linea_motivo(linea_motivo)
+        self.grap_f4_linea_local(linea_local)
+        self.grap_f4_top_10_marcas(top_10_marca)
+        self.grap_marca_esp()
+        self.grap_marca_averia(marcas_calidad)
+        self.grap_pant_rotas(f4_pant_rotas)
+        self.pie_anulados(gr_anulados)
+        self.grap_anulados_mes(gr_anulados_mes)
+        self.grap_enviados(gr_f4_enviados)
+        self.graph_registradosdos(gr_f4_regis)
+        self.graf_linea_mes_mot(linea_mt_mes, mes)
 
     def grap_bar_sem(self,f4_x_semanas):
         colores = unif_colors(f4_x_semanas, 'local_agg') # TODO leer desde var_f4
         orden = ord_num(f4_x_semanas,'local_agg',var_f4['costo']) # TODO leer desde var_f4
         self.grafica_f4_sem = px.bar(f4_x_semanas, x = 'Semana (fecha de reserva)', y = var_f4['costo'], labels = {var_f4['costo']: 'Total costo','local_agg':'Local'}, text = var_f4['costo'], # TODO leer desde var_f4
         text_auto = '.2s', color = 'local_agg', color_discrete_map = colores, category_orders = {'local_agg' :orden}) # TODO leer desde var_f4
-        self.grafica_f4_sem.update_layout(legend = dict(orientation = 'h', yanchor = 'bottom', xanchor = 'left',x = 0,y = 1), font = dict(size = 14), margin=dict(l=0,r=10,t=100), title={'text':'Creación F4 dados de baja por semana','y':0.99,'x':0.5,'yanchor': 'top'})
+        self.grafica_f4_sem.update_layout(legend = dict(orientation = 'h', yanchor = 'bottom', xanchor = 'left',x = 0,y = 1), font = dict(size = 14), margin=dict(l=0,r=10,t=100), title={'text':'Creación F4 dados de baja por semana - 2023','y':0.99,'x':0.5,'yanchor': 'top'})
 
     def grap_bar(self, f4_x_años):
         colores = unif_colors(f4_x_años,'año') # TODO leer desde var_f4
@@ -260,15 +245,14 @@ class F4():
         
     def grap_pos_causa(self,gb_f4g_graf_21): 
         total = f'{gb_f4g_graf_21[var_f4["costo"]].sum():,.0f}'
-        # gb_f4g_graf_21 = gb_f4g_graf_21.loc[~gb_f4g_graf_21['mes'].isin(['Inventario', 'Jan', 'Feb'])]
-        print(gb_f4g_graf_21['mes'].unique())
+        #gb_f4g_graf_21 = gb_f4g_graf_21.loc[~gb_f4g_graf_21['mes'].isin(['Inventario', 'Jan', 'Feb', 'Mar','Apr'])]
         colores = unif_colors(gb_f4g_graf_21,'local_agg') # TODO leer desde var_f4
         orden = gb_f4g_graf_21.sort_values(var_f4['costo'], ascending = False)['Posible Causa'].unique() # TODO leer desde var_f4
         gb_f4g_graf_21[var_f4['costo']] = gb_f4g_graf_21[var_f4['costo']]/1e6
         self.graf_f4_pos_causa = px.bar(gb_f4g_graf_21, y = 'Posible Causa', x = var_f4['costo'] , color = 'local_agg',text = var_f4['costo'],text_auto = '.2s', # TODO leer desde var_f4
         title = f'Posibles causas de F4 dados de baja por locales - Total costo $ {total} M ', 
         labels = {'Posible Causa':'Posibles causas',var_f4['costo']:'Costo total (Millones)', 'local_agg':'Local', 'mes':'Mes de reserva'}, 
-        facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['Inventario', 'Jan', 'Feb']}, color_discrete_map = colores) # TODO leer desde var_f4
+        facet_col = 'mes', category_orders = {'Posible Causa':orden, 'mes':['Inventario', 'Jan','Feb']}, color_discrete_map = colores) # TODO leer desde var_f4
         self.graf_f4_pos_causa.update_layout(legend = dict(yanchor = 'bottom', y = 0.05, xanchor = 'right', x = 1))
 
     def grap_pie(self, gb_local):
@@ -396,7 +380,7 @@ class F4():
     def graf_linea_mes_mot(self ,linea_mt_mes, mes):
         print('Cambiar mes')
         self.fig_linea_mes_mot = px.bar(linea_mt_mes, x = var_f4['desc_linea'],y = var_f4['costo'], text = var_f4['costo'],color = 'Posible Causa', text_auto ='.2s', barmode = 'group', labels = {var_f4['costo']:'Costo total', var_f4['desc_linea']:'Línea'}) # TODO leer desde var_f4
-        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: Febrero'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
+        self.fig_linea_mes_mot.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 15, uniformtext_mode = 'show', legend = dict(yanchor = 'auto',xanchor = 'right', orientation = 'v',y = 1), title = {'text': f'Top 5 línea posible causa: Marzo'}, margin=dict(t=100,l=0,r=0),font=dict(size=14))
         self.fig_linea_mes_mot.update_yaxes(range = [0, linea_mt_mes[var_f4['costo']].max() + (linea_mt_mes[var_f4['costo']].max() * 0.25)], constrain = 'domain')
         self.fig_linea_mes_mot.update_traces(textangle = 90, textposition = 'outside')
 

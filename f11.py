@@ -18,7 +18,7 @@ class F11():
     def __init__(self, frango, fcorte, f11_name) -> None:
         self.fcorte = fcorte
         self.rango_fechas = frango
-        self.f11 = pd.read_csv(var_f11['path_df'] + f11_name + '.csv', dtype='object', sep=';', encoding= 'latin-1')
+        self.f11 = pd.read_csv(var_f11['path_df'] + f11_name + '.csv', dtype='object', sep=';')
         self.path = f"{var_global['path_cortes']}/{fcorte}_corte/images/f11"
         self.transform()
         self.f11 = self.f11.sort_values(var_f11['fech_creacion'])

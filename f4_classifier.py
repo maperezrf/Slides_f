@@ -118,10 +118,10 @@ class CLASSIFIER_F4():
         reservado = self.f4.loc[(self.f4[var_f4['tipo_redinv']] == "Dado de Baja") & (self.f4[var_f4['estado']] =='Reservado')].reset_index(drop=True).groupby([var_f4["estado"],"local_agg"])[[var_f4["costo"]]].sum().reset_index()
         cd = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "CD", var_f4['costo']].item() /1e6)
         tienda = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "TIENDA", var_f4['costo']].item() /1e6)
-        # dvd = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "DVD ADMINISTRATIVO", var_f4['costo']].item() /1e6)
-        # vent_emp = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "VENTA EMPRESA", var_f4['costo']].item() /1e6)
+        dvd = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "DVD ADMINISTRATIVO", var_f4['costo']].item() /1e6)
+        #vent_emp = '${:,.0f} M '.format(reservado.loc[reservado["local_agg"] == "VENTA EMPRESA", var_f4['costo']].item() /1e6)
         total = '${:,.0f} M '.format(reservado[var_f4['costo']].sum() /1e6)
-        return [cd,tienda,total]
+        return [cd,tienda,dvd,total]
 
     def print_data(self,reg_clasificados,reg_sin_clasificar,reg_sin_marca,montos_estado):
         print(f"\nCantidad de registros clasificados posible causa: {reg_clasificados}")
