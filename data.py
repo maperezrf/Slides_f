@@ -33,7 +33,7 @@ var_f11 = {
 
 var_f4 = {
     'path_df':f"{path_ea}/DATA/F4/",
-    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4_2022_prueba31.csv',
+    'path_f4_2021':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/f4bi.csv',
     'path_df_clas':'output/220406_corte/classifier/220406_f4_clasificado.csv',
     'f4_id':'CTECH_KEY',
     'marcas_df':f'{path_ea}/SEGUIMIENTO-FS/repositorio_fs/Marcas.xlsx',
@@ -48,7 +48,7 @@ var_f4 = {
     'local' : 'LOC_ID',
     'costo' : 'TOTAL_COSTO',
     'desc_linea': 'PROD_CAT_DESC',
-    'marca_':'PROD_BRAND_ID',
+    'marca_':'MARCA',
     'desc_local':'LOC_NAME',
     'linea':'PROD_CAT_ID',
     'nombre_prod':'PROD_NAME'

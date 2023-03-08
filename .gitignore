@@ -6,6 +6,7 @@ __pycache__/
 /output
 /cierres_f11
 /jupyters
+app.py
 
 # C extensions
 *.so

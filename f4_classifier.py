@@ -39,11 +39,11 @@ class CLASSIFIER_F4():
         self.f4['mes_creacion'] = self.f4[var_f4['fecha_creacion']].dt.strftime('%b')
         self.f4['Posible Causa'] = np.nan
         for i in const.fechas_inv:
-            self.f4.loc[(self.f4[var_f4['local']] == i) & (self.f4[var_f4['fecha_res']] <= const.fechas_inv[i]),"mes"] = "Inventario"
+            self.f4.loc[(self.f4[var_f4['local']] == i) & (self.f4[var_f4['fecha_res']] <= const.fechas_inv[i]) & (self.f4[var_f4['fecha_res']] >= "2023-01-01"),"mes"] = "Inventario"
+        self.f4.loc[self.f4['mes']=='Inventario', 'mes_res_num'] = 0
+        self.f4.loc[(self.f4['FECHA_RESERVA'].notna()) & (self.f4['mes_res_num'].isna()),'mes_res_num'] = self.f4.loc[(self.f4['FECHA_RESERVA'].notna()) & (self.f4['mes_res_num'].isna()),'FECHA_RESERVA'].apply(lambda x : x.strftime('%m'))
         self.f4[var_f4['destino']] = self.f4[var_f4['destino']].str.lower()
         
-        
-    
     def set_local_agg(self):
         self.f4.loc[self.f4[var_f4["local"]].isin(const.tienda), 'local_agg'] = 'TIENDA'
         self.f4.loc[self.f4[var_f4["local"]].isin(const.cd), 'local_agg'] = 'CD'
