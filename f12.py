@@ -40,7 +40,7 @@ class F12():
         self.f12['DIAS'] = self.f12['DIAS'].apply(lambda x :x.days)
         self.f12 = set_antiguedad(self.f12, 'DIAS', 'f11')
         self.f12.rename(columns={'Estado Actual':'Estado'}, inplace=True)
-        #self.f12.to_excel('f12.xlsx')
+        self.f12.to_excel('f12.xlsx')
 
     def make_table(self):
         print('Generando tabla...')
