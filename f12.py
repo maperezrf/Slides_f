@@ -38,7 +38,7 @@ class F12():
         print('Seteando edades...')
         self.f12['DIAS'] = (datetime.now() - self.f12['Fecha Pactada'])
         self.f12['DIAS'] = self.f12['DIAS'].apply(lambda x :x.days)
-        self.f12 = set_antiguedad(self.f12, 'DIAS', 'f11')
+        self.f12 = set_antiguedad(self.f12, 'DIAS', 'f12')
         self.f12.rename(columns={'Estado Actual':'Estado'}, inplace=True)
         self.f12.to_excel('f12.xlsx')
 
@@ -64,7 +64,7 @@ class F12():
         self.tabla_digitadoSS = make_tables(f12_digitadoSS, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
         
         self.tabla_rutaHD = make_tables(f12_rutaHD, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
-        self.tabla_rutaPS = make_tables(f12_rutaPS, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
+        # self.tabla_rutaPS = make_tables(f12_rutaPS, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
         self.tabla_rutaSS = make_tables(f12_rutaSS, 'Local abastecimiento', 'age', 'Importe Total', types = 'ant' )
         
 
@@ -92,7 +92,7 @@ class F12():
         self.tabla_estadoDG.write_image(f'{self.path}/tb_estadosDG.png',width=1800, height=400, engine='orca')
 
         self.tabla_rutaHD.write_image(f'{self.path}/tb_rutaHD.png',width = 1800, height=1500, engine='orca')
-        self.tabla_rutaPS.write_image(f'{self.path}/tb_rutaPS.png',width = 1800, height=1500, engine='orca')
+        # self.tabla_rutaPS.write_image(f'{self.path}/tb_rutaPS.png',width = 1800, height=1500, engine='orca')
         self.tabla_rutaSS.write_image(f'{self.path}/tb_rutaSS.png',width = 1800, height=1500, engine='orca')
 
         self.tabla_digitadoHD.write_image(f'{self.path}/tb_digitadoHD.png',width= 1800, height=1500, engine='orca')

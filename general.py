@@ -53,6 +53,8 @@ def ord_mes(df,column,f = "general", orden = None):
         meses = orden
     elif f == "ant":
         meses = ['Menor a 30', '31 a 60', '61 a 90','91 a 120', '121 a 180','Mayor a 121', 'Mayor a 181','Total'] 
+    elif f== "f11_ant":
+        meses = ['Menor a 30', '31 a 45', '45 a 60', '61 a 90','91 a 120', '121 a 180','Mayor a 121', 'Mayor a 181','Total'] 
     col_mes = df[column].unique()
     list_mes = []
     for mes in meses:
@@ -88,6 +90,16 @@ def make_tables(df,rows,column,sum, f = None ,types = None):
         ord_antiguedad.insert(0, rows)
         ord_antiguedad.extend(['Total Riesgo', 'Total General'])
         pt_df = pt_df[ord_antiguedad]
+    if types == "f11_ant":
+        ord_antiguedad = ord_mes(df, 'age', 'f11_ant')
+        ord_antiguedad.insert(0, rows)
+        ord_antiguedad.append('Total General')
+        pt_df = pt_df[ord_antiguedad]
+        set_col_riesgo(pt_df, f, rows)
+        ord_antiguedad = ord_mes(df, 'age', 'f11_ant')
+        ord_antiguedad.insert(0, rows)
+        ord_antiguedad.extend(['Total Riesgo', 'Total General'])
+        pt_df = pt_df[ord_antiguedad]
     elif types == "local":
         pt_df.rename(columns={rows:"Local"},inplace=True)
         pt_df = pd.concat([pt_df.loc[pt_df["Local"] != 'Total General'].sort_values('Total General',ascending = False), pt_df.loc[pt_df["Local"] == 'Total General']])
@@ -98,7 +110,11 @@ def make_tables(df,rows,column,sum, f = None ,types = None):
                     if mes in i:
                         list_mes.append(i)
         pt_df= pt_df[["Local"]+ list_mes +['Total General']]
-
+    if f=='f5':
+        pt_df=pt_df.assign(sortkey=pt_df.index == 10)\
+                .sort_values(['sortkey','Total General'], ascending=[True, False])\
+                .drop('sortkey', axis=1)
+    
     columns = pt_df.columns.to_list()
     listado = []
     for i in columns:
@@ -108,15 +124,17 @@ def make_tables(df,rows,column,sum, f = None ,types = None):
            val[i[0]] =(i[1]/1e6)
     font_color =  ['rgb(0,0,0)' if x == 'Total' else 'rgb(0,0,0)' for x in listado[0]]
     color_fill=  ['rgb(229,236,246)' if x == 'Total' else 'rgb(255,255,255)' for x in listado[0]]
-    fig = go.Figure(data=[go.Table(header=dict(values = pt_df.columns.to_list(),font=dict(size=14,color=['rgb(0,0,0)'], family='Arial Black'),line = dict(color='rgb(50,50,50)'),fill=dict(color='rgb(229,236,246)')),
+    fig = go.Figure(data=[go.Table(header=dict(values = pt_df.columns.to_list(),font=dict(size=18,color=['rgb(0,0,0)'], family='Arial Black'),line = dict(color='rgb(50,50,50)'),fill=dict(color='rgb(229,236,246)')),
                     cells = dict(values=listado,
-                    format =  [None,'$,.0f'],font = dict(size = 13, color = [font_color]),align='center', height = 23,fill= dict(color=[color_fill]),line = dict(color='rgb(50,50,50)')))
+                    format =  [None,'$,.0f'],font = dict(size = 18, color = [font_color]),align='center', height = 30,fill= dict(color=[color_fill]),line = dict(color='rgb(50,50,50)')))
                         ])
     fig.update_layout( margin = dict(r=1,l=1,t=0,b=0))
     return fig
 
 def set_antiguedad(df, fecha_column, tipo):
     if tipo == 'f11':
+        df = set_age_f11(df,'DIAS','age')
+    elif tipo == 'f12':
         df = set_age(df,'DIAS','age')
     elif tipo == 'f3':
         for i in fecha_column:
@@ -138,9 +156,21 @@ def set_age(df, column, age):
     df.loc[(df[column] > 180), age] ='Mayor a 181'
     return df
 
+def set_age_f11(df, column, age):
+    df.loc[df[column] <30, age] = 'Menor a 30' 
+    df.loc[(df[column] >= 30) & (df[column]<=45), age] ='31 a 45'
+    df.loc[(df[column] > 45) & (df[column]<=60), age] ='45 a 60'
+    df.loc[(df[column] > 60) & (df[column]<=90), age] ='61 a 90'
+    df.loc[(df[column] > 90) & (df[column]<=120), age] ='91 a 120'
+    df.loc[(df[column] > 120)&(df[column]<=180), age]='121 a 180'
+    df.loc[(df[column] > 180), age] ='Mayor a 181'
+    return df
+
 def set_col_riesgo(df,f,rows):
     if f == 'f11':
-        col = 4
+        col = 5
+    elif f == 'f11_cl':
+        col = 3
     else:
         col = 2
     lista_col = df.loc[df[rows]!= 'Total'].iloc[:,col:-1].columns

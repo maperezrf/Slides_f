@@ -18,7 +18,7 @@ class F3():
        self.f3 = pd.read_csv(var_f3['path_df'] + f3_name + '.csv', sep = ';', dtype = object)
        self.f3_tendencia = pd.read_excel(var_f3['trend_path'], dtype = str)
        self.path = f"{var_global['path_cortes']}/{fc}_corte/images/f3"
-    #    self.set_f3_sin_sop() # Agrega categoria Producto sin soporte
+       self.set_f3_sin_sop() # Agrega categoria Producto sin soporte
        self.transform()
        self.set_local_agg()
        self.filters()
@@ -266,7 +266,7 @@ class F3():
         self.graf_tend_prod.write_image(f'{self.path}/f3_tendencia_Producto.png',width=500, height=400, engine='orca')
         self.fig_prd_costo.write_image(f'{self.path}/f3_cerrado_producto_costo.png',width=700, height=400, engine='orca')
         self.fig_mkp_costo.write_image(f'{self.path}/f3_cerrado_mkp_costo.png',width=500, height=400, engine='orca')
-        self.generate_table().write_image(f'{self.path}/f3_tabla_res_env.png',width=1300, height=120, engine='orca')
+        self.generate_table().write_image(f'{self.path}/f3_tabla_res_env.png',width=1300, height=300, engine='orca')
 
         # # Graphs x cant
         # self.graf_f3_prd_mkp_num.write_image(f'{self.path}/f3_abiertos_fecha_reserva_cant.png' ,width=600, height=350, engine='orca')

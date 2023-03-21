@@ -157,6 +157,7 @@ class F4():
 
         
         self.tb_averias = make_tables(top_10_marca.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
+        # self.tb_averias = self.tb_averias.update_layout(width=650)
         self.tb_p_rotas = make_tables(f4_pant_rotas.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
         self.tb_calidad = make_tables(marcas_calidad.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
         self.tb_loc_pant = make_tables(self.f4_2022_pant_rotas, var_f4['desc_local'], None,var_f4['costo'],types="loc")

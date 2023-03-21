@@ -60,13 +60,13 @@ class PPTPY():
         
     def slide_f11_emp_tab(self, slide, list_graf):
         f11_emp_tab = self.seguimiento_fs.slides[slide]
-        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(4.17), Cm(3.81),  width = Cm(23.41)) 
-        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(4.17), Cm(11.48), width = Cm(23.41)) 
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(1.12), Cm(3.81),  width = Cm(31.55)) 
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(1.12), Cm(11.48), width = Cm(31.55)) 
 
     def slide_f11_emp_cli(self, slide, list_graf):
         f11_emp_tab = self.seguimiento_fs.slides[slide]
-        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(4.17), Cm(3.81), width = Cm(23.41)) 
-        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(4.17), Cm(11.48), width = Cm(23.41)) 
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[0]}", Cm(1.12), Cm(3.81), width = Cm(31.55)) 
+        f11_emp_tab.shapes.add_picture(f"{self.path_f11}/{self.fecha_corte}{list_graf[1]}", Cm(1.12), Cm(11.48), width = Cm(31.55)) 
 
     def slide_f3_costo(self):
         f3 = self.seguimiento_fs.slides[12]
@@ -91,7 +91,7 @@ class PPTPY():
 
     def slide_f3_tab(self):
         f3 = self.seguimiento_fs.slides[13]
-        f3.shapes.add_picture(f"{self.path_f3}/f3_tabla_res_env.png",  Cm(4.58), Cm(5.69), width = Cm(23.41)) 
+        f3.shapes.add_picture(f"{self.path_f3}/f3_tabla_res_env.png",  Cm(1.12), Cm(5.69), width = Cm(31.55)) 
 
     def slide_f4(self):
         f4 = self.seguimiento_fs.slides[14]
