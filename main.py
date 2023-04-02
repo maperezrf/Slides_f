@@ -35,7 +35,7 @@ def f4():
         # F4 Clasificador
         f4_classifier = CLASSIFIER_F4(fecha_corte, f4_file)
         f4_clasificada = f4_classifier.get_f4_classifier()
-
+        
         # F4
         f4 = F4(f4_clasificada,fecha_corte)
         path_f4 = f4.get_path()

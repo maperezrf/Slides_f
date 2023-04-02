@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import plotly
 import plotly.express as px
 plotly.io.orca.config.save()
@@ -121,11 +122,52 @@ class F4():
         top_10_marca = aux_averia.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
         listado_marcas = self.f4_2022_averia.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10] # TODO leer desde var_f4
         top_10_marca = top_10_marca.loc[top_10_marca[var_f4['marca_']].isin(listado_marcas)].reset_index(drop = True)
+        tienda_averia = pd.pivot_table(aux_averia,values=var_f4['costo'],index=[var_f4['desc_local'],var_f4['marca_']], aggfunc=np.sum)
+        tienda_averia = tienda_averia.reset_index()
+        listado_marcas = top_10_marca.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10] # TODO leer desde var_f4
+        tienda_averia = tienda_averia.loc[tienda_averia[var_f4['marca_']].isin(listado_marcas)].reset_index(drop = True)
+        tienda_averia = tienda_averia.groupby([var_f4['desc_local']])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
+        # tienda_averia=tienda_averia.append({var_f4['desc_local']:'Total',var_f4['costo']:tienda_averia[tienda_averia.columns[1]].sum()}, ignore_index=True)
+       
+        top_10_marca_mes=aux_averia[aux_averia['mes']=='Mar']
+        top_10_marca_mes = top_10_marca_mes.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
+        listado_marcas = top_10_marca_mes.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10] # TODO leer desde var_f4
+        top_10_marca_mes = top_10_marca_mes.loc[top_10_marca_mes[var_f4['marca_']].isin(listado_marcas)].reset_index(drop = True)
+        # print(top_10_marca_mes)
+        tienda_averia_mes=aux_averia[aux_averia['mes']=='Mar']
+        tienda_averia_mes = pd.pivot_table(tienda_averia_mes,values=var_f4['costo'],index=[var_f4['desc_local'],var_f4['marca_']], aggfunc=np.sum)
+        tienda_averia_mes = tienda_averia_mes.reset_index()
+        listado_marcas = top_10_marca_mes.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10] # TODO leer desde var_f4
+        tienda_averia_mes = tienda_averia_mes.loc[tienda_averia_mes[var_f4['marca_']].isin(listado_marcas)].reset_index(drop = True)
+        tienda_averia_mes = tienda_averia_mes.groupby([var_f4['desc_local']])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
+        # tienda_averia_mes=tienda_averia_mes.append({var_f4['desc_local']:'Total',var_f4['costo']:tienda_averia_mes[tienda_averia_mes.columns[1]].sum()}, ignore_index=True)
+          
 
+    
         aux_calidad = filter_change_date(self.f4_2022_calidad, self.date_filter)
         marcas_calidad = aux_calidad.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
         lista_marcas = self.f4_2022_calidad.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10]
         marcas_calidad = marcas_calidad.loc[marcas_calidad[var_f4['marca_']].isin(lista_marcas)].reset_index(drop = True)  # TODO para llamar una columna usa ['col'] TODO leer desde var_f4
+        tienda_calidad = pd.pivot_table(aux_calidad,values=var_f4['costo'],index=[var_f4['desc_local'],var_f4['marca_']], aggfunc=np.sum)
+        tienda_calidad = tienda_calidad.reset_index()
+        listado_marcas = marcas_calidad.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10] # TODO leer desde var_f4
+        tienda_calidad = tienda_calidad.loc[tienda_calidad[var_f4['marca_']].isin(listado_marcas)].reset_index(drop = True)
+        tienda_calidad = tienda_calidad.groupby([var_f4['desc_local']])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
+
+        marcas_calidad_mes=aux_calidad[aux_calidad['mes']=='Mar']
+        marcas_calidad_mes = marcas_calidad_mes.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
+        lista_marcas = marcas_calidad_mes.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10]
+        marcas_calidad_mes = marcas_calidad_mes.loc[marcas_calidad_mes[var_f4['marca_']].isin(lista_marcas)].reset_index(drop = True)  # TODO para llamar una columna usa ['col'] TODO leer desde var_f4
+        tienda_calidad_mes=aux_averia[aux_averia['mes']=='Mar']
+        tienda_calidad_mes = pd.pivot_table(tienda_calidad_mes,values=var_f4['costo'],index=[var_f4['desc_local'],var_f4['marca_']], aggfunc=np.sum)
+        tienda_calidad_mes = tienda_calidad_mes.reset_index()
+        listado_marcas = marcas_calidad_mes.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index()[var_f4['marca_']].unique()[0:10] # TODO leer desde var_f4
+        tienda_calidad_mes = tienda_calidad_mes.loc[tienda_calidad_mes[var_f4['marca_']].isin(listado_marcas)].reset_index(drop = True)
+        tienda_calidad_mes = tienda_calidad_mes.groupby([var_f4['desc_local']])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
+        
+
+
+
 
         f4_pant_rotas= self.f4_2022_pant_rotas.groupby([var_f4['marca_'],'mes'])[var_f4['costo']].sum().sort_values(ascending = False).reset_index() # TODO leer desde var_f4
         orden_pc_tot = self.f4_2022_res.groupby('Posible Causa')[var_f4['costo']].sum().sort_values(ascending = False).head(7).keys()  # TODO leer desde var_f4
@@ -157,10 +199,15 @@ class F4():
 
         
         self.tb_averias = make_tables(top_10_marca.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
-        # self.tb_averias = self.tb_averias.update_layout(width=650)
+        self.tb_averias_mes = make_tables(top_10_marca_mes.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
         self.tb_p_rotas = make_tables(f4_pant_rotas.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
         self.tb_calidad = make_tables(marcas_calidad.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
+        self.tb_calidad_mes = make_tables(marcas_calidad_mes.rename(columns= {'PROD_BRAND_ID':'Marca'}) , 'Marca', "mes", var_f4['costo'],types="meses")
         self.tb_loc_pant = make_tables(self.f4_2022_pant_rotas, var_f4['desc_local'], None,var_f4['costo'],types="loc")
+        self.tb_loc_ave = make_tables(tienda_averia, var_f4['desc_local'], None,var_f4['costo'],types="loc")
+        self.tb_loc_ave_mes = make_tables(tienda_averia_mes, var_f4['desc_local'], None,var_f4['costo'],types="loc")
+        self.tb_loc_cal = make_tables(tienda_calidad, var_f4['desc_local'], None,var_f4['costo'],types="loc")
+        self.tb_loc_cal_mes = make_tables(tienda_calidad_mes, var_f4['desc_local'], None,var_f4['costo'],types="loc")
         self.tb_prod_pant = make_tables(self.f4_2022_pant_rotas, var_f4['nombre_prod'], None,var_f4['costo'],types="prod")
         self.tb_anulados = make_tables(self.f4_anulados, "local_agg", "mes_creacion", var_f4['costo'], types="local")
         self.tb_enviados = make_tables(self.f4_enviados,var_f4['tipo_redinv'], "mes", var_f4['costo'], types="local")
@@ -194,8 +241,12 @@ class F4():
         set_columns_sum(linea_local, 'local_agg',var_f4['costo'])
         set_columns_sum(top_10_marca, var_f4['marca_'],var_f4['costo'])
         set_columns_sum(top_10_marca, 'mes',var_f4['costo'])
+        set_columns_sum(top_10_marca_mes, var_f4['marca_'],var_f4['costo'])
+        set_columns_sum(top_10_marca_mes, 'mes',var_f4['costo'])
         set_columns_sum(marcas_calidad, 'mes',var_f4['costo'])
         set_columns_sum(marcas_calidad, var_f4['marca_'],var_f4['costo'])
+        set_columns_sum(marcas_calidad_mes, 'mes',var_f4['costo'])
+        set_columns_sum(marcas_calidad_mes, var_f4['marca_'],var_f4['costo'])
         set_columns_sum(f4_pant_rotas, var_f4['marca_'],var_f4['costo'])
         set_columns_sum(f4_pant_rotas, 'mes',var_f4['costo'])
         set_columns_sum(gb_f4mes_tot, 'mes',var_f4['costo'])
@@ -219,8 +270,10 @@ class F4():
         self.grap_f4_linea_motivo(linea_motivo)
         self.grap_f4_linea_local(linea_local)
         self.grap_f4_top_10_marcas(top_10_marca)
+        self.grap_f4_top_10_marcas_mes(top_10_marca_mes)
         self.grap_marca_esp()
         self.grap_marca_averia(marcas_calidad)
+        self.grap_marca_averia_mes(marcas_calidad_mes)
         self.grap_pant_rotas(f4_pant_rotas)
         self.pie_anulados(gr_anulados)
         self.grap_anulados_mes(gr_anulados_mes)
@@ -321,6 +374,19 @@ class F4():
         self.fig_f4_marca.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 12,uniformtext_mode ='show',legend = dict(yanchor = 'bottom',xanchor = 'left', orientation  = 'h',y = 1),font=dict(size=15),title={'text': 'Top 10 F4s Avería por marca y mes','y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
         self.fig_f4_marca.update_yaxes(range = [0, top_10_marca[var_f4['costo']].max() + (top_10_marca[var_f4['costo']].max() * 0.25)], constrain = 'domain')
         self.fig_f4_marca.update_traces(textangle = 90, textposition = 'outside')
+        
+
+    def grap_f4_top_10_marcas_mes(self,top_10_marca_mes):
+        top_10_marca_mes=top_10_marca_mes[top_10_marca_mes.mes.str.contains('Mar')]
+        color = unif_colors(top_10_marca_mes,'mes') # TODO leer desde var_f4
+        orden = ord_mes(top_10_marca_mes,'mes') # TODO leer desde var_f4
+        self.fig_f4_marca_mes = px.bar(top_10_marca_mes, x = var_f4['marca_'],y = var_f4['costo'],text = var_f4['costo'],color = 'mes', # TODO leer desde var_f4
+        text_auto = '.2s', barmode = 'group', labels = {var_f4['costo']:'Costo total',var_f4['desc_linea']:'Linea','mes':'Mes',var_f4['marca_'] : "Marca" }, color_discrete_map = color, category_orders = {'mes':orden}) # TODO leer desde var_f4
+        self.fig_f4_marca_mes.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 12,uniformtext_mode ='show',legend = dict(yanchor = 'bottom',xanchor = 'left', orientation  = 'h',y = 1),font=dict(size=15),title={'text': 'Top 10 F4s Avería por marca, mes actual','y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
+        self.fig_f4_marca_mes.update_yaxes(range = [0, top_10_marca_mes[var_f4['costo']].max() + (top_10_marca_mes[var_f4['costo']].max() * 0.25)], constrain = 'domain')
+        self.fig_f4_marca_mes.update_traces(textangle = 90, textposition = 'outside')
+        # print(top_10_marca_mes)
+        # tabla_tienda_averia=top_10_marca_mes.groupby([var_f4['desc_local'],'mes'])[var_f4['costo']].sum().sort_values(ascending=False).reset_index()
     
     def grap_marca_esp(self):
         self.marc = "Benefit"
@@ -344,6 +410,14 @@ class F4():
         self.fig_marcas_calidad.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 10,uniformtext_mode = 'show',legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1),font=dict(size=15),title={'text':"Top 10 F4's marcas por calidad",'y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
         self.fig_marcas_calidad.update_yaxes(range = [0, marcas_calidad[var_f4['costo']].max() + (marcas_calidad[var_f4['costo']].max() * 0.25)], constrain = 'domain')
         self.fig_marcas_calidad.update_traces(textangle = 90, textposition = 'outside')
+
+    def grap_marca_averia_mes(self, marcas_calidad_mes):
+        orden = ord_mes(marcas_calidad_mes,'mes') # TODO leer desde var_f4
+        color = unif_colors(marcas_calidad_mes,'mes') # TODO leer desde var_f4
+        self.fig_marcas_calidad_mes = px.bar(marcas_calidad_mes, x = var_f4['marca_'], y = var_f4['costo'], barmode = 'group',color = 'mes',text_auto = '.2s', color_discrete_map = color, category_orders = {'mes':orden}, labels = {var_f4['costo']:'Total costo','mes':'Mes',var_f4['marca_']:"Marca"}) # TODO leer desde var_f4
+        self.fig_marcas_calidad_mes.update_layout(xaxis_categoryorder = 'total descending', uniformtext_minsize = 10,uniformtext_mode = 'show',legend = dict(yanchor = 'bottom',xanchor = 'left', orientation = 'h',y = 1),font=dict(size=15),title={'text':"Top 10 F4's marcas por calidad",'y':0.99,'x':0.5,'yanchor': 'top'}, margin=dict(r=0,l=0,t=100))
+        self.fig_marcas_calidad_mes.update_yaxes(range = [0, marcas_calidad_mes[var_f4['costo']].max() + (marcas_calidad_mes[var_f4['costo']].max() * 0.25)], constrain = 'domain')
+        self.fig_marcas_calidad_mes.update_traces(textangle = 90, textposition = 'outside')
 
     def grap_pant_rotas(self,f4_pant_rotas):
         color = unif_colors(f4_pant_rotas,'mes') # TODO leer desde var_f4
@@ -401,14 +475,22 @@ class F4():
         self.fig_f4_linea_motivo.write_image(f'{self.path}/f4_linea_motivo.png', height = 800,  width = 1000,engine = 'orca')
         self.fig_lin_local.write_image(f'{self.path}/linea_local.png', height = 700,  width = 800, engine = 'orca')
         self.fig_f4_marca.write_image(f'{self.path}/grafica_averia_x_mes_y_marca.png', height = 900,  width = 900,engine = 'orca')
+        self.fig_f4_marca_mes.write_image(f'{self.path}/grafica_averia_x_mes_y_marca_mes.png', height = 900,  width = 900,engine = 'orca')
         self.fig_marca_locales.write_image(f'{self.path}/{self.marc}_local.png', height = 700,  width = 500, engine = 'orca')
         self.fig_marcas_calidad.write_image(f'{self.path}/marca_calidad.png', height = 700,  width = 800, engine = 'orca')
+        self.fig_marcas_calidad_mes.write_image(f'{self.path}/marca_calidad_mes.png', height = 700,  width = 800, engine = 'orca')
         self.fig_pant_rotas.write_image(f'{self.path}/pantallas_rotas.png', height = 800,  width = 650, engine = 'orca')
         self.f4_mespc_tot.write_image(f'{self.path}/mes_f4_motivo_compañia.png', height = 700,  width = 800, engine = 'orca')
         self.tb_averias.write_image(f'{self.path}/tabla_averias.png',height = 400,  width = 1300, engine = 'orca')
+        self.tb_averias_mes.write_image(f'{self.path}/tabla_averias_mes.png',height = 400,  width = 1300, engine = 'orca')
         self.tb_p_rotas.write_image(f'{self.path}/tabla_pantallas_rotas.png',height = 400,  width = 1300, engine = 'orca')
         self.tb_calidad.write_image(f'{self.path}/tabla_calidad.png',height = 370,  width = 1300, engine = 'orca')
+        self.tb_calidad_mes.write_image(f'{self.path}/tabla_calidad_mes.png',height = 370,  width = 1300, engine = 'orca')
         self.tb_loc_pant.write_image(f'{self.path}/tabla_loc_pant.png',height = 600,  width = 400, engine = 'orca')
+        self.tb_loc_ave.write_image(f'{self.path}/tabla_loc_ave.png',height = 600,  width = 400, engine = 'orca')
+        self.tb_loc_ave_mes.write_image(f'{self.path}/tabla_loc_ave_mes.png',height = 600,  width = 400, engine = 'orca')
+        self.tb_loc_cal.write_image(f'{self.path}/tabla_loc_cal.png',height = 600,  width = 400, engine = 'orca')
+        self.tb_loc_cal_mes.write_image(f'{self.path}/tabla_loc_cal_mes.png',height = 600,  width = 400, engine = 'orca')
         self.tb_prod_pant.write_image(f'{self.path}/tabla_prod_pant.png',height = 340,  width = 600, engine = 'orca')
         self.fig_torta_anu.write_image(f'{self.path}/pie_anulados.png',height = 400,  width = 400, engine = 'orca')
         self.graf_anul_mes.write_image(f'{self.path}/anulados_mes.png',height = 350,  width = 800, engine = 'orca')
